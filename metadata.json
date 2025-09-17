@@ -1,0 +1,8 @@
+{
+  "name": "AURA - International Dating",
+  "description": "A cinematic, premium international dating application with a unique, immersive user experience. It features a vertical discovery feed, and a micro-gift monetization system designed to foster genuine connections.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
