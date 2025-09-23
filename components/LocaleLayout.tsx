@@ -1,25 +1,28 @@
-// FIX: Creating the `LocaleLayout` component to provide contexts and render child routes.
 import React from 'react';
-import { Outlet, useParams, Navigate } from 'react-router-dom';
+import { Outlet, useParams } from 'react-router-dom';
 import { LocaleProvider } from '../contexts/LocaleContext';
 import { UserProvider } from '../contexts/UserContext';
+import BottomNavBar from './BottomNavBar';
 
 const LocaleLayout: React.FC = () => {
     const { locale } = useParams<{ locale: string }>();
 
-    // This is a simple validation. A real app would have a more robust system.
-    if (!locale || !/^[a-z]{2}(-[a-z]{2})?$/i.test(locale)) {
-      // Redirect to a default/detected locale if the URL is malformed
-      const detectedLocale = navigator.language || 'en-US';
-      return <Navigate to={`/${detectedLocale}`} replace />;
+    if (!locale) {
+        // This case should ideally be handled by the router redirecting from '/',
+        // but it's good practice to have a fallback.
+        return <div>Loading locale...</div>;
     }
 
     return (
         <LocaleProvider locale={locale}>
             <UserProvider>
-                {/* This div represents the main app container */}
-                <div className="h-screen w-screen bg-[#120B2E] text-white font-sans overflow-hidden">
-                    <Outlet />
+                <div className="h-screen w-screen bg-[#120B2E] text-white flex flex-col">
+                    {/* Main content area that fills the available space */}
+                    <main className="flex-1 min-h-0">
+                        <Outlet />
+                    </main>
+                    {/* Nav bar is now part of the flex layout, not fixed */}
+                    <BottomNavBar />
                 </div>
             </UserProvider>
         </LocaleProvider>

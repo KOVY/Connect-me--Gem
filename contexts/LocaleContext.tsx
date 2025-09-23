@@ -1,20 +1,8 @@
 import React, { createContext, useContext, useMemo } from 'react';
 import { LocaleContextState, SupportedLanguage, SupportedCountry, SupportedCurrency } from '../types';
+import { parseLocaleParts } from '../utils/locale';
 
 const LocaleContext = createContext<LocaleContextState | null>(null);
-
-const getCurrencyFromCountry = (country: SupportedCountry): SupportedCurrency => {
-    switch (country) {
-        case 'CZ': return 'CZK';
-        case 'DE':
-        case 'FR':
-        case 'ES':
-        case 'IT': return 'EUR';
-        case 'GB': return 'GBP';
-        case 'US':
-        default: return 'USD';
-    }
-}
 
 interface LocaleProviderProps {
     children: React.ReactNode;
@@ -23,13 +11,11 @@ interface LocaleProviderProps {
 
 export const LocaleProvider: React.FC<LocaleProviderProps> = ({ children, locale }) => {
     const contextValue = useMemo<LocaleContextState>(() => {
-        const [langPart, countryPart] = locale.toLowerCase().split('-');
-        const language = (['en', 'cs'].includes(langPart) ? langPart : 'en') as SupportedLanguage;
-        const country = (countryPart?.toUpperCase() ?? 'US') as SupportedCountry;
-        const currency = getCurrencyFromCountry(country);
-
+        // Normalize the locale to lowercase to ensure consistency throughout the app.
+        const normalizedLocale = locale.toLowerCase();
+        const { language, country, currency } = parseLocaleParts(normalizedLocale);
         return {
-            locale,
+            locale: normalizedLocale,
             language,
             country,
             currency,

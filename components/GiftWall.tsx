@@ -6,11 +6,27 @@ import { useLocale } from '../contexts/LocaleContext';
 
 interface GiftWallProps {
   onUnlock: () => void;
+  isLoggedIn: boolean;
 }
 
-const GiftWall: React.FC<GiftWallProps> = ({ onUnlock }) => {
+const GiftWall: React.FC<GiftWallProps> = ({ onUnlock, isLoggedIn }) => {
   const { t } = useTranslations();
   const { locale } = useLocale();
+
+  if (!isLoggedIn) {
+      return (
+        <div className="bg-black/30 backdrop-blur-md rounded-2xl p-6 text-center border border-white/10 max-w-md">
+            <h3 className="text-xl font-bold aurora-text">{t('login_to_chat_title')}</h3>
+            <p className="text-white/70 mt-2 mb-6">{t('login_to_chat_prompt')}</p>
+            <Link 
+                to={`/${locale}/login`}
+                className="px-8 py-3 rounded-full aurora-gradient font-semibold transition-transform hover:scale-105"
+            >
+                {t('login')}
+            </Link>
+        </div>
+      )
+  }
 
   return (
     <div className="bg-black/30 backdrop-blur-md rounded-2xl p-6 text-center border border-white/10">

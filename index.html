@@ -1,73 +1,102 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AURA - International Dating</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* Basic reset and global styles */
         body {
-            font-family: 'Manrope', sans-serif;
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+                'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+                sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            background-color: #120B2E; /* Match the app's theme */
+            color: white;
+            overscroll-behavior: none; /* Prevents pull-to-refresh */
         }
-        .scrollbar-hide::-webkit-scrollbar {
-            display: none;
+
+        #root {
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
         }
-        .scrollbar-hide {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-        .aurora-gradient {
-            background-image: linear-gradient(135deg, #FF00FF, #00FFFF);
-        }
+
+        /* Gradient Text */
         .aurora-text {
-             background: linear-gradient(135deg, #FF00FF, #00FFFF);
+            background: linear-gradient(90deg, #ff8a00, #e52e71);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-fill-color: transparent;
         }
-        @keyframes aurora-pulse {
-            0%, 100% { box-shadow: 0 0 20px rgba(255, 0, 255, 0.5), 0 0 20px rgba(0, 255, 255, 0.5); }
-            50% { box-shadow: 0 0 35px rgba(255, 0, 255, 0.8), 0 0 35px rgba(0, 255, 255, 0.8); }
+
+        /* Gradient Background */
+        .aurora-gradient {
+            background-image: linear-gradient(to right, #e52e71, #ff8a00, #e52e71);
+            background-size: 200% auto;
+            color: white;
+            transition: background-position 0.5s ease;
+        }
+        .aurora-gradient:hover {
+            background-position: right center;
+        }
+
+        /* Pulse animation for buttons */
+        @keyframes pulse-aurora {
+            0% { box-shadow: 0 0 0 0 rgba(229, 46, 113, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(229, 46, 113, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(229, 46, 113, 0); }
         }
         .aurora-pulse {
-            animation: aurora-pulse 3s infinite ease-in-out;
+            animation: pulse-aurora 2s infinite;
         }
-        /* Premium Theme Backgrounds */
-        .theme-aurora-bg {
-            background-image: linear-gradient(135deg, #FF00FF, #00FFFF);
+        
+        @keyframes end-call-pulse {
+            0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(220, 38, 38, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
         }
-        .theme-midnight-bg {
-             background-image: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-        }
-        .theme-sunset-bg {
-            background-image: linear-gradient(135deg, #ff7e5f, #feb47b);
-        }
-
-        /* VIP Badge Glow Effect */
-        .vip-badge-glow {
-            filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.8));
+        .end-call-pulse {
+            animation: end-call-pulse 2s infinite;
         }
 
-        /* Custom Toggle Switch */
-        .toggle-checkbox:checked {
-            right: 0;
-            border-color: #a855f7;
+        /* Bio text fade-in */
+        .bio-fade-in {
+            animation: fadeIn 0.3s ease-in;
         }
-        .toggle-checkbox:checked + .toggle-label {
-            background-color: #a855f7;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Animation for profile card exit */
+        @keyframes card-exit {
+            to {
+                transform: translateY(-150%) rotate(-15deg);
+                opacity: 0;
+            }
+        }
+        .animate-card-exit {
+            animation: card-exit 0.5s forwards ease-in-out;
         }
     </style>
+    <!-- TailwindCSS for utility classes -->
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
+
     <script type="importmap">
 {
   "imports": {
-    "react": "https://esm.sh/react@18.2.0",
-    "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
-    "react-router-dom": "https://esm.sh/react-router-dom@6.23.1",
-    "@google/genai": "https://esm.sh/@google/genai@0.6.0",
+    "@google/genai": "https://esm.sh/@google/genai@1.20.0",
+    "react-router-dom": "https://esm.sh/react-router-dom@6.24.1",
+    "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
+    "react": "https://esm.sh/react@18.3.1",
     "react-dom/": "https://aistudiocdn.com/react-dom@^19.1.1/",
     "react/": "https://aistudiocdn.com/react@^19.1.1/"
   }

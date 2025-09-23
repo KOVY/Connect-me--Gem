@@ -1,95 +1,77 @@
-// FIX: Creating a mock API for the application.
-import { User, Gift, CreditPackage, Transaction } from './types';
+import { User, Transaction, Gift } from './types';
 import { CREDIT_PACKAGES } from './constants';
 
-const USER_KEY = 'dating_app_user';
-
-// Mock user data
-const getInitialUser = (): User => ({
-    id: 'current_user',
+// --- SIMULATED DATABASE ---
+let MOCK_USER: User = {
+    id: 'user_123',
     name: 'Alex',
-    bio: 'Just exploring the world and looking for new connections.',
-    interests: ['photography', 'travel', 'foodie'],
-    credits: 100,
-    profilePictureUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1887&auto=format&fit=crop',
+    // FIX: Add missing 'imageUrl' property to satisfy the User interface which extends UserProfile.
+    imageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1887&auto=format&fit=crop',
+    bio: 'Just a person exploring the world. I love hiking, coding, and a good cup of tea.',
+    occupation: 'Software Engineer',
+    interests: ['Hiking', 'Coding', 'Tea'],
+    credits: 500,
     transactions: [
-        { id: 'tx1', date: '2023-10-26', description: 'Welcome bonus', amount: 100 }
+        { id: 'tx1', date: '2023-10-26', description: 'Initial credit grant', amount: 500 },
     ],
-});
-
-// Helper to simulate network delay
-const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
-
-const api = {
-    getCurrentUser: async (): Promise<User> => {
-        await delay(500);
-        const savedUser = localStorage.getItem(USER_KEY);
-        if (savedUser) {
-            return JSON.parse(savedUser);
-        }
-        const initialUser = getInitialUser();
-        localStorage.setItem(USER_KEY, JSON.stringify(initialUser));
-        return initialUser;
-    },
-
-    updateUserProfile: async (updates: Partial<User>): Promise<User> => {
-        await delay(800);
-        const user = await api.getCurrentUser();
-        const updatedUser = { ...user, ...updates };
-        localStorage.setItem(USER_KEY, JSON.stringify(updatedUser));
-        return updatedUser;
-    },
-    
-    purchaseCredits: async (packageId: string): Promise<{ user: User, transaction: Transaction }> => {
-        await delay(1200);
-        const user = await api.getCurrentUser();
-        const pkg = CREDIT_PACKAGES.find(p => p.id === packageId);
-        
-        if (!pkg) {
-            throw new Error('Credit package not found.');
-        }
-
-        const newTransaction: Transaction = {
-            id: `tx_${Date.now()}`,
-            date: new Date().toISOString().split('T')[0],
-            description: `Purchased ${pkg.credits} credits`,
-            amount: pkg.credits,
-        };
-        
-        const updatedUser: User = {
-            ...user,
-            credits: user.credits + pkg.credits,
-            transactions: [newTransaction, ...user.transactions],
-        };
-        
-        localStorage.setItem(USER_KEY, JSON.stringify(updatedUser));
-        return { user: updatedUser, transaction: newTransaction };
-    },
-
-    sendGift: async (gift: Gift, recipientName: string): Promise<{ user: User, transaction: Transaction }> => {
-        await delay(700);
-        const user = await api.getCurrentUser();
-
-        if (user.credits < gift.cost) {
-            throw new Error('Insufficient credits.');
-        }
-
-        const newTransaction: Transaction = {
-            id: `tx_${Date.now()}`,
-            date: new Date().toISOString().split('T')[0],
-            description: `Sent a ${gift.name} to ${recipientName}`,
-            amount: -gift.cost,
-        };
-        
-        const updatedUser: User = {
-            ...user,
-            credits: user.credits - gift.cost,
-            transactions: [newTransaction, ...user.transactions],
-        };
-        
-        localStorage.setItem(USER_KEY, JSON.stringify(updatedUser));
-        return { user: updatedUser, transaction: newTransaction };
-    },
+    profilePictureUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1887&auto=format&fit=crop',
 };
 
-export { api };
+// --- SIMULATED API LATENCY ---
+const apiDelay = (ms = 500) => new Promise(resolve => setTimeout(resolve, ms));
+
+// --- API FUNCTIONS ---
+
+export const fetchUserData = async (): Promise<User> => {
+    await apiDelay();
+    console.log("API: Fetched user data", MOCK_USER);
+    return JSON.parse(JSON.stringify(MOCK_USER)); // Return a copy
+};
+
+export const updateUserProfile = async (updates: Partial<Pick<User, 'name' | 'bio' | 'interests' | 'profilePictureUrl' | 'occupation'>>): Promise<User> => {
+    await apiDelay();
+    MOCK_USER = { ...MOCK_USER, ...updates };
+    console.log("API: Updated user data", MOCK_USER);
+    return JSON.parse(JSON.stringify(MOCK_USER));
+};
+
+export const processGiftPurchase = async (gift: Gift, recipientName: string): Promise<{ user: User, transaction: Transaction }> => {
+    await apiDelay(700);
+    if (MOCK_USER.credits < gift.cost) {
+        throw new Error("Insufficient credits");
+    }
+    const newTransaction: Transaction = {
+        id: `tx_${Date.now()}`,
+        date: new Date().toISOString().split('T')[0],
+        description: `Sent ${gift.name} to ${recipientName}`,
+        amount: -gift.cost,
+    };
+    MOCK_USER.credits -= gift.cost;
+    MOCK_USER.transactions.unshift(newTransaction);
+    console.log("API: Processed gift purchase", { user: MOCK_USER, transaction: newTransaction });
+    return {
+        user: JSON.parse(JSON.stringify(MOCK_USER)),
+        transaction: newTransaction
+    };
+};
+
+export const processCreditPurchase = async (packageId: string): Promise<{ user: User, transaction: Transaction }> => {
+    await apiDelay(1000);
+    const pkg = CREDIT_PACKAGES.find(p => p.id === packageId);
+    if (!pkg) {
+        throw new Error("Credit package not found");
+    }
+    const newTransaction: Transaction = {
+        id: `tx_${Date.now()}`,
+        date: new Date().toISOString().split('T')[0],
+        description: `Purchased ${pkg.credits} credits`,
+        amount: pkg.credits,
+    };
+    MOCK_USER.credits += pkg.credits;
+    MOCK_USER.transactions.unshift(newTransaction);
+    console.log("API: Processed credit purchase", { user: MOCK_USER, transaction: newTransaction });
+    return {
+        user: JSON.parse(JSON.stringify(MOCK_USER)),
+        transaction: newTransaction
+    };
+};

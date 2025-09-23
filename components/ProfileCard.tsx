@@ -1,10 +1,9 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
 import { UserProfile } from '../types';
-import { useLocale } from '../contexts/LocaleContext';
 
 interface ProfileCardProps {
   profile: UserProfile;
+  onLike?: () => void;
 }
 
 const HeartIcon: React.FC = () => (
@@ -13,24 +12,82 @@ const HeartIcon: React.FC = () => (
     </svg>
 );
 
+const BriefcaseIcon: React.FC<{className?: string}> = ({className}) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={className || "w-5 h-5"}>
+        <path fillRule="evenodd" d="M6 3.75A2.75 2.75 0 0 1 8.75 1h2.5A2.75 2.75 0 0 1 14 3.75v.443c.579.055 1.14.16 1.68.321A2.25 2.25 0 0 1 17.5 6.5v6.25a2.25 2.25 0 0 1-1.82 2.229c-.538.16-1.1.266-1.68.321v.441A2.75 2.75 0 0 1 11.25 19h-2.5A2.75 2.75 0 0 1 6 16.25v-.443a9.003 9.003 0 0 1-1.68-.321A2.25 2.25 0 0 1 2.5 13.25V6.5a2.25 2.25 0 0 1 1.82-2.23c.538-.16 1.1-.266 1.68-.321V3.75ZM8.5 7.5a.75.75 0 0 1 .75-.75h2a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1-.75-.75Z" clipRule="evenodd" />
+    </svg>
+);
 
-const ProfileCard: React.FC<ProfileCardProps> = ({ profile }) => {
-  const { locale } = useLocale();
+const TagIcon: React.FC<{className?: string}> = ({className}) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={className || "w-5 h-5"}>
+        <path d="M3.5 2A1.5 1.5 0 0 0 2 3.5v3.882a1.5 1.5 0 0 0 .44 1.06l7.25 7.25a.75.75 0 0 0 1.06 0l4.94-4.94a.75.75 0 0 0 0-1.06l-7.25-7.25A1.5 1.5 0 0 0 7.382 2H3.5ZM6.5 5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z" />
+    </svg>
+);
+
+const MapPinIcon: React.FC<{className?: string}> = ({className}) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={className || "w-5 h-5"}>
+        <path fillRule="evenodd" d="m9.69 18.933.003.001a9.7 9.7 0 0 1-1.38-1.92 9.7 9.7 0 0 1-1.12-2.31A9.7 9.7 0 0 1 6 12.31V9.75a.75.75 0 0 1 1.5 0v2.56c0 .597.107 1.18.315 1.74a8.2 8.2 0 0 0 .84 1.94l.003.001a.75.75 0 0 1-1.03.805ZM10 2a4 4 0 1 0 0 8 4 4 0 0 0 0-8ZM8.5 9a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0Z" clipRule="evenodd" />
+    </svg>
+);
+
+
+const ProfileCard: React.FC<ProfileCardProps> = ({ profile, onLike }) => {
+  const allTags = [...profile.interests, ...profile.hobbies];
+  const [isBioExpanded, setIsBioExpanded] = useState(false);
+
+  const BIO_TRUNCATE_LENGTH = 120;
+  const isBioLong = profile.bio.length > BIO_TRUNCATE_LENGTH;
+
   return (
     <div className="relative h-full w-full bg-cover bg-center" style={{ backgroundImage: `url(${profile.imageUrl})` }}>
-      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
       <div className="absolute bottom-0 left-0 p-6 text-white w-full flex flex-col items-center">
-        <div className="w-full mb-8">
+        <div className="w-full mb-4">
             <h1 className="text-4xl font-bold">{profile.name}, {profile.age}</h1>
-            <p className="text-lg mt-1 opacity-90">{profile.bio}</p>
+            <div className="flex items-center gap-4 mt-2 opacity-90">
+                <div className="flex items-center gap-2">
+                    <BriefcaseIcon className="w-5 h-5 text-white/80" />
+                    <p className="text-lg">{profile.occupation}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                    <MapPinIcon className="w-5 h-5 text-white/80" />
+                    <p className="text-lg">{profile.country}</p>
+                </div>
+            </div>
+             <div className="text-lg mt-2 opacity-90 transition-all duration-300">
+                <p key={isBioExpanded ? 'expanded' : 'collapsed'} className="bio-fade-in">
+                    {isBioLong && !isBioExpanded
+                        ? `${profile.bio.substring(0, BIO_TRUNCATE_LENGTH)}...`
+                        : profile.bio}
+                    {isBioLong && (
+                        <button
+                            onClick={() => setIsBioExpanded(!isBioExpanded)}
+                            className="font-semibold text-white/80 hover:text-white underline ml-2 bg-transparent border-none p-0 cursor-pointer"
+                            aria-expanded={isBioExpanded}
+                        >
+                            {isBioExpanded ? 'Show less' : 'Read more'}
+                        </button>
+                    )}
+                </p>
+            </div>
+            
+            <div className="mt-4 flex flex-wrap gap-2 items-center">
+                {allTags.slice(0, 5).map((tag, index) => (
+                    <div key={index} className="flex items-center gap-1.5 bg-white/10 backdrop-blur-sm rounded-full px-3 py-1 text-sm font-medium">
+                        <TagIcon className="w-4 h-4 text-white/70" />
+                        <span>{tag}</span>
+                    </div>
+                ))}
+            </div>
         </div>
-        <Link
-          to={`/${locale}/match/${profile.id}`}
-          className="relative w-20 h-20 rounded-full flex items-center justify-center transition-transform duration-300 ease-in-out hover:scale-110 active:scale-100 aurora-gradient aurora-pulse"
+        <button
+          onClick={onLike}
+          disabled={!onLike}
+          className={`relative w-20 h-20 rounded-full flex items-center justify-center transition-all duration-200 ease-in-out aurora-gradient mt-4 ${onLike ? 'hover:scale-110 active:scale-90 aurora-pulse' : 'opacity-60 cursor-default'}`}
           aria-label={`Like ${profile.name}`}
         >
          <HeartIcon />
-        </Link>
+        </button>
       </div>
     </div>
   );

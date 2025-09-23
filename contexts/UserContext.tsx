@@ -1,106 +1,86 @@
-// FIX: Implementing the UserContext to provide user data and actions throughout the application.
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { api } from '../api';
-import { User, Gift, Transaction } from '../types';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
+import { User, Transaction, Gift } from '../types';
+import * as api from '../api';
+import { calculateProfileCompleteness, getProfileCompletionSuggestions } from '../utils/profile';
 
 interface UserContextState {
-    user: User | null;
-    isLoading: boolean;
-    transactions: Transaction[];
-    fetchUser: () => Promise<void>;
-    updateUser: (updates: Partial<User>) => Promise<void>;
-    purchaseCredits: (packageId: string) => Promise<void>;
-    sendGift: (gift: Gift, recipientName: string) => Promise<void>;
+  user: User | null;
+  isLoading: boolean;
+  isLoggedIn: boolean;
+  transactions: Transaction[];
+  updateUser: (updates: Partial<Pick<User, 'name' | 'bio' | 'interests' | 'profilePictureUrl' | 'occupation'>>) => Promise<void>;
+  sendGift: (gift: Gift, recipientName: string) => Promise<void>;
+  purchaseCredits: (packageId: string) => Promise<void>;
+  profileCompleteness: number;
+  completionSuggestions: string[];
 }
 
 const UserContext = createContext<UserContextState | null>(null);
 
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [user, setUser] = useState<User | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-    const fetchUser = useCallback(async () => {
-        setIsLoading(true);
-        try {
-            // FIX: Corrected function name from api.fetchUser to api.getCurrentUser to match the implementation in api.ts.
-            const userData = await api.getCurrentUser();
-            setUser(userData);
-        } catch (error) {
-            console.error("Failed to fetch user", error);
-            setUser(null);
-        } finally {
-            setIsLoading(false);
-        }
-    }, []);
-
-    useEffect(() => {
-        fetchUser();
-    }, [fetchUser]);
-
-    const updateUser = async (updates: Partial<User>) => {
-        setIsLoading(true);
-        try {
-            const updatedUser = await api.updateUserProfile(updates);
-            setUser(updatedUser);
-        } catch (error) {
-            console.error("Failed to update user profile", error);
-            throw error;
-        } finally {
-            setIsLoading(false);
-        }
+  useEffect(() => {
+    const loadUser = async () => {
+      try {
+        const userData = await api.fetchUserData();
+        setUser(userData);
+      } catch (error) {
+        console.error("Failed to load user data", error);
+        setUser(null);
+      } finally {
+        setIsLoading(false);
+      }
     };
+    loadUser();
+  }, []);
 
-    const purchaseCredits = async (packageId: string) => {
-        setIsLoading(true);
-        try {
-            const { user: updatedUser } = await api.purchaseCredits(packageId);
-            setUser(updatedUser);
-        } catch (error) {
-            console.error("Failed to purchase credits", error);
-            throw error;
-        } finally {
-            setIsLoading(false);
-        }
-    };
-    
-    const sendGift = async (gift: Gift, recipientName: string) => {
-        if (!user || user.credits < gift.cost) {
-            throw new Error("Insufficient credits");
-        }
-        setIsLoading(true);
-        try {
-            // FIX: Destructured the response from api.sendGift to correctly extract the updated user object for the state update.
-            const { user: updatedUser } = await api.sendGift(gift, recipientName);
-            setUser(updatedUser);
-        } catch (error) {
-            console.error("Failed to send gift", error);
-            throw error;
-        } finally {
-            setIsLoading(false);
-        }
-    };
+  const updateUser = useCallback(async (updates: Partial<Pick<User, 'name' | 'bio' | 'interests' | 'profilePictureUrl' | 'occupation'>>) => {
+    const updatedUser = await api.updateUserProfile(updates);
+    setUser(updatedUser);
+  }, []);
 
-    const value = {
-        user,
-        isLoading,
-        transactions: user?.transactions ?? [],
-        fetchUser,
-        updateUser,
-        purchaseCredits,
-        sendGift,
-    };
+  const sendGift = useCallback(async (gift: Gift, recipientName: string) => {
+    if (!user || user.credits < gift.cost) {
+      throw new Error("Insufficient credits");
+    }
+    const { user: updatedUser } = await api.processGiftPurchase(gift, recipientName);
+    setUser(updatedUser);
+  }, [user]);
 
-    return (
-        <UserContext.Provider value={value}>
-            {children}
-        </UserContext.Provider>
-    );
+  const purchaseCredits = useCallback(async (packageId: string) => {
+      const { user: updatedUser } = await api.processCreditPurchase(packageId);
+      setUser(updatedUser);
+  }, []);
+
+  const profileCompleteness = useMemo(() => calculateProfileCompleteness(user), [user]);
+  const completionSuggestions = useMemo(() => getProfileCompletionSuggestions(user), [user]);
+
+
+  const value: UserContextState = {
+    user,
+    isLoading,
+    isLoggedIn: !!user,
+    transactions: user?.transactions ?? [],
+    updateUser,
+    sendGift,
+    purchaseCredits,
+    profileCompleteness,
+    completionSuggestions,
+  };
+
+  return (
+    <UserContext.Provider value={value}>
+      {children}
+    </UserContext.Provider>
+  );
 };
 
 export const useUser = (): UserContextState => {
-    const context = useContext(UserContext);
-    if (!context) {
-        throw new Error('useUser must be used within a UserProvider');
-    }
-    return context;
+  const context = useContext(UserContext);
+  if (!context) {
+    throw new Error('useUser must be used within a UserProvider');
+  }
+  return context;
 };

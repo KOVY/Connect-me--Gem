@@ -1,326 +1,313 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { GoogleGenAI, Chat } from "@google/genai";
-import { UserProfile, ChatMessage, Gift } from '../types';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+// FIX: Import from @google/genai
+import { GoogleGenAI, Chat } from '@google/genai';
+
 import { PROFILES, GIFTS } from '../constants';
+import { UserProfile, ChatMessage, Gift } from '../types';
 import { useLocale } from '../contexts/LocaleContext';
-import ChatInterface from '../components/ChatInterface';
-import GiftWall from '../components/GiftWall';
 import { useUser } from '../contexts/UserContext';
-import GiftSelectionModal from '../components/GiftSelectionModal';
 import { useTranslations } from '../hooks/useTranslations';
 import { showLocalNotification } from '../utils/notifications';
-import ApiKeyModal from '../components/ApiKeyModal';
+import signalingService from '../utils/signalingService';
 
-// Define a type for our signaling data for clarity
-type SignalingData = {
-    type: 'offer' | 'answer';
-    sdp: string;
-} | {
-    type: 'candidate';
-    candidate: RTCIceCandidateInit;
-};
-
+import ChatInterface from '../components/ChatInterface';
+import GiftWall from '../components/GiftWall';
+import GiftSelectionModal from '../components/GiftSelectionModal';
 
 const ChatPage: React.FC = () => {
-    const { userId } = useParams<{ userId: string }>();
-    const { locale } = useLocale();
-    const { user, sendGift } = useUser();
-    const { t } = useTranslations();
+  // Hooks
+  const { userId } = useParams<{ userId: string }>();
+  const navigate = useNavigate();
+  const { locale } = useLocale();
+  const { t } = useTranslations();
+  const { user, isLoggedIn } = useUser();
+  
+  // State
+  const [recipient, setRecipient] = useState<UserProfile | undefined>();
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [isSending, setIsSending] = useState(false);
+  // In a real app, this would be persisted
+  const [isChatLocked, setIsChatLocked] = useState(true); 
+  const [isGiftModalOpen, setIsGiftModalOpen] = useState(false);
+
+  // WebRTC Call State
+  const [isCallActive, setIsCallActive] = useState(false);
+  const [signalingData, setSignalingData] = useState(null);
+  
+  // Gemini AI Chat Ref
+  const chatRef = useRef<Chat | null>(null);
+
+  // Memoized Gemini API check
+  const isApiKeyMissing = useMemo(() => !process.env.API_KEY, []);
+  
+  // Find recipient profile
+  useEffect(() => {
+    const profile = PROFILES.find(p => p.id === userId);
+    if (profile) {
+      setRecipient(profile);
+    } else {
+      // Handle user not found, maybe redirect after a delay
+      setTimeout(() => navigate(`/${locale}/`), 3000);
+    }
+  }, [userId, navigate, locale]);
+
+  // Initialize Gemini Chat
+  useEffect(() => {
+    if (!recipient || isChatLocked || isApiKeyMissing || chatRef.current || !isLoggedIn) {
+        return;
+    }
     
-    const [profile, setProfile] = useState<UserProfile | null>(null);
-    const [messages, setMessages] = useState<ChatMessage[]>([]);
-    const [isSending, setIsSending] = useState(false);
-    const [isChatUnlocked, setIsChatUnlocked] = useState(false);
-    const [isGiftModalOpen, setIsGiftModalOpen] = useState(false);
-    const [isCallActive, setIsCallActive] = useState(false);
-    const [geminiChat, setGeminiChat] = useState<Chat | null>(null);
-    const [signalingData, setSignalingData] = useState<SignalingData | null>(null);
-    const [apiKey, setApiKey] = useState<string | null>(null);
-    const [isApiKeyModalOpen, setIsApiKeyModalOpen] = useState(false);
+    // FIX: Initialize GoogleGenAI with named apiKey parameter as per guidelines
+    const ai = new GoogleGenAI({apiKey: process.env.API_KEY!});
 
+    const systemInstruction = `You are ${recipient.name}, a ${recipient.age}-year-old ${recipient.occupation} from ${recipient.country}. 
+    Your personality is reflected in your bio: "${recipient.bio}". 
+    Your interests are: ${recipient.interests.join(', ')}. 
+    Your hobbies include: ${recipient.hobbies.join(', ')}.
+    Your goal is to have a friendly, engaging conversation with the user, embodying this persona. 
+    Keep your responses relatively short and conversational, like a text message. Do not reveal you are an AI.`;
 
-    const lastSeenStatus = useMemo(() => {
-        if (!profile?.lastSeen) return '';
-
-        const lastSeenDate = new Date(profile.lastSeen);
-        const now = new Date();
-        const diffInMinutes = (now.getTime() - lastSeenDate.getTime()) / (1000 * 60);
-
-        if (diffInMinutes < 5) {
-            return t('online');
+    // FIX: Create chat session using ai.chats.create
+    // FIX: Use correct model name 'gemini-2.5-flash'
+    chatRef.current = ai.chats.create({
+        model: 'gemini-2.5-flash', 
+        history: [],
+        config: {
+            systemInstruction: systemInstruction,
         }
+    });
 
-        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        const yesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+  }, [recipient, isChatLocked, isApiKeyMissing, isLoggedIn]);
+  
+   // WebRTC Signaling Effect
+  useEffect(() => {
+    if (!isCallActive || !user) return;
+
+    const listenerId = user.id;
+
+    // Set up a listener for incoming signaling messages.
+    signalingService.onMessage(listenerId, (data) => {
+      setSignalingData(data);
+    });
+
+    // When the component unmounts or the call ends, remove the listener.
+    return () => signalingService.removeListener(listenerId);
+  }, [isCallActive, user]);
+
+
+  const handleSendMessage = async (message: string) => {
+    if (!chatRef.current || isSending) return;
+
+    const userMessage: ChatMessage = {
+      id: `msg-${Date.now()}`,
+      sender: 'user',
+      type: 'text',
+      text: message,
+      timestamp: new Date().toISOString(),
+    };
+    setMessages(prev => [...prev, userMessage]);
+    
+    // Simulate reading time before showing typing indicator
+    const readingDelay = Math.random() * 1000 + 500; // 0.5s to 1.5s
+    await new Promise(resolve => setTimeout(resolve, readingDelay));
+
+    setIsSending(true);
+
+    try {
+        // FIX: Use sendMessageStream for a streaming response
+        const stream = await chatRef.current.sendMessageStream({ message });
         
-        const lastSeenDay = new Date(lastSeenDate.getFullYear(), lastSeenDate.getMonth(), lastSeenDate.getDate());
+        let aiResponseText = '';
+        let aiMessageId = '';
 
-        const timeFormatter = new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: 'numeric' });
-        const dateFormatter = new Intl.DateTimeFormat(locale, { year: 'numeric', month: 'short', day: 'numeric' });
+        for await (const chunk of stream) {
+            // FIX: Get text directly from chunk.text property
+            const chunkText = chunk.text; 
+            aiResponseText += chunkText;
 
-        if (lastSeenDay.getTime() === today.getTime()) {
-            return t('last_seen_today', { time: timeFormatter.format(lastSeenDate) });
-        }
-        if (lastSeenDay.getTime() === yesterday.getTime()) {
-            return t('last_seen_yesterday', { time: timeFormatter.format(lastSeenDate) });
-        }
-        return t('last_seen_on', { date: dateFormatter.format(lastSeenDate) });
-
-    }, [profile, t, locale]);
-
-    // Effect to check for API key on mount
-    useEffect(() => {
-        const storedKey = localStorage.getItem('gemini_api_key');
-        if (storedKey) {
-            setApiKey(storedKey);
-        } else {
-            setIsApiKeyModalOpen(true);
-        }
-    }, []);
-
-    // Effect to find profile on mount
-    useEffect(() => {
-        const foundProfile = PROFILES.find(p => p.id === userId);
-        if (foundProfile) {
-            setProfile(foundProfile);
-            setMessages([
-                { id: '1', sender: 'system', type: 'text', text: `You've matched with ${foundProfile.name}! Send a gift to start chatting.`, timestamp: new Date().toISOString() }
-            ]);
-            
-            // Simulate a "new match" notification if the tab is not active
-            if (document.hidden) {
-                showLocalNotification(
-                    t('new_match_title'),
-                    {
-                        body: t('new_match_body', { name: foundProfile.name }),
-                        icon: foundProfile.imageUrl,
-                    }
-                );
-            }
-        }
-    }, [userId, t]);
-    
-    // Effect to initialize Gemini chat when we have a profile AND an API key
-    useEffect(() => {
-        if (profile && apiKey) {
-            const ai = new GoogleGenAI({ apiKey });
-            const chat = ai.chats.create({
-                model: 'gemini-2.5-flash',
-                config: {
-                     systemInstruction: `You are ${profile.name}, a ${profile.age}-year-old from ${profile.country}. Your bio is "${profile.bio}". You are on a dating app. Be friendly, engaging, and stay in character. Keep your responses brief, like a text message.`,
-                }
-            });
-            setGeminiChat(chat);
-        }
-    }, [profile, apiKey]);
-
-    const handleSaveApiKey = (key: string) => {
-        localStorage.setItem('gemini_api_key', key);
-        setApiKey(key);
-        setIsApiKeyModalOpen(false);
-    };
-
-    const handleUnlockAndOpenModal = () => {
-        setIsGiftModalOpen(true);
-    };
-
-    const handleSendGift = async (giftId: string) => {
-        if (!profile) return;
-        const giftToSend = GIFTS.find(g => g.id === giftId);
-        if (!giftToSend) return;
-
-        try {
-            await sendGift(giftToSend, profile.name);
-            setIsGiftModalOpen(false);
-            
-            const giftMessage: ChatMessage = {
-                id: Date.now().toString(),
-                sender: 'user',
-                type: 'gift',
-                gift: giftToSend,
-                timestamp: new Date().toISOString()
-            };
-
-            if (!isChatUnlocked) {
-                setIsChatUnlocked(true);
-                 setMessages([giftMessage, {
-                    id: Date.now().toString() + 'unlock',
-                    sender: 'system',
+            if (!aiMessageId) {
+                aiMessageId = `msg-ai-${Date.now()}`;
+                const aiMessage: ChatMessage = {
+                    id: aiMessageId,
+                    sender: 'ai',
                     type: 'text',
-                    text: `You can now chat with ${profile.name}.`,
-                    timestamp: new Date().toISOString()
-                }]);
+                    text: aiResponseText,
+                    timestamp: new Date().toISOString(),
+                };
+                setMessages(prev => [...prev, aiMessage]);
             } else {
-                 setMessages(prev => [...prev, giftMessage]);
+                setMessages(prev => prev.map(m => m.id === aiMessageId ? { ...m, text: aiResponseText } : m));
             }
-
-        } catch (error) {
-            console.error("Failed to send gift from ChatPage", error);
         }
+        
+        if (recipient) {
+            showLocalNotification(t('new_message_title', { name: recipient.name }), {
+                body: aiResponseText,
+                icon: recipient.imageUrl
+            });
+        }
+
+    } catch (error) {
+      console.error("Gemini API error:", error);
+      const errorMessage: ChatMessage = {
+        id: `msg-err-${Date.now()}`,
+        sender: 'system',
+        type: 'text',
+        text: 'Sorry, I am having trouble connecting. Please try again later.',
+        timestamp: new Date().toISOString(),
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  const handleGiftSent = (giftId: string) => {
+    const gift = GIFTS.find(g => g.id === giftId);
+    if (!gift || !recipient) return;
+
+    const giftMessage: ChatMessage = {
+        id: `gift-${Date.now()}`,
+        sender: 'user',
+        type: 'gift',
+        gift: gift,
+        timestamp: new Date().toISOString(),
+    };
+    
+    const systemMessage: ChatMessage = {
+        id: `sys-${Date.now()}`,
+        sender: 'system',
+        type: 'text',
+        text: 'You sent a gift and unlocked the chat!',
+        timestamp: new Date().toISOString(),
     }
 
-    const handleSendMessage = async (message: string) => {
-        if (!geminiChat || !profile) return;
-        if (!isChatUnlocked) {
-            handleUnlockAndOpenModal();
-            return;
-        }
-
-        const userMessage: ChatMessage = {
-            id: Date.now().toString(),
-            sender: 'user',
+    setMessages(prev => [...prev, giftMessage, systemMessage]);
+    setIsGiftModalOpen(false);
+    setIsChatLocked(false);
+    
+    // Send a thank you message from the AI
+    setTimeout(() => {
+        const thankYouMessage: ChatMessage = {
+            id: `msg-ai-${Date.now()}`,
+            sender: 'ai',
             type: 'text',
-            text: message,
-            timestamp: new Date().toISOString()
+            text: `Oh, wow! A ${gift.name}? Thank you so much! ${gift.icon} That's so sweet of you.`,
+            timestamp: new Date().toISOString(),
         };
-        setMessages(prev => [...prev, userMessage]);
-        setIsSending(true);
-
-        try {
-            const response = await geminiChat.sendMessage({ message });
-            const aiResponseText = response.text;
-            
-            const aiMessage: ChatMessage = {
-                id: Date.now().toString() + 'ai',
-                sender: 'ai',
-                type: 'text',
-                text: aiResponseText,
-                timestamp: new Date().toISOString()
-            };
-            setMessages(prev => [...prev, aiMessage]);
-
-            if (document.hidden) {
-                 showLocalNotification(t('new_message_title', { name: profile.name }), {
-                    body: aiResponseText,
-                    icon: profile.imageUrl,
-                 });
+        setMessages(prev => [...prev, thankYouMessage]);
+    }, 1000);
+  };
+  
+  const handleAddReaction = (messageId: string, emoji: string) => {
+    if (!user) return;
+    setMessages(prevMessages => prevMessages.map(msg => {
+        if (msg.id === messageId) {
+            const newReactions = { ...(msg.reactions || {}) };
+            if (!newReactions[emoji]) {
+                newReactions[emoji] = [];
             }
-
-        } catch (error) {
-            console.error('Gemini API error:', error);
-            const errorMessage: ChatMessage = {
-                id: Date.now().toString() + 'err',
-                sender: 'system',
-                type: 'text',
-                text: 'Sorry, I am having trouble responding right now.',
-                timestamp: new Date().toISOString()
-            };
-            setMessages(prev => [...prev, errorMessage]);
-        } finally {
-            setIsSending(false);
+            // Toggle reaction
+            if (newReactions[emoji].includes(user.id)) {
+                newReactions[emoji] = newReactions[emoji].filter(uid => uid !== user.id);
+            } else {
+                newReactions[emoji].push(user.id);
+            }
+            return { ...msg, reactions: newReactions };
         }
-    };
-    
-    const handleAddReaction = (messageId: string, emoji: string) => {
-        if (!user) return;
+        return msg;
+    }));
+  };
 
-        setMessages(prevMessages => 
-            prevMessages.map(msg => {
-                if (msg.id === messageId) {
-                    const newReactions = { ...(msg.reactions || {}) };
-                    const usersForEmoji = newReactions[emoji] || [];
+  const calculateLastSeen = useCallback((isoString: string): string => {
+    const now = new Date();
+    const lastSeenDate = new Date(isoString);
+    const diffSeconds = (now.getTime() - lastSeenDate.getTime()) / 1000;
 
-                    if (usersForEmoji.includes(user.id)) {
-                        // User has already reacted with this emoji, so remove their reaction
-                        newReactions[emoji] = usersForEmoji.filter(id => id !== user.id);
-                        // If no one has reacted with this emoji anymore, remove the emoji key
-                        if (newReactions[emoji].length === 0) {
-                            delete newReactions[emoji];
-                        }
-                    } else {
-                        // User has not reacted with this emoji, so add their reaction
-                        newReactions[emoji] = [...usersForEmoji, user.id];
-                    }
-                    
-                    return { ...msg, reactions: newReactions };
-                }
-                return msg;
-            })
-        );
-    };
-
-    const handleStartCall = () => setIsCallActive(true);
-    const handleEndCall = () => {
-        setIsCallActive(false);
-        setSignalingData(null); // Reset signaling data on call end
-    };
-    
-    // This function simulates a signaling server.
-    const handleSignal = (data: SignalingData) => {
-        console.log('[SIGNALING] Sent:', data);
-        // In a real app, this would send data over a WebSocket.
-        // Here, we simulate the "other peer" receiving it after a short delay.
-        setTimeout(() => {
-            console.log('[SIGNALING] Received:', data);
-            setSignalingData(data);
-        }, 500);
-    };
-
-    if (!profile) {
-        return <div className="p-8 text-center">User not found.</div>;
+    if (diffSeconds < 300) { // 5 minutes
+      return t('online');
     }
 
+    const timeFormat: Intl.DateTimeFormatOptions = { hour: 'numeric', minute: 'numeric', hour12: true };
+    const dateFormat: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric' };
+
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const yesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+
+    if (lastSeenDate >= today) {
+      return t('last_seen_today', { time: lastSeenDate.toLocaleTimeString(locale, timeFormat) });
+    }
+    if (lastSeenDate >= yesterday) {
+      return t('last_seen_yesterday', { time: lastSeenDate.toLocaleTimeString(locale, timeFormat) });
+    }
+    return t('last_seen_on', { date: lastSeenDate.toLocaleDateString(locale, dateFormat) });
+  }, [locale, t]);
+
+  
+  const handleSignal = (data: any) => {
+    // Send signaling data. In this mock setup where the user is in a call with an AI
+    // (which has no WebRTC client), we echo the signal back to the user's own listener
+    // to complete the WebRTC handshake and demonstrate the video call UI.
+    if (user) {
+      // The 'to' user is the user themselves, creating a loopback.
+      // The 'from' property is added to more realistically mimic a signaling message.
+      signalingService.send(user.id, { ...data, from: recipient?.id || 'ai-peer' });
+    }
+  };
+
+  const handleStartCall = useCallback(() => setIsCallActive(true), []);
+  const handleEndCall = useCallback(() => setIsCallActive(false), []);
+
+  // RENDER LOGIC
+  if (!recipient) {
     return (
-        <>
-            <div className="h-full w-full flex flex-col md:flex-row overflow-hidden">
-                <div className="w-full md:w-1/3 h-1/3 md:h-full bg-cover bg-center flex-shrink-0" style={{ backgroundImage: `url(${profile.imageUrl})` }}>
-                    <div className="h-full w-full bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6 flex flex-col justify-between text-white">
-                        <div>
-                            <Link to={`/${locale}/`} className="text-white/80 hover:text-white transition-colors text-sm">
-                                &larr; Back to Discovery
-                            </Link>
-                        </div>
-                        <div>
-                            <h1 className="text-4xl font-bold">{profile.name}, {profile.age}</h1>
-                            <p className="text-lg mt-1 opacity-90">{profile.bio}</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="flex-1 flex flex-col p-4 md:p-6 overflow-hidden">
-                    <div className="relative flex-1 flex flex-col justify-center">
-                        {!isChatUnlocked && !isCallActive && (
-                            <div className="absolute inset-0 flex items-center justify-center z-10">
-                                <GiftWall onUnlock={handleUnlockAndOpenModal} />
-                            </div>
-                        )}
-                        <div className={`transition-all duration-500 h-full ${!isChatUnlocked && !isCallActive ? 'blur-md' : ''}`}>
-                            <ChatInterface 
-                                messages={messages}
-                                onSendMessage={handleSendMessage}
-                                isSending={isSending}
-                                recipient={profile}
-                                recipientLastSeenStatus={lastSeenStatus}
-                                onOpenGiftModal={() => setIsGiftModalOpen(true)}
-                                onAddReaction={handleAddReaction}
-                                isCallActive={isCallActive}
-                                onStartCall={handleStartCall}
-                                onEndCall={handleEndCall}
-                                signalingData={signalingData}
-                                onSignal={handleSignal}
-                                isChatDisabled={!apiKey}
-                            />
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {isGiftModalOpen && (
-                <GiftSelectionModal 
-                    recipientName={profile.name}
-                    onClose={() => setIsGiftModalOpen(false)}
-                    onGiftSent={handleSendGift}
-                />
-            )}
-
-            <ApiKeyModal
-                isOpen={isApiKeyModalOpen}
-                onClose={() => setIsApiKeyModalOpen(false)}
-                onSave={handleSaveApiKey}
-            />
-        </>
+      <div className="flex flex-col items-center justify-center h-full w-full">
+        <p className="text-xl">User not found.</p>
+        <p className="text-white/70">Redirecting you back to discovery...</p>
+      </div>
     );
+  }
+
+  return (
+    <div className="h-full w-full max-w-5xl mx-auto p-4 flex flex-col">
+      <div className="mb-4">
+        <Link to={`/${locale}/`} className="text-pink-400 hover:underline text-sm">
+          &larr; Back to Discovery
+        </Link>
+      </div>
+      <div className="flex-1 min-h-0">
+        {isChatLocked ? (
+          <div className="h-full flex items-center justify-center">
+            <GiftWall onUnlock={() => setIsGiftModalOpen(true)} isLoggedIn={isLoggedIn} />
+          </div>
+        ) : (
+          <ChatInterface
+            messages={messages}
+            onSendMessage={handleSendMessage}
+            isSending={isSending}
+            recipient={recipient}
+            recipientLastSeenStatus={calculateLastSeen(recipient.lastSeen)}
+            onOpenGiftModal={() => setIsGiftModalOpen(true)}
+            onAddReaction={handleAddReaction}
+            isCallActive={isCallActive}
+            onStartCall={handleStartCall}
+            onEndCall={handleEndCall}
+            signalingData={signalingData}
+            onSignal={handleSignal}
+            disabledReason={isApiKeyMissing ? 'API_KEY' : null}
+          />
+        )}
+      </div>
+      {isGiftModalOpen && (
+        <GiftSelectionModal
+          recipientName={recipient.name}
+          onClose={() => setIsGiftModalOpen(false)}
+          onGiftSent={handleGiftSent}
+        />
+      )}
+    </div>
+  );
 };
 
 export default ChatPage;

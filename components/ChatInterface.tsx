@@ -24,7 +24,7 @@ interface ChatInterfaceProps {
     onEndCall: () => void;
     signalingData: SignalingData | null;
     onSignal: (data: SignalingData) => void;
-    isChatDisabled?: boolean;
+    disabledReason?: 'API_KEY' | 'LOCKED' | null;
 }
 
 // --- ICONS ---
@@ -88,10 +88,10 @@ const XIcon: React.FC = () => (
 
 // --- REACTION COMPONENTS ---
 const EMOJIS = ['👍', '❤️', '😂', '😯', '😢', '🙏'];
-const ReactionPicker: React.FC<{ onSelect: (emoji: string) => void; className?: string }> = ({ onSelect, className = '' }) => (
+const ReactionPicker: React.FC<{ onSelect: (emoji: string) => void; className?: string; t: (key: any) => string; }> = ({ onSelect, className = '', t }) => (
     <div className={`absolute bottom-full mb-2 bg-gray-800 border border-gray-700 rounded-full p-1 flex items-center gap-1 shadow-lg z-20 ${className}`}>
         {EMOJIS.map(emoji => (
-            <button key={emoji} onClick={() => onSelect(emoji)} className="text-xl p-1 rounded-full hover:bg-gray-700 transition-colors" aria-label={`React with ${emoji}`}>{emoji}</button>
+            <button key={emoji} onClick={() => onSelect(emoji)} className="text-xl p-1 rounded-full hover:bg-gray-700 transition-colors" aria-label={`${t('add_reaction')} ${emoji}`}>{emoji}</button>
         ))}
     </div>
 );
@@ -118,8 +118,9 @@ interface VideoCallViewProps {
     onEndCall: () => void;
     signalingData: SignalingData | null;
     onSignal: (data: SignalingData) => void;
+    t: (key: any, replacements?: Record<string, string | number>) => string;
 }
-const VideoCallView: React.FC<VideoCallViewProps> = ({ recipient, onEndCall, signalingData, onSignal }) => {
+const VideoCallView: React.FC<VideoCallViewProps> = ({ recipient, onEndCall, signalingData, onSignal, t }) => {
     const [isMuted, setIsMuted] = useState(false);
     const [isCameraOff, setIsCameraOff] = useState(false);
     const [connectionStatus, setConnectionStatus] = useState<RTCPeerConnectionState>('new');
@@ -149,11 +150,11 @@ const VideoCallView: React.FC<VideoCallViewProps> = ({ recipient, onEndCall, sig
                 }
             } catch (err) {
                  console.error("Error handling signaling data:", err);
-                 setCallError("A signaling error occurred. The call cannot proceed.");
+                 setCallError(t('signaling_error'));
             }
         })();
 
-    }, [signalingData, onSignal]);
+    }, [signalingData, onSignal, t]);
 
 
     // Effect for initializing the call
@@ -179,11 +180,11 @@ const VideoCallView: React.FC<VideoCallViewProps> = ({ recipient, onEndCall, sig
         startStreamAndCreateOffer().catch(err => {
             console.error("Error accessing media devices or starting WebRTC.", err);
             if (err.name === "NotAllowedError") {
-                 setCallError("Camera and microphone access was denied. Please grant permission in your browser settings to make calls.");
+                 setCallError(t('permission_denied_error'));
             } else if (err.name === "NotFoundError") {
-                 setCallError("No camera or microphone found. Please ensure your devices are connected and working.");
+                 setCallError(t('no_media_error'));
             } else {
-                 setCallError("An unexpected error occurred while starting the call.");
+                 setCallError(t('unexpected_call_error'));
             }
         });
 
@@ -205,7 +206,7 @@ const VideoCallView: React.FC<VideoCallViewProps> = ({ recipient, onEndCall, sig
             localStreamRef.current?.getTracks().forEach(track => track.stop());
             pc?.close();
         };
-    }, [onEndCall, onSignal]);
+    }, [onEndCall, onSignal, t]);
 
     const toggleMute = () => {
         if (!localStreamRef.current) return;
@@ -225,15 +226,15 @@ const VideoCallView: React.FC<VideoCallViewProps> = ({ recipient, onEndCall, sig
     
     const getStatusText = () => {
         switch (connectionStatus) {
-            case 'connected': return 'Connected';
-            case 'connecting': return 'Connecting...';
-            case 'failed': return 'Connection Failed';
-            default: return 'Initializing...';
+            case 'connected': return t('video_call_connected');
+            case 'connecting': return t('video_call_connecting');
+            case 'failed': return t('video_call_failed');
+            default: return t('video_call_initializing');
         }
     }
     
     const hasError = !!callError || connectionStatus === 'failed';
-    const errorMessage = callError || "The connection failed. Please check your internet connection and try again.";
+    const errorMessage = callError || t('call_failed_default_error');
 
     return (
         <div className="relative h-full w-full bg-black flex items-center justify-center overflow-hidden text-white">
@@ -244,7 +245,7 @@ const VideoCallView: React.FC<VideoCallViewProps> = ({ recipient, onEndCall, sig
             {hasError ? (
                  <div className="absolute z-30 flex flex-col items-center text-center p-4">
                     <ErrorIcon />
-                    <h3 className="text-2xl font-bold mt-4">Call Failed</h3>
+                    <h3 className="text-2xl font-bold mt-4">{t('call_failed_title')}</h3>
                     <p className="text-white/80 mt-1 max-w-sm">{errorMessage}</p>
                  </div>
             ) : (
@@ -272,7 +273,7 @@ const VideoCallView: React.FC<VideoCallViewProps> = ({ recipient, onEndCall, sig
                         </button>
                     </>
                 )}
-                <button onClick={onEndCall} className="w-16 h-14 rounded-full flex items-center justify-center bg-red-600 hover:bg-red-700 transition-colors">
+                <button onClick={onEndCall} className="w-16 h-14 rounded-full flex items-center justify-center bg-red-600 hover:bg-red-700 transition-colors end-call-pulse">
                     <EndCallIcon />
                 </button>
             </div>
@@ -282,7 +283,7 @@ const VideoCallView: React.FC<VideoCallViewProps> = ({ recipient, onEndCall, sig
 
 
 // --- MAIN CHAT INTERFACE ---
-const ChatInterface: React.FC<ChatInterfaceProps> = ({ messages, onSendMessage, isSending, recipient, recipientLastSeenStatus, onOpenGiftModal, onAddReaction, isCallActive, onStartCall, onEndCall, signalingData, onSignal, isChatDisabled = false }) => {
+const ChatInterface: React.FC<ChatInterfaceProps> = ({ messages, onSendMessage, isSending, recipient, recipientLastSeenStatus, onOpenGiftModal, onAddReaction, isCallActive, onStartCall, onEndCall, signalingData, onSignal, disabledReason = null }) => {
     const { t } = useTranslations();
     const { locale } = useLocale();
     const [input, setInput] = useState('');
@@ -331,6 +332,14 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ messages, onSendMessage, 
             msg.type === 'text' && msg.text?.toLowerCase().includes(searchQuery.toLowerCase())
         );
     }, [messages, searchQuery]);
+    
+    const getPlaceholder = () => {
+        if (disabledReason === 'API_KEY') return t('chat_needs_api_key');
+        if (disabledReason === 'LOCKED') return t('unlock_chat_placeholder');
+        return t('type_your_message');
+    };
+
+    const isInputDisabled = isSending || !!disabledReason;
 
     const Highlight: React.FC<{ text: string; query: string }> = ({ text, query }) => {
         if (!query.trim()) return <>{text}</>;
@@ -349,7 +358,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ messages, onSendMessage, 
     };
 
     if (isCallActive) {
-        return <VideoCallView recipient={recipient} onEndCall={onEndCall} signalingData={signalingData} onSignal={onSignal} />;
+        return <VideoCallView recipient={recipient} onEndCall={onEndCall} signalingData={signalingData} onSignal={onSignal} t={t} />;
     }
 
     return (
@@ -365,23 +374,23 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ messages, onSendMessage, 
                             className="flex-1 bg-gray-700 border border-gray-600 rounded-full px-4 py-1.5 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500"
                             autoFocus
                         />
-                        <button onClick={() => { setIsSearchVisible(false); setSearchQuery(''); }} className="p-2 rounded-full hover:bg-white/10 transition-colors" aria-label="Close search">
+                        <button onClick={() => { setIsSearchVisible(false); setSearchQuery(''); }} className="p-2 rounded-full hover:bg-white/10 transition-colors" aria-label={t('close_search')}>
                             <XIcon />
                         </button>
                     </div>
                 ) : (
                     <>
                         <div className="text-center flex-1">
-                            <h2 className="text-lg font-bold aurora-text">Chat with {recipient.name}</h2>
+                            <h2 className="text-lg font-bold aurora-text">{t('chat_with', { name: recipient.name })}</h2>
                             {recipientLastSeenStatus && (
                                 <p className="text-xs text-white/60">{recipientLastSeenStatus}</p>
                             )}
                         </div>
                         <div className="flex items-center">
-                            <button onClick={() => setIsSearchVisible(true)} className="p-2 rounded-full hover:bg-white/10 transition-colors" aria-label="Search messages">
+                            <button onClick={() => setIsSearchVisible(true)} className="p-2 rounded-full hover:bg-white/10 transition-colors" aria-label={t('search_placeholder')}>
                                 <SearchIcon />
                             </button>
-                            <button onClick={onStartCall} className="p-2 rounded-full hover:bg-white/10 transition-colors" aria-label="Start video call">
+                            <button onClick={onStartCall} className="p-2 rounded-full hover:bg-white/10 transition-colors" aria-label={t('start_video_call')}>
                                 <VideoCameraIcon />
                             </button>
                         </div>
@@ -394,14 +403,14 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ messages, onSendMessage, 
                         return (
                             <div key={msg.id} className="relative group my-4 text-center">
                                 {activeReactionPicker === msg.id && (
-                                    <ReactionPicker onSelect={(emoji) => { onAddReaction(msg.id, emoji); setActiveReactionPicker(null); }} className="left-1/2 -translate-x-1/2" />
+                                    <ReactionPicker onSelect={(emoji) => { onAddReaction(msg.id, emoji); setActiveReactionPicker(null); }} className="left-1/2 -translate-x-1/2" t={t} />
                                 )}
                                 <div className="relative w-fit mx-auto">
                                     <div className="text-center text-pink-400 text-sm py-2 border-y border-pink-400/20">
                                         {t('you_sent_a_gift', { recipientName: recipient.name, giftName: msg.gift!.name, giftIcon: msg.gift!.icon })}
                                     </div>
                                      <div className="absolute top-1/2 -translate-y-1/2 right-0 translate-x-full pl-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <button onClick={() => setActiveReactionPicker(activeReactionPicker === msg.id ? null : msg.id)} className="p-1 rounded-full bg-gray-600 hover:bg-gray-500 text-gray-300" aria-label="Add reaction">
+                                        <button onClick={() => setActiveReactionPicker(activeReactionPicker === msg.id ? null : msg.id)} className="p-1 rounded-full bg-gray-600 hover:bg-gray-500 text-gray-300" aria-label={t('add_reaction')}>
                                             <ReactionIcon />
                                         </button>
                                     </div>
@@ -422,6 +431,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ messages, onSendMessage, 
                                 <div className="relative group">
                                     {activeReactionPicker === msg.id && (
                                         <ReactionPicker 
+                                            t={t}
                                             onSelect={(emoji) => { 
                                                 onAddReaction(msg.id, emoji); 
                                                 setActiveReactionPicker(null); 
@@ -434,7 +444,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ messages, onSendMessage, 
                                         </p>
                                     </div>
                                     <div className={`absolute top-1/2 -translate-y-1/2 ${isUser ? 'left-0 -translate-x-full pr-1' : 'right-0 translate-x-full pl-1'} opacity-0 group-hover:opacity-100 transition-opacity`}>
-                                        <button onClick={() => setActiveReactionPicker(activeReactionPicker === msg.id ? null : msg.id)} className="p-1 rounded-full bg-gray-600 hover:bg-gray-500 text-gray-300" aria-label="Add reaction">
+                                        <button onClick={() => setActiveReactionPicker(activeReactionPicker === msg.id ? null : msg.id)} className="p-1 rounded-full bg-gray-600 hover:bg-gray-500 text-gray-300" aria-label={t('add_reaction')}>
                                             <ReactionIcon />
                                         </button>
                                     </div>
@@ -467,11 +477,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ messages, onSendMessage, 
             </div>
             <div className="p-4 bg-black/30 border-t border-white/10">
                 <div className="flex items-center gap-4">
-                    <button onClick={onOpenGiftModal} className="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center bg-gray-700 hover:bg-gray-600 transition-colors text-pink-400 disabled:opacity-50 disabled:cursor-not-allowed" aria-label="Send a gift" disabled={isChatDisabled}>
+                    <button onClick={onOpenGiftModal} className="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center bg-gray-700 hover:bg-gray-600 transition-colors text-pink-400 disabled:opacity-50 disabled:cursor-not-allowed" aria-label={t('send_a_gift')} disabled={isInputDisabled}>
                        <GiftIcon />
                     </button>
-                    <input type="text" value={input} onChange={(e) => setInput(e.target.value)} onKeyPress={handleKeyPress} placeholder={isChatDisabled ? t('chat_not_configured') : "Type your message..."} className="flex-1 bg-gray-700 border border-gray-600 rounded-full px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500" disabled={isSending || isChatDisabled} />
-                    <button onClick={handleSend} disabled={!input.trim() || isSending || isChatDisabled} className="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center bg-pink-600 hover:bg-pink-700 transition-colors disabled:bg-gray-500 disabled:cursor-not-allowed" aria-label="Send message">
+                    <input type="text" value={input} onChange={(e) => setInput(e.target.value)} onKeyPress={handleKeyPress} placeholder={getPlaceholder()} className="flex-1 bg-gray-700 border border-gray-600 rounded-full px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500" disabled={isInputDisabled} />
+                    <button onClick={handleSend} disabled={!input.trim() || isInputDisabled} className="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center bg-pink-600 hover:bg-pink-700 transition-colors disabled:bg-gray-500 disabled:cursor-not-allowed" aria-label={t('send_message')}>
                        <SendIcon />
                     </button>
                 </div>

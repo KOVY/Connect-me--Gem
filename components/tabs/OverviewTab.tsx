@@ -4,9 +4,10 @@ import { Link } from 'react-router-dom';
 import { useUser } from '../../contexts/UserContext';
 import { useLocale } from '../../contexts/LocaleContext';
 import BalanceWidget from '../BalanceWidget';
+import ProfileCompletenessWidget from '../ProfileCompletenessWidget';
 
 const OverviewTab: React.FC = () => {
-  const { user, isLoading } = useUser();
+  const { user, isLoading, profileCompleteness, completionSuggestions } = useUser();
   const { locale } = useLocale();
 
   if (isLoading && !user) {
@@ -14,7 +15,7 @@ const OverviewTab: React.FC = () => {
   }
 
   if (!user) {
-    return <div>Could not load user data.</div>;
+    return <div>Could not load user data. Please log in to view your hub.</div>;
   }
 
   return (
@@ -23,6 +24,14 @@ const OverviewTab: React.FC = () => {
         <h2 className="text-2xl font-bold">Welcome back, {user.name}!</h2>
         <p className="mt-1 text-gray-400">Here's a quick look at your hub.</p>
       </div>
+
+      {profileCompleteness < 100 && (
+        <ProfileCompletenessWidget 
+            completeness={profileCompleteness} 
+            suggestions={completionSuggestions}
+            showAction={true}
+        />
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <BalanceWidget />

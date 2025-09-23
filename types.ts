@@ -1,23 +1,32 @@
-// FIX: Creating type definitions for the application.
-export type SupportedLanguage = 'en' | 'cs';
-export type SupportedCountry = 'US' | 'GB' | 'DE' | 'FR' | 'ES' | 'IT' | 'CZ';
-export type SupportedCurrency = 'USD' | 'GBP' | 'EUR' | 'CZK';
-
-export interface LocaleContextState {
-    locale: string;
-    language: SupportedLanguage;
-    country: SupportedCountry;
-    currency: SupportedCurrency;
-}
+// --- Core Data Types ---
 
 export interface UserProfile {
     id: string;
     name: string;
     age: number;
-    bio: string;
     imageUrl: string;
+    occupation: string;
+    bio: string;
+    interests: string[];
+    hobbies: string[];
     country: string;
-    lastSeen: string; // ISO 8601 date string
+    lastSeen: string; // ISO string date
+}
+
+export interface User extends Omit<UserProfile, 'age' | 'country' | 'lastSeen' | 'hobbies'> {
+    credits: number;
+    transactions: Transaction[];
+    profilePictureUrl: string; // Renamed from imageUrl for clarity
+}
+
+export interface ChatMessage {
+    id:string;
+    sender: 'user' | 'ai' | 'system';
+    type: 'text' | 'gift';
+    text?: string;
+    timestamp: string; // ISO string date
+    reactions?: Record<string, string[]>; // emoji -> userIds[]
+    gift?: Gift;
 }
 
 export interface Gift {
@@ -27,36 +36,37 @@ export interface Gift {
     cost: number;
 }
 
-export interface ChatMessage {
-    id: string;
-    sender: 'user' | 'ai' | 'system';
-    type: 'text' | 'gift';
-    text?: string;
-    gift?: Gift;
-    timestamp: string;
-    reactions?: Record<string, string[]>; // e.g. { '❤️': ['user_id_1'], '👍': ['user_id_1', 'user_id_2'] }
-}
-
 export interface Transaction {
     id: string;
-    date: string;
+    date: string; // YYYY-MM-DD
     description: string;
-    amount: number; // positive for credits added, negative for credits spent
-}
-
-export interface User {
-    id: string;
-    name: string;
-    bio: string;
-    interests: string[];
-    credits: number;
-    transactions: Transaction[];
-    profilePictureUrl: string;
+    amount: number; // positive for credit, negative for debit
 }
 
 export interface CreditPackage {
-    id:string;
+    id: string;
     credits: number;
     price: number;
+    currency: SupportedCurrency;
+}
+
+export interface Reel {
+    id: string;
+    videoUrl: string;
+    description: string;
+    userProfile: UserProfile;
+}
+
+
+// --- Locale & Internationalization ---
+
+export type SupportedLanguage = 'en' | 'cs';
+export type SupportedCountry = 'US' | 'GB' | 'DE' | 'FR' | 'ES' | 'IT' | 'CZ';
+export type SupportedCurrency = 'USD' | 'EUR' | 'GBP' | 'CZK';
+
+export interface LocaleContextState {
+    locale: string;
+    language: SupportedLanguage;
+    country: SupportedCountry;
     currency: SupportedCurrency;
 }
