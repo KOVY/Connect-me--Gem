@@ -30,6 +30,12 @@ const MapPinIcon: React.FC<{className?: string}> = ({className}) => (
     </svg>
 );
 
+const VerifiedBadgeIcon: React.FC<{className?: string}> = ({className}) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className || "w-6 h-6"}>
+        <path fillRule="evenodd" d="M8.603 3.799A4.49 4.49 0 0 1 12 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 0 1 3.498 1.307 4.491 4.491 0 0 1 1.307 3.497A4.49 4.49 0 0 1 21.75 12a4.49 4.49 0 0 1-1.549 3.397 4.491 4.491 0 0 1-1.307 3.497 4.491 4.491 0 0 1-3.497 1.307A4.49 4.49 0 0 1 12 21.75a4.49 4.49 0 0 1-3.397-1.549 4.49 4.49 0 0 1-3.498-1.306 4.491 4.491 0 0 1-1.307-3.498A4.49 4.49 0 0 1 2.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 0 1 1.307-3.497 4.49 4.49 0 0 1 3.497-1.307Zm7.007 6.387a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z" clipRule="evenodd" />
+    </svg>
+);
+
 
 const ProfileCard: React.FC<ProfileCardProps> = ({ profile, onLike }) => {
   const allTags = [...profile.interests, ...profile.hobbies];
@@ -43,7 +49,12 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ profile, onLike }) => {
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
       <div className="absolute bottom-0 left-0 p-6 text-white w-full flex flex-col items-center">
         <div className="w-full mb-4">
-            <h1 className="text-4xl font-bold">{profile.name}, {profile.age}</h1>
+            <div className="flex items-center gap-2">
+                <h1 className="text-4xl font-bold">{profile.name}, {profile.age}</h1>
+                {profile.verified && (
+                    <VerifiedBadgeIcon className="w-8 h-8 text-blue-400" title="Verified" />
+                )}
+            </div>
             <div className="flex items-center gap-4 mt-2 opacity-90">
                 <div className="flex items-center gap-2">
                     <BriefcaseIcon className="w-5 h-5 text-white/80" />

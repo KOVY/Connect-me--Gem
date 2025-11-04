@@ -17,6 +17,7 @@ import NotFoundPage from './pages/NotFoundPage';
 // Profile Hub Tabs
 import OverviewTab from './components/tabs/OverviewTab';
 import MyProfileTab from './components/tabs/MyProfileTab';
+import SubscriptionTab from './components/tabs/SubscriptionTab';
 import ShopTab from './components/tabs/ShopTab';
 import HistoryTab from './components/tabs/HistoryTab';
 import AnalyticsTab from './components/tabs/AnalyticsTab';
@@ -58,6 +59,7 @@ export const router = createBrowserRouter([
                                 children: [
                                     { index: true, element: <OverviewTab /> },
                                     { path: 'profile', element: <MyProfileTab /> },
+                                    { path: 'subscription', element: <SubscriptionTab /> },
                                     { path: 'shop', element: <ShopTab /> },
                                     { path: 'history', element: <HistoryTab /> },
                                     { path: 'analytics', element: <AnalyticsTab /> },

@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { UserProfile } from '../types';
 import ProfileCard from './ProfileCard';
+import DiscoveryActions from './DiscoveryActions';
 
 interface DiscoveryFeedProps {
   profiles: UserProfile[];
@@ -19,6 +20,16 @@ const DiscoveryFeed: React.FC<DiscoveryFeedProps> = ({ profiles }) => {
       setCurrentIndex(prev => prev + 1);
       setIsAnimating(false);
     }, 500); // Animation duration
+  };
+
+  const handleRewind = () => {
+    if (currentIndex > 0) {
+      setCurrentIndex(prev => prev - 1);
+    }
+  };
+
+  const handleSuperLike = () => {
+    handleNextProfile(); // Move to next profile after super like
   };
 
   const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
@@ -52,6 +63,11 @@ const DiscoveryFeed: React.FC<DiscoveryFeedProps> = ({ profiles }) => {
           )}
           <div className={`absolute inset-0 z-20 ${isAnimating ? 'animate-card-exit' : ''}`}>
             <ProfileCard profile={currentProfile} onLike={handleNextProfile} />
+            <DiscoveryActions
+              profile={currentProfile}
+              onSuperLike={handleSuperLike}
+              onRewind={handleRewind}
+            />
           </div>
         </>
       ) : (

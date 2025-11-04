@@ -6,6 +6,7 @@ import { useLocale } from '../contexts/LocaleContext';
 const TABS = [
   { name: 'Overview', path: '' },
   { name: 'My Profile', path: 'profile' },
+  { name: 'Subscription', path: 'subscription' },
   { name: 'Shop', path: 'shop' },
   { name: 'History', path: 'history' },
   { name: 'Analytics', path: 'analytics' },

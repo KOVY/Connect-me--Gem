@@ -1,5 +1,5 @@
-import { User, Transaction, Gift } from './types';
-import { CREDIT_PACKAGES } from './constants';
+import { User, Transaction, Gift, UserSubscription } from './types';
+import { CREDIT_PACKAGES, SUBSCRIPTION_PLANS } from './constants';
 
 // --- SIMULATED DATABASE ---
 let MOCK_USER: User = {
@@ -15,6 +15,10 @@ let MOCK_USER: User = {
         { id: 'tx1', date: '2023-10-26', description: 'Initial credit grant', amount: 500 },
     ],
     profilePictureUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1887&auto=format&fit=crop',
+    subscription: undefined, // Free tier by default
+    superLikesRemaining: 0, // Free users don't get super likes
+    boostsRemaining: 0, // Free users don't get boosts
+    rewindsRemaining: 0, // Free users don't get rewinds
 };
 
 // --- SIMULATED API LATENCY ---
@@ -74,4 +78,128 @@ export const processCreditPurchase = async (packageId: string): Promise<{ user: 
         user: JSON.parse(JSON.stringify(MOCK_USER)),
         transaction: newTransaction
     };
+};
+
+export const processSubscription = async (planId: string): Promise<{ user: User, transaction: Transaction }> => {
+    await apiDelay(1000);
+    const plan = SUBSCRIPTION_PLANS.find(p => p.id === planId);
+    if (!plan) {
+        throw new Error("Subscription plan not found");
+    }
+
+    const startDate = new Date();
+    const expiryDate = new Date();
+    expiryDate.setMonth(expiryDate.getMonth() + 1); // Add 1 month
+
+    const subscription: UserSubscription = {
+        tier: plan.tier,
+        startDate: startDate.toISOString(),
+        expiryDate: expiryDate.toISOString(),
+        autoRenew: true,
+    };
+
+    // Set subscription benefits based on tier
+    let superLikes = 0;
+    let boosts = 0;
+    let rewinds = 999; // Effectively unlimited
+    let creditBonus = 0;
+
+    if (plan.tier === 'basic') {
+        superLikes = 5;
+        boosts = 1;
+    } else if (plan.tier === 'premium') {
+        superLikes = 10;
+        boosts = 2;
+    } else if (plan.tier === 'vip') {
+        superLikes = 999; // Unlimited
+        boosts = 5;
+        creditBonus = 500;
+    }
+
+    const newTransaction: Transaction = {
+        id: `tx_${Date.now()}`,
+        date: new Date().toISOString().split('T')[0],
+        description: `Subscribed to ${plan.name} (${plan.duration})`,
+        amount: -plan.price, // Negative for expense
+    };
+
+    MOCK_USER.subscription = subscription;
+    MOCK_USER.superLikesRemaining = superLikes;
+    MOCK_USER.boostsRemaining = boosts;
+    MOCK_USER.rewindsRemaining = rewinds;
+
+    // Add credit bonus and verified badge for VIP
+    if (plan.tier === 'vip') {
+        MOCK_USER.credits += creditBonus;
+        MOCK_USER.verified = true; // VIP users get verified badge
+    } else {
+        MOCK_USER.verified = false; // Remove badge for non-VIP tiers
+    }
+
+    MOCK_USER.transactions.unshift(newTransaction);
+    console.log("API: Processed subscription", { user: MOCK_USER, transaction: newTransaction });
+
+    return {
+        user: JSON.parse(JSON.stringify(MOCK_USER)),
+        transaction: newTransaction
+    };
+};
+
+export const cancelSubscription = async (): Promise<User> => {
+    await apiDelay(800);
+
+    if (MOCK_USER.subscription) {
+        MOCK_USER.subscription.autoRenew = false;
+    }
+
+    console.log("API: Cancelled subscription auto-renewal", MOCK_USER);
+    return JSON.parse(JSON.stringify(MOCK_USER));
+};
+
+export const useBoost = async (): Promise<User> => {
+    await apiDelay(500);
+
+    if (!MOCK_USER.boostsRemaining || MOCK_USER.boostsRemaining <= 0) {
+        throw new Error("No boosts remaining");
+    }
+
+    MOCK_USER.boostsRemaining -= 1;
+
+    const newTransaction: Transaction = {
+        id: `tx_${Date.now()}`,
+        date: new Date().toISOString().split('T')[0],
+        description: `Used Profile Boost`,
+        amount: 0, // No credit cost for subscription users
+    };
+
+    MOCK_USER.transactions.unshift(newTransaction);
+    console.log("API: Used boost", MOCK_USER);
+
+    return JSON.parse(JSON.stringify(MOCK_USER));
+};
+
+export const useSuperLike = async (profileId: string): Promise<User> => {
+    await apiDelay(500);
+
+    if (!MOCK_USER.superLikesRemaining || MOCK_USER.superLikesRemaining <= 0) {
+        throw new Error("No super likes remaining");
+    }
+
+    MOCK_USER.superLikesRemaining -= 1;
+
+    console.log(`API: Used super like on profile ${profileId}`, MOCK_USER);
+    return JSON.parse(JSON.stringify(MOCK_USER));
+};
+
+export const useRewind = async (): Promise<User> => {
+    await apiDelay(500);
+
+    if (!MOCK_USER.rewindsRemaining || MOCK_USER.rewindsRemaining <= 0) {
+        throw new Error("No rewinds remaining");
+    }
+
+    MOCK_USER.rewindsRemaining -= 1;
+
+    console.log("API: Used rewind", MOCK_USER);
+    return JSON.parse(JSON.stringify(MOCK_USER));
 };

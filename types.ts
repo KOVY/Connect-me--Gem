@@ -11,12 +11,37 @@ export interface UserProfile {
     hobbies: string[];
     country: string;
     lastSeen: string; // ISO string date
+    verified?: boolean; // Verification badge (for VIP users)
 }
 
 export interface User extends Omit<UserProfile, 'age' | 'country' | 'lastSeen' | 'hobbies'> {
     credits: number;
     transactions: Transaction[];
     profilePictureUrl: string; // Renamed from imageUrl for clarity
+    subscription?: UserSubscription; // Current subscription
+    superLikesRemaining?: number; // Super likes available
+    boostsRemaining?: number; // Profile boosts available
+    rewindsRemaining?: number; // Rewinds available
+}
+
+export interface UserSubscription {
+    tier: SubscriptionTier;
+    startDate: string; // ISO string date
+    expiryDate: string; // ISO string date
+    autoRenew: boolean;
+}
+
+export type SubscriptionTier = 'free' | 'basic' | 'premium' | 'vip';
+
+export interface SubscriptionPlan {
+    id: string;
+    tier: SubscriptionTier;
+    name: string;
+    price: number;
+    currency: SupportedCurrency;
+    duration: 'monthly' | 'yearly';
+    features: string[];
+    savings?: string; // e.g., "Save 20%" for yearly plans
 }
 
 export interface ChatMessage {
@@ -27,6 +52,7 @@ export interface ChatMessage {
     timestamp: string; // ISO string date
     reactions?: Record<string, string[]>; // emoji -> userIds[]
     gift?: Gift;
+    read?: boolean; // Whether the message has been read (for read receipts)
 }
 
 export interface Gift {
