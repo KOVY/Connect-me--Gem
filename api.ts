@@ -43,6 +43,78 @@ let MOCK_USER: User = {
         },
     ],
     likedProfiles: [],
+    stats: {
+        totalLikes: 42,
+        totalMatches: 15,
+        totalMessages: 238,
+        profileViews: 1547,
+        points: 575, // Level 5 with 75 points into current level
+        level: 6,
+        dailyStreak: {
+            current: 7,
+            longest: 12,
+            lastActivityDate: new Date().toISOString(),
+            isActive: true,
+        },
+        messageStreak: {
+            current: 5,
+            longest: 8,
+            lastActivityDate: new Date(Date.now() - 1000 * 60 * 60).toISOString(), // 1 hour ago
+            isActive: true,
+        },
+        achievements: [
+            {
+                id: 'streak_3',
+                name: '3-Day Streak',
+                description: 'Log in for 3 consecutive days',
+                icon: '🔥',
+                category: 'streak' as const,
+                unlockedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 4).toISOString(), // 4 days ago
+                target: 3,
+                progress: 100,
+            },
+            {
+                id: 'streak_7',
+                name: 'Week Warrior',
+                description: 'Maintain a 7-day login streak',
+                icon: '⚡',
+                category: 'streak' as const,
+                unlockedAt: new Date().toISOString(), // Just unlocked today!
+                target: 7,
+                progress: 100,
+            },
+            {
+                id: 'matches_10',
+                name: 'Connection Starter',
+                description: 'Get your first 10 matches',
+                icon: '💖',
+                category: 'social' as const,
+                unlockedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7).toISOString(), // Week ago
+                target: 10,
+                progress: 100,
+            },
+            {
+                id: 'messages_100',
+                name: 'Conversationalist',
+                description: 'Send 100 messages',
+                icon: '💬',
+                category: 'engagement' as const,
+                unlockedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(), // 2 days ago
+                target: 100,
+                progress: 100,
+            },
+            {
+                id: 'profile_complete',
+                name: 'All Set Up',
+                description: 'Complete your profile with photo and bio',
+                icon: '✅',
+                category: 'special' as const,
+                unlockedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 30).toISOString(), // A month ago
+                target: 1,
+                progress: 100,
+            },
+        ],
+    },
 };
 
 // --- SIMULATED API LATENCY ---

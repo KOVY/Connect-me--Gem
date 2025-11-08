@@ -25,6 +25,7 @@ export interface User extends Omit<UserProfile, 'age' | 'country' | 'lastSeen' |
     rewindsRemaining?: number; // Rewinds available
     likedBy?: ProfileLike[]; // Who liked this user
     likedProfiles?: ProfileLike[]; // Who this user liked
+    stats?: UserStats; // Gamification stats, streaks, and achievements
 }
 
 export interface ProfileLike {
@@ -128,3 +129,35 @@ export type EducationLevel = 'high_school' | 'bachelors' | 'masters' | 'phd';
 export type SmokingPreference = 'never' | 'sometimes' | 'regularly';
 export type DrinkingPreference = 'never' | 'socially' | 'regularly';
 export type PetPreference = 'no_pets' | 'has_cats' | 'has_dogs' | 'has_other';
+
+// --- Gamification & Streaks ---
+
+export interface UserStreak {
+    current: number; // Current streak count in days
+    longest: number; // Longest streak ever achieved
+    lastActivityDate: string; // ISO date string
+    isActive: boolean; // Whether streak is still active today
+}
+
+export interface Achievement {
+    id: string;
+    name: string;
+    description: string;
+    icon: string;
+    category: 'social' | 'engagement' | 'streak' | 'special';
+    unlockedAt?: string; // ISO date string when unlocked
+    progress?: number; // Progress towards unlocking (0-100)
+    target?: number; // Target value to unlock
+}
+
+export interface UserStats {
+    totalLikes: number;
+    totalMatches: number;
+    totalMessages: number;
+    profileViews: number;
+    points: number; // Gamification points
+    level: number; // User level based on points
+    achievements: Achievement[];
+    dailyStreak: UserStreak;
+    messageStreak: UserStreak;
+}

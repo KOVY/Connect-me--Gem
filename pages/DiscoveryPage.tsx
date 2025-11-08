@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import DiscoveryFeed from '../components/DiscoveryFeed';
 import DiscoveryFilters from '../components/DiscoveryFilters';
+import StreakWidget from '../components/StreakWidget';
 import { PROFILES } from '../constants';
 import { DiscoveryFilters as IDiscoveryFilters } from '../types';
 
@@ -17,7 +18,12 @@ const DiscoveryPage: React.FC = () => {
 
   return (
     <div className="h-full w-full relative">
-      {/* Filter Button */}
+      {/* Streak Widget - Top Left */}
+      <div className="absolute top-4 left-4 z-30">
+        <StreakWidget />
+      </div>
+
+      {/* Filter Button - Top Right */}
       <button
         onClick={() => setShowFilters(true)}
         className="absolute top-4 right-4 z-30 w-12 h-12 rounded-full bg-white/10 backdrop-blur-md hover:bg-white/20 flex items-center justify-center transition-all shadow-lg border border-white/20"

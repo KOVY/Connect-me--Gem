@@ -1,4 +1,4 @@
-import { UserProfile, Gift, CreditPackage, Reel, SubscriptionPlan } from './types';
+import { UserProfile, Gift, CreditPackage, Reel, SubscriptionPlan, Achievement } from './types';
 
 // Placeholder avatars for user profile customization
 export const PLACEHOLDER_AVATARS: string[] = [
@@ -475,5 +475,125 @@ export const REELS: Reel[] = [
         videoUrl: 'https://test-videos.co.uk/vids/sintel/mp4/h264/360/Sintel_360_10s_1MB.mp4',
         description: 'Baking up a storm this weekend. 🥐 #baking #foodie',
         userProfile: PROFILES[2],
+    },
+];
+
+// Achievements and badges
+export const ACHIEVEMENTS: Achievement[] = [
+    // Streak Achievements
+    {
+        id: 'streak_3',
+        name: '3-Day Streak',
+        description: 'Log in for 3 consecutive days',
+        icon: '🔥',
+        category: 'streak',
+        target: 3,
+    },
+    {
+        id: 'streak_7',
+        name: 'Week Warrior',
+        description: 'Maintain a 7-day login streak',
+        icon: '⚡',
+        category: 'streak',
+        target: 7,
+    },
+    {
+        id: 'streak_30',
+        name: 'Monthly Master',
+        description: 'Achieve a 30-day login streak',
+        icon: '👑',
+        category: 'streak',
+        target: 30,
+    },
+    {
+        id: 'streak_100',
+        name: 'Century Club',
+        description: 'Reach a 100-day login streak',
+        icon: '💯',
+        category: 'streak',
+        target: 100,
+    },
+    // Social Achievements
+    {
+        id: 'matches_10',
+        name: 'Connection Starter',
+        description: 'Get your first 10 matches',
+        icon: '💖',
+        category: 'social',
+        target: 10,
+    },
+    {
+        id: 'matches_50',
+        name: 'Social Butterfly',
+        description: 'Reach 50 total matches',
+        icon: '🦋',
+        category: 'social',
+        target: 50,
+    },
+    {
+        id: 'matches_100',
+        name: 'Matchmaking Pro',
+        description: 'Achieve 100 matches',
+        icon: '✨',
+        category: 'social',
+        target: 100,
+    },
+    // Engagement Achievements
+    {
+        id: 'messages_100',
+        name: 'Conversationalist',
+        description: 'Send 100 messages',
+        icon: '💬',
+        category: 'engagement',
+        target: 100,
+    },
+    {
+        id: 'messages_500',
+        name: 'Chat Master',
+        description: 'Send 500 messages',
+        icon: '📱',
+        category: 'engagement',
+        target: 500,
+    },
+    {
+        id: 'likes_50',
+        name: 'Generous Heart',
+        description: 'Give 50 likes',
+        icon: '❤️',
+        category: 'engagement',
+        target: 50,
+    },
+    {
+        id: 'gifts_10',
+        name: 'Gift Giver',
+        description: 'Send 10 gifts',
+        icon: '🎁',
+        category: 'engagement',
+        target: 10,
+    },
+    // Special Achievements
+    {
+        id: 'profile_complete',
+        name: 'All Set Up',
+        description: 'Complete your profile with photo and bio',
+        icon: '✅',
+        category: 'special',
+        target: 1,
+    },
+    {
+        id: 'verified',
+        name: 'Verified User',
+        description: 'Get your profile verified',
+        icon: '🔵',
+        category: 'special',
+        target: 1,
+    },
+    {
+        id: 'early_adopter',
+        name: 'Early Adopter',
+        description: 'Join in the first month of launch',
+        icon: '🚀',
+        category: 'special',
+        target: 1,
     },
 ];
