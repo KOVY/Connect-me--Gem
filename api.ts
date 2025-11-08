@@ -1,5 +1,5 @@
-import { User, Transaction, Gift, UserSubscription } from './types';
-import { CREDIT_PACKAGES, SUBSCRIPTION_PLANS } from './constants';
+import { User, Transaction, Gift, UserSubscription, ProfileLike } from './types';
+import { CREDIT_PACKAGES, SUBSCRIPTION_PLANS, PROFILES } from './constants';
 
 // --- SIMULATED DATABASE ---
 let MOCK_USER: User = {
@@ -19,6 +19,30 @@ let MOCK_USER: User = {
     superLikesRemaining: 0, // Free users don't get super likes
     boostsRemaining: 0, // Free users don't get boosts
     rewindsRemaining: 0, // Free users don't get rewinds
+    likedBy: [
+        {
+            profileId: 'prof_1',
+            profile: PROFILES[0],
+            timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), // 2 hours ago
+            isSuperLike: false,
+            isMatch: false,
+        },
+        {
+            profileId: 'prof_2',
+            profile: PROFILES[1],
+            timestamp: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(), // 5 hours ago
+            isSuperLike: true,
+            isMatch: false,
+        },
+        {
+            profileId: 'prof_3',
+            profile: PROFILES[2],
+            timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // 1 day ago
+            isSuperLike: false,
+            isMatch: false,
+        },
+    ],
+    likedProfiles: [],
 };
 
 // --- SIMULATED API LATENCY ---

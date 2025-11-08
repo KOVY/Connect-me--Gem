@@ -22,6 +22,16 @@ export interface User extends Omit<UserProfile, 'age' | 'country' | 'lastSeen' |
     superLikesRemaining?: number; // Super likes available
     boostsRemaining?: number; // Profile boosts available
     rewindsRemaining?: number; // Rewinds available
+    likedBy?: ProfileLike[]; // Who liked this user
+    likedProfiles?: ProfileLike[]; // Who this user liked
+}
+
+export interface ProfileLike {
+    profileId: string;
+    profile: UserProfile;
+    timestamp: string; // ISO string date
+    isSuperLike: boolean;
+    isMatch?: boolean; // Mutual like
 }
 
 export interface UserSubscription {
