@@ -23,6 +23,11 @@ export const PROFILES: UserProfile[] = [
         hobbies: ['Painting', 'Hiking', 'Trying new recipes'],
         country: 'USA',
         lastSeen: new Date(Date.now() - 1000 * 60 * 3).toISOString(), // 3 mins ago
+        icebreakers: [
+            "What's the last thing that made you laugh?",
+            "Best hidden cafe you've discovered?",
+            "Dream travel destination and why?"
+        ],
     },
     {
         id: 'prof_2',
@@ -35,6 +40,11 @@ export const PROFILES: UserProfile[] = [
         hobbies: ['Board Games', 'Rock Climbing', 'Podcasts'],
         country: 'Canada',
         lastSeen: new Date(Date.now() - 1000 * 60 * 60 * 25).toISOString(), // 25 hours ago
+        icebreakers: [
+            "Favorite board game to play on a rainy day?",
+            "Best concert you've ever been to?",
+            "What's your go-to spicy dish?"
+        ],
     },
     {
         id: 'prof_3',
@@ -47,6 +57,11 @@ export const PROFILES: UserProfile[] = [
         hobbies: ['Baking', 'Yoga', 'Documentaries'],
         country: 'Italy',
         lastSeen: new Date(Date.now() - 1000 * 60 * 60 * 4).toISOString(), // 4 hours ago
+        icebreakers: [
+            "What's your comfort food?",
+            "Most memorable meal you've ever had?",
+            "Coffee or tea - and how do you take it?"
+        ],
     },
      {
         id: 'prof_4',
@@ -59,6 +74,11 @@ export const PROFILES: UserProfile[] = [
         hobbies: ['Volunteering', 'Playing Guitar', 'Camping'],
         country: 'Australia',
         lastSeen: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3).toISOString(), // 3 days ago
+        icebreakers: [
+            "Dog person or cat person?",
+            "Last book that left you thinking?",
+            "Favorite camping spot you've discovered?"
+        ],
     }
 ];
 

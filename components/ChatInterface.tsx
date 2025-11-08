@@ -26,6 +26,7 @@ interface ChatInterfaceProps {
     signalingData: SignalingData | null;
     onSignal: (data: SignalingData) => void;
     disabledReason?: 'API_KEY' | 'LOCKED' | null;
+    prefilledMessage?: string | null;
 }
 
 // --- ICONS ---
@@ -296,7 +297,7 @@ const VideoCallView: React.FC<VideoCallViewProps> = ({ recipient, onEndCall, sig
 
 
 // --- MAIN CHAT INTERFACE ---
-const ChatInterface: React.FC<ChatInterfaceProps> = ({ messages, onSendMessage, isSending, recipient, recipientLastSeenStatus, onOpenGiftModal, onAddReaction, isCallActive, onStartCall, onEndCall, signalingData, onSignal, disabledReason = null }) => {
+const ChatInterface: React.FC<ChatInterfaceProps> = ({ messages, onSendMessage, isSending, recipient, recipientLastSeenStatus, onOpenGiftModal, onAddReaction, isCallActive, onStartCall, onEndCall, signalingData, onSignal, disabledReason = null, prefilledMessage = null }) => {
     const { t } = useTranslations();
     const { locale } = useLocale();
     const { user } = useUser();
@@ -305,6 +306,13 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ messages, onSendMessage, 
     const [isSearchVisible, setIsSearchVisible] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const messagesEndRef = useRef<HTMLDivElement>(null);
+
+    // Handle prefilled message from icebreaker
+    useEffect(() => {
+        if (prefilledMessage) {
+            setInput(prefilledMessage);
+        }
+    }, [prefilledMessage]);
 
     // Check if user has premium features (read receipts)
     const hasReadReceipts = user?.subscription &&

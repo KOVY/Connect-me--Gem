@@ -12,6 +12,7 @@ export interface UserProfile {
     country: string;
     lastSeen: string; // ISO string date
     verified?: boolean; // Verification badge (for VIP users)
+    icebreakers?: string[]; // Conversation prompts (max 3)
 }
 
 export interface User extends Omit<UserProfile, 'age' | 'country' | 'lastSeen' | 'hobbies'> {
