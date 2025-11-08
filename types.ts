@@ -106,3 +106,24 @@ export interface LocaleContextState {
     country: SupportedCountry;
     currency: SupportedCurrency;
 }
+
+// --- Discovery Filters ---
+
+export interface DiscoveryFilters {
+    ageRange: [number, number]; // [min, max]
+    distance?: number; // in km
+    gender?: 'male' | 'female' | 'other' | 'all';
+    interests?: string[];
+    verified?: boolean; // Only verified profiles
+    hasPhotos?: boolean;
+    height?: [number, number]; // in cm
+    education?: EducationLevel[];
+    smoking?: SmokingPreference[];
+    drinking?: DrinkingPreference[];
+    pets?: PetPreference[];
+}
+
+export type EducationLevel = 'high_school' | 'bachelors' | 'masters' | 'phd';
+export type SmokingPreference = 'never' | 'sometimes' | 'regularly';
+export type DrinkingPreference = 'never' | 'socially' | 'regularly';
+export type PetPreference = 'no_pets' | 'has_cats' | 'has_dogs' | 'has_other';
