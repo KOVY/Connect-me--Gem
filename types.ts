@@ -161,3 +161,30 @@ export interface UserStats {
     dailyStreak: UserStreak;
     messageStreak: UserStreak;
 }
+
+// --- Stories/Moments (24h ephemeral content) ---
+
+export interface StoryItem {
+    id: string;
+    userId: string;
+    mediaUrl: string; // Image or video URL
+    mediaType: 'image' | 'video';
+    caption?: string;
+    timestamp: string; // ISO date string
+    expiresAt: string; // ISO date string (24h from timestamp)
+    views: string[]; // User IDs who viewed this story
+    reactions: StoryReaction[];
+}
+
+export interface StoryReaction {
+    userId: string;
+    emoji: string;
+    timestamp: string;
+}
+
+export interface UserStories {
+    user: UserProfile;
+    stories: StoryItem[];
+    hasUnviewedStories: boolean;
+    lastUpdated: string; // ISO date of most recent story
+}

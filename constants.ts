@@ -1,4 +1,4 @@
-import { UserProfile, Gift, CreditPackage, Reel, SubscriptionPlan, Achievement } from './types';
+import { UserProfile, Gift, CreditPackage, Reel, SubscriptionPlan, Achievement, UserStories, StoryItem } from './types';
 
 // Placeholder avatars for user profile customization
 export const PLACEHOLDER_AVATARS: string[] = [
@@ -595,5 +595,89 @@ export const ACHIEVEMENTS: Achievement[] = [
         icon: '🚀',
         category: 'special',
         target: 1,
+    },
+];
+
+// Stories/Moments - 24h ephemeral content
+const now = Date.now();
+const hoursAgo = (hours: number) => new Date(now - hours * 60 * 60 * 1000).toISOString();
+const hoursFromNow = (hours: number) => new Date(now + hours * 60 * 60 * 1000).toISOString();
+
+export const USER_STORIES: UserStories[] = [
+    {
+        user: PROFILES[0], // Sophia
+        stories: [
+            {
+                id: 'story_1',
+                userId: 'prof_1',
+                mediaUrl: 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?q=80&w=1887&auto=format&fit=crop',
+                mediaType: 'image',
+                caption: 'Sunset views from my favorite hiking spot 🌅',
+                timestamp: hoursAgo(2),
+                expiresAt: hoursFromNow(22),
+                views: [],
+                reactions: [],
+            },
+            {
+                id: 'story_2',
+                userId: 'prof_1',
+                mediaUrl: 'https://images.unsplash.com/photo-1511405946472-a37e3b5ccd47?q=80&w=1887&auto=format&fit=crop',
+                mediaType: 'image',
+                caption: 'Working on a new painting! 🎨',
+                timestamp: hoursAgo(5),
+                expiresAt: hoursFromNow(19),
+                views: [],
+                reactions: [],
+            },
+        ],
+        hasUnviewedStories: true,
+        lastUpdated: hoursAgo(2),
+    },
+    {
+        user: PROFILES[1], // Liam
+        stories: [
+            {
+                id: 'story_3',
+                userId: 'prof_2',
+                mediaUrl: 'https://images.unsplash.com/photo-1511367461989-f85a21fda167?q=80&w=1887&auto=format&fit=crop',
+                mediaType: 'image',
+                caption: 'Live music night! 🎸',
+                timestamp: hoursAgo(8),
+                expiresAt: hoursFromNow(16),
+                views: [],
+                reactions: [],
+            },
+        ],
+        hasUnviewedStories: true,
+        lastUpdated: hoursAgo(8),
+    },
+    {
+        user: PROFILES[2], // Isabella
+        stories: [
+            {
+                id: 'story_4',
+                userId: 'prof_3',
+                mediaUrl: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=1887&auto=format&fit=crop',
+                mediaType: 'image',
+                caption: "Today's special: Homemade pasta! 🍝",
+                timestamp: hoursAgo(3),
+                expiresAt: hoursFromNow(21),
+                views: [],
+                reactions: [],
+            },
+            {
+                id: 'story_5',
+                userId: 'prof_3',
+                mediaUrl: 'https://images.unsplash.com/photo-1464454709131-ffd692591ee5?q=80&w=1887&auto=format&fit=crop',
+                mediaType: 'image',
+                caption: 'Garden harvest 🌿',
+                timestamp: hoursAgo(6),
+                expiresAt: hoursFromNow(18),
+                views: [],
+                reactions: [],
+            },
+        ],
+        hasUnviewedStories: true,
+        lastUpdated: hoursAgo(3),
     },
 ];
