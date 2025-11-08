@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { ChatMessage, UserProfile } from '../types';
 import { useTranslations } from '../hooks/useTranslations';
 import { useLocale } from '../contexts/LocaleContext';
+import { useUser } from '../contexts/UserContext';
 
 type SignalingData = {
     type: 'offer' | 'answer';
@@ -25,6 +26,7 @@ interface ChatInterfaceProps {
     signalingData: SignalingData | null;
     onSignal: (data: SignalingData) => void;
     disabledReason?: 'API_KEY' | 'LOCKED' | null;
+    prefilledMessage?: string | null;
 }
 
 // --- ICONS ---
@@ -83,6 +85,18 @@ const XIcon: React.FC = () => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-6 h-6">
         <path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z" />
     </svg>
+);
+const CheckmarkIcon: React.FC<{ double?: boolean; className?: string }> = ({ double = false, className = "" }) => (
+    double ? (
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={`w-4 h-4 ${className}`}>
+            <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clipRule="evenodd" />
+            <path fillRule="evenodd" d="M12.704 4.153a.75.75 0 0 1 .143 1.052l-6 7.5a.75.75 0 0 1-1.195-.09l-2-2.5a.75.75 0 1 1 1.176-.94l1.358 1.697 5.368-6.719a.75.75 0 0 1 1.05-.143Z" clipRule="evenodd" opacity="0.5" />
+        </svg>
+    ) : (
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={`w-4 h-4 ${className}`}>
+            <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clipRule="evenodd" />
+        </svg>
+    )
 );
 
 
@@ -283,14 +297,27 @@ const VideoCallView: React.FC<VideoCallViewProps> = ({ recipient, onEndCall, sig
 
 
 // --- MAIN CHAT INTERFACE ---
-const ChatInterface: React.FC<ChatInterfaceProps> = ({ messages, onSendMessage, isSending, recipient, recipientLastSeenStatus, onOpenGiftModal, onAddReaction, isCallActive, onStartCall, onEndCall, signalingData, onSignal, disabledReason = null }) => {
+const ChatInterface: React.FC<ChatInterfaceProps> = ({ messages, onSendMessage, isSending, recipient, recipientLastSeenStatus, onOpenGiftModal, onAddReaction, isCallActive, onStartCall, onEndCall, signalingData, onSignal, disabledReason = null, prefilledMessage = null }) => {
     const { t } = useTranslations();
     const { locale } = useLocale();
+    const { user } = useUser();
     const [input, setInput] = useState('');
     const [activeReactionPicker, setActiveReactionPicker] = useState<string | null>(null);
     const [isSearchVisible, setIsSearchVisible] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const messagesEndRef = useRef<HTMLDivElement>(null);
+
+    // Handle prefilled message from icebreaker
+    useEffect(() => {
+        if (prefilledMessage) {
+            setInput(prefilledMessage);
+        }
+    }, [prefilledMessage]);
+
+    // Check if user has premium features (read receipts)
+    const hasReadReceipts = user?.subscription &&
+        (user.subscription.tier === 'premium' || user.subscription.tier === 'vip') &&
+        new Date(user.subscription.expiryDate) > new Date();
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -451,8 +478,19 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ messages, onSendMessage, 
                                     {msg.reactions && <ReactionsDisplay reactions={msg.reactions} alignment={isUser ? 'right' : 'left'} />}
                                 </div>
                             </div>
-                            <div className={`text-xs text-white/50 mt-1 px-2`}>
-                                {formatTimestamp(msg.timestamp)}
+                            <div className={`text-xs text-white/50 mt-1 px-2 flex items-center gap-1 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
+                                <span>{formatTimestamp(msg.timestamp)}</span>
+                                {isUser && hasReadReceipts && (
+                                    <CheckmarkIcon
+                                        double={msg.read}
+                                        className={msg.read ? 'text-blue-400' : 'text-white/30'}
+                                    />
+                                )}
+                                {isUser && !hasReadReceipts && msg.read === undefined && (
+                                    <span className="text-xs text-white/30 italic ml-1" title="Upgrade to Premium to see read receipts">
+                                        (Premium)
+                                    </span>
+                                )}
                             </div>
                         </div>
                     );

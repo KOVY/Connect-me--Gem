@@ -11,6 +11,11 @@ interface UserContextState {
   updateUser: (updates: Partial<Pick<User, 'name' | 'bio' | 'interests' | 'profilePictureUrl' | 'occupation'>>) => Promise<void>;
   sendGift: (gift: Gift, recipientName: string) => Promise<void>;
   purchaseCredits: (packageId: string) => Promise<void>;
+  subscribe: (planId: string) => Promise<void>;
+  cancelSubscription: () => Promise<void>;
+  useBoost: () => Promise<void>;
+  useSuperLike: (profileId: string) => Promise<void>;
+  useRewind: () => Promise<void>;
   profileCompleteness: number;
   completionSuggestions: string[];
 }
@@ -54,6 +59,31 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(updatedUser);
   }, []);
 
+  const subscribe = useCallback(async (planId: string) => {
+    const { user: updatedUser } = await api.processSubscription(planId);
+    setUser(updatedUser);
+  }, []);
+
+  const cancelSubscription = useCallback(async () => {
+    const updatedUser = await api.cancelSubscription();
+    setUser(updatedUser);
+  }, []);
+
+  const useBoost = useCallback(async () => {
+    const updatedUser = await api.useBoost();
+    setUser(updatedUser);
+  }, []);
+
+  const useSuperLike = useCallback(async (profileId: string) => {
+    const updatedUser = await api.useSuperLike(profileId);
+    setUser(updatedUser);
+  }, []);
+
+  const useRewind = useCallback(async () => {
+    const updatedUser = await api.useRewind();
+    setUser(updatedUser);
+  }, []);
+
   const profileCompleteness = useMemo(() => calculateProfileCompleteness(user), [user]);
   const completionSuggestions = useMemo(() => getProfileCompletionSuggestions(user), [user]);
 
@@ -66,6 +96,11 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     updateUser,
     sendGift,
     purchaseCredits,
+    subscribe,
+    cancelSubscription,
+    useBoost,
+    useSuperLike,
+    useRewind,
     profileCompleteness,
     completionSuggestions,
   };

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom';
 // FIX: Import from @google/genai
 import { GoogleGenAI, Chat } from '@google/genai';
 
@@ -22,8 +22,10 @@ const ChatPage: React.FC = () => {
   const { locale } = useLocale();
   const { t } = useTranslations();
   const { user, isLoggedIn } = useUser();
-  
+  const [searchParams, setSearchParams] = useSearchParams();
+
   // State
+  const [prefilledMessage, setPrefilledMessage] = useState<string | null>(null);
   const [recipient, setRecipient] = useState<UserProfile | undefined>();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isSending, setIsSending] = useState(false);
@@ -41,6 +43,16 @@ const ChatPage: React.FC = () => {
   // Memoized Gemini API check
   const isApiKeyMissing = useMemo(() => !process.env.API_KEY, []);
   
+  // Handle icebreaker message from URL parameter
+  useEffect(() => {
+    const messageParam = searchParams.get('message');
+    if (messageParam) {
+      setPrefilledMessage(decodeURIComponent(messageParam));
+      // Clear the URL parameter after capturing it
+      setSearchParams({});
+    }
+  }, [searchParams, setSearchParams]);
+
   // Find recipient profile
   useEffect(() => {
     const profile = PROFILES.find(p => p.id === userId);
@@ -296,6 +308,7 @@ const ChatPage: React.FC = () => {
             signalingData={signalingData}
             onSignal={handleSignal}
             disabledReason={isApiKeyMissing ? 'API_KEY' : null}
+            prefilledMessage={prefilledMessage}
           />
         )}
       </div>

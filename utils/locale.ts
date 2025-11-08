@@ -1,15 +1,21 @@
 import { SupportedLanguage, SupportedCountry, SupportedCurrency } from '../types';
 
-const SUPPORTED_LANGUAGES: SupportedLanguage[] = ['en', 'cs'];
-const SUPPORTED_COUNTRIES: SupportedCountry[] = ['US', 'GB', 'DE', 'FR', 'ES', 'IT', 'CZ'];
+const SUPPORTED_LANGUAGES: SupportedLanguage[] = ['en', 'cs', 'de', 'fr', 'es', 'it', 'pl', 'pt'];
+const SUPPORTED_COUNTRIES: SupportedCountry[] = ['US', 'GB', 'DE', 'FR', 'ES', 'IT', 'CZ', 'PL', 'PT', 'AT', 'CH', 'BE', 'NL'];
 
 const getCurrencyFromCountry = (country: SupportedCountry): SupportedCurrency => {
     switch (country) {
         case 'CZ': return 'CZK';
+        case 'PL': return 'PLN';
+        case 'CH': return 'CHF';
         case 'DE':
         case 'FR':
         case 'ES':
-        case 'IT': return 'EUR';
+        case 'IT':
+        case 'AT':
+        case 'BE':
+        case 'NL':
+        case 'PT': return 'EUR';
         case 'GB': return 'GBP';
         case 'US':
         default: return 'USD';

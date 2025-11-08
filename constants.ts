@@ -1,4 +1,4 @@
-import { UserProfile, Gift, CreditPackage, Reel } from './types';
+import { UserProfile, Gift, CreditPackage, Reel, SubscriptionPlan, Achievement, UserStories, StoryItem } from './types';
 
 // Placeholder avatars for user profile customization
 export const PLACEHOLDER_AVATARS: string[] = [
@@ -23,6 +23,11 @@ export const PROFILES: UserProfile[] = [
         hobbies: ['Painting', 'Hiking', 'Trying new recipes'],
         country: 'USA',
         lastSeen: new Date(Date.now() - 1000 * 60 * 3).toISOString(), // 3 mins ago
+        icebreakers: [
+            "What's the last thing that made you laugh?",
+            "Best hidden cafe you've discovered?",
+            "Dream travel destination and why?"
+        ],
     },
     {
         id: 'prof_2',
@@ -35,6 +40,11 @@ export const PROFILES: UserProfile[] = [
         hobbies: ['Board Games', 'Rock Climbing', 'Podcasts'],
         country: 'Canada',
         lastSeen: new Date(Date.now() - 1000 * 60 * 60 * 25).toISOString(), // 25 hours ago
+        icebreakers: [
+            "Favorite board game to play on a rainy day?",
+            "Best concert you've ever been to?",
+            "What's your go-to spicy dish?"
+        ],
     },
     {
         id: 'prof_3',
@@ -47,6 +57,11 @@ export const PROFILES: UserProfile[] = [
         hobbies: ['Baking', 'Yoga', 'Documentaries'],
         country: 'Italy',
         lastSeen: new Date(Date.now() - 1000 * 60 * 60 * 4).toISOString(), // 4 hours ago
+        icebreakers: [
+            "What's your comfort food?",
+            "Most memorable meal you've ever had?",
+            "Coffee or tea - and how do you take it?"
+        ],
     },
      {
         id: 'prof_4',
@@ -59,6 +74,11 @@ export const PROFILES: UserProfile[] = [
         hobbies: ['Volunteering', 'Playing Guitar', 'Camping'],
         country: 'Australia',
         lastSeen: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3).toISOString(), // 3 days ago
+        icebreakers: [
+            "Dog person or cat person?",
+            "Last book that left you thinking?",
+            "Favorite camping spot you've discovered?"
+        ],
     }
 ];
 
@@ -66,6 +86,12 @@ export const PROFILES: UserProfile[] = [
 export const GIFTS: Gift[] = [
     { id: 'gift_1', name: 'Rose', icon: '🌹', cost: 50 },
     { id: 'gift_2', name: 'Teddy Bear', icon: '🧸', cost: 150 },
+    { id: 'gift_3', name: 'Chocolate Box', icon: '🍫', cost: 75 },
+    { id: 'gift_4', name: 'Champagne', icon: '🍾', cost: 200 },
+    { id: 'gift_5', name: 'Diamond Ring', icon: '💍', cost: 500 },
+    { id: 'gift_6', name: 'Bouquet', icon: '💐', cost: 100 },
+    { id: 'gift_7', name: 'Heart', icon: '❤️', cost: 30 },
+    { id: 'gift_8', name: 'Star', icon: '⭐', cost: 120 },
 ];
 
 // Credit packages available for purchase
@@ -86,6 +112,348 @@ export const CREDIT_PACKAGES: CreditPackage[] = [
   { id: 'czk_1', credits: 100, price: 25, currency: 'CZK' },
   { id: 'czk_2', credits: 550, price: 125, currency: 'CZK' },
   { id: 'czk_3', credits: 1200, price: 250, currency: 'CZK' },
+  // PLN
+  { id: 'pln_1', credits: 100, price: 4.49, currency: 'PLN' },
+  { id: 'pln_2', credits: 550, price: 22, currency: 'PLN' },
+  { id: 'pln_3', credits: 1200, price: 45, currency: 'PLN' },
+  // CHF
+  { id: 'chf_1', credits: 100, price: 0.99, currency: 'CHF' },
+  { id: 'chf_2', credits: 550, price: 4.99, currency: 'CHF' },
+  { id: 'chf_3', credits: 1200, price: 9.99, currency: 'CHF' },
+];
+
+// Subscription plans (Premium memberships)
+export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
+  // USD Plans
+  {
+    id: 'usd_basic_monthly',
+    tier: 'basic',
+    name: 'Basic',
+    price: 9.99,
+    currency: 'USD',
+    duration: 'monthly',
+    features: [
+      '5 Super Likes per day',
+      'See who liked you',
+      'Unlimited rewinds',
+      'Ad-free experience',
+      '1 free Boost per month',
+    ],
+  },
+  {
+    id: 'usd_premium_monthly',
+    tier: 'premium',
+    name: 'Premium',
+    price: 19.99,
+    currency: 'USD',
+    duration: 'monthly',
+    features: [
+      '10 Super Likes per day',
+      'See who liked you',
+      'Unlimited rewinds',
+      'Ad-free experience',
+      '2 free Boosts per month',
+      'Read receipts',
+      'Priority profile visibility',
+      'Advanced filters',
+    ],
+  },
+  {
+    id: 'usd_vip_monthly',
+    tier: 'vip',
+    name: 'VIP',
+    price: 34.99,
+    currency: 'USD',
+    duration: 'monthly',
+    features: [
+      'Unlimited Super Likes',
+      'See who liked you',
+      'Unlimited rewinds',
+      'Ad-free experience',
+      '5 free Boosts per month',
+      'Read receipts',
+      'Top profile placement',
+      'Advanced filters',
+      'Verified badge',
+      'Monthly credit bonus (500)',
+      'Exclusive VIP support',
+    ],
+  },
+  // EUR Plans
+  {
+    id: 'eur_basic_monthly',
+    tier: 'basic',
+    name: 'Basic',
+    price: 9.99,
+    currency: 'EUR',
+    duration: 'monthly',
+    features: [
+      '5 Super Likes per day',
+      'See who liked you',
+      'Unlimited rewinds',
+      'Ad-free experience',
+      '1 free Boost per month',
+    ],
+  },
+  {
+    id: 'eur_premium_monthly',
+    tier: 'premium',
+    name: 'Premium',
+    price: 19.99,
+    currency: 'EUR',
+    duration: 'monthly',
+    features: [
+      '10 Super Likes per day',
+      'See who liked you',
+      'Unlimited rewinds',
+      'Ad-free experience',
+      '2 free Boosts per month',
+      'Read receipts',
+      'Priority profile visibility',
+      'Advanced filters',
+    ],
+  },
+  {
+    id: 'eur_vip_monthly',
+    tier: 'vip',
+    name: 'VIP',
+    price: 34.99,
+    currency: 'EUR',
+    duration: 'monthly',
+    features: [
+      'Unlimited Super Likes',
+      'See who liked you',
+      'Unlimited rewinds',
+      'Ad-free experience',
+      '5 free Boosts per month',
+      'Read receipts',
+      'Top profile placement',
+      'Advanced filters',
+      'Verified badge',
+      'Monthly credit bonus (500)',
+      'Exclusive VIP support',
+    ],
+  },
+  // GBP Plans
+  {
+    id: 'gbp_basic_monthly',
+    tier: 'basic',
+    name: 'Basic',
+    price: 8.99,
+    currency: 'GBP',
+    duration: 'monthly',
+    features: [
+      '5 Super Likes per day',
+      'See who liked you',
+      'Unlimited rewinds',
+      'Ad-free experience',
+      '1 free Boost per month',
+    ],
+  },
+  {
+    id: 'gbp_premium_monthly',
+    tier: 'premium',
+    name: 'Premium',
+    price: 17.99,
+    currency: 'GBP',
+    duration: 'monthly',
+    features: [
+      '10 Super Likes per day',
+      'See who liked you',
+      'Unlimited rewinds',
+      'Ad-free experience',
+      '2 free Boosts per month',
+      'Read receipts',
+      'Priority profile visibility',
+      'Advanced filters',
+    ],
+  },
+  {
+    id: 'gbp_vip_monthly',
+    tier: 'vip',
+    name: 'VIP',
+    price: 29.99,
+    currency: 'GBP',
+    duration: 'monthly',
+    features: [
+      'Unlimited Super Likes',
+      'See who liked you',
+      'Unlimited rewinds',
+      'Ad-free experience',
+      '5 free Boosts per month',
+      'Read receipts',
+      'Top profile placement',
+      'Advanced filters',
+      'Verified badge',
+      'Monthly credit bonus (500)',
+      'Exclusive VIP support',
+    ],
+  },
+  // CZK Plans
+  {
+    id: 'czk_basic_monthly',
+    tier: 'basic',
+    name: 'Basic',
+    price: 249,
+    currency: 'CZK',
+    duration: 'monthly',
+    features: [
+      '5 Super Likes per day',
+      'See who liked you',
+      'Unlimited rewinds',
+      'Ad-free experience',
+      '1 free Boost per month',
+    ],
+  },
+  {
+    id: 'czk_premium_monthly',
+    tier: 'premium',
+    name: 'Premium',
+    price: 499,
+    currency: 'CZK',
+    duration: 'monthly',
+    features: [
+      '10 Super Likes per day',
+      'See who liked you',
+      'Unlimited rewinds',
+      'Ad-free experience',
+      '2 free Boosts per month',
+      'Read receipts',
+      'Priority profile visibility',
+      'Advanced filters',
+    ],
+  },
+  {
+    id: 'czk_vip_monthly',
+    tier: 'vip',
+    name: 'VIP',
+    price: 849,
+    currency: 'CZK',
+    duration: 'monthly',
+    features: [
+      'Unlimited Super Likes',
+      'See who liked you',
+      'Unlimited rewinds',
+      'Ad-free experience',
+      '5 free Boosts per month',
+      'Read receipts',
+      'Top profile placement',
+      'Advanced filters',
+      'Verified badge',
+      'Monthly credit bonus (500)',
+      'Exclusive VIP support',
+    ],
+  },
+  // PLN Plans
+  {
+    id: 'pln_basic_monthly',
+    tier: 'basic',
+    name: 'Basic',
+    price: 45,
+    currency: 'PLN',
+    duration: 'monthly',
+    features: [
+      '5 Super Likes per day',
+      'See who liked you',
+      'Unlimited rewinds',
+      'Ad-free experience',
+      '1 free Boost per month',
+    ],
+  },
+  {
+    id: 'pln_premium_monthly',
+    tier: 'premium',
+    name: 'Premium',
+    price: 89,
+    currency: 'PLN',
+    duration: 'monthly',
+    features: [
+      '10 Super Likes per day',
+      'See who liked you',
+      'Unlimited rewinds',
+      'Ad-free experience',
+      '2 free Boosts per month',
+      'Read receipts',
+      'Priority profile visibility',
+      'Advanced filters',
+    ],
+  },
+  {
+    id: 'pln_vip_monthly',
+    tier: 'vip',
+    name: 'VIP',
+    price: 149,
+    currency: 'PLN',
+    duration: 'monthly',
+    features: [
+      'Unlimited Super Likes',
+      'See who liked you',
+      'Unlimited rewinds',
+      'Ad-free experience',
+      '5 free Boosts per month',
+      'Read receipts',
+      'Top profile placement',
+      'Advanced filters',
+      'Verified badge',
+      'Monthly credit bonus (500)',
+      'Exclusive VIP support',
+    ],
+  },
+  // CHF Plans
+  {
+    id: 'chf_basic_monthly',
+    tier: 'basic',
+    name: 'Basic',
+    price: 9.99,
+    currency: 'CHF',
+    duration: 'monthly',
+    features: [
+      '5 Super Likes per day',
+      'See who liked you',
+      'Unlimited rewinds',
+      'Ad-free experience',
+      '1 free Boost per month',
+    ],
+  },
+  {
+    id: 'chf_premium_monthly',
+    tier: 'premium',
+    name: 'Premium',
+    price: 19.99,
+    currency: 'CHF',
+    duration: 'monthly',
+    features: [
+      '10 Super Likes per day',
+      'See who liked you',
+      'Unlimited rewinds',
+      'Ad-free experience',
+      '2 free Boosts per month',
+      'Read receipts',
+      'Priority profile visibility',
+      'Advanced filters',
+    ],
+  },
+  {
+    id: 'chf_vip_monthly',
+    tier: 'vip',
+    name: 'VIP',
+    price: 34.99,
+    currency: 'CHF',
+    duration: 'monthly',
+    features: [
+      'Unlimited Super Likes',
+      'See who liked you',
+      'Unlimited rewinds',
+      'Ad-free experience',
+      '5 free Boosts per month',
+      'Read receipts',
+      'Top profile placement',
+      'Advanced filters',
+      'Verified badge',
+      'Monthly credit bonus (500)',
+      'Exclusive VIP support',
+    ],
+  },
 ];
 
 // Mock Reels data
@@ -107,5 +475,209 @@ export const REELS: Reel[] = [
         videoUrl: 'https://test-videos.co.uk/vids/sintel/mp4/h264/360/Sintel_360_10s_1MB.mp4',
         description: 'Baking up a storm this weekend. 🥐 #baking #foodie',
         userProfile: PROFILES[2],
+    },
+];
+
+// Achievements and badges
+export const ACHIEVEMENTS: Achievement[] = [
+    // Streak Achievements
+    {
+        id: 'streak_3',
+        name: '3-Day Streak',
+        description: 'Log in for 3 consecutive days',
+        icon: '🔥',
+        category: 'streak',
+        target: 3,
+    },
+    {
+        id: 'streak_7',
+        name: 'Week Warrior',
+        description: 'Maintain a 7-day login streak',
+        icon: '⚡',
+        category: 'streak',
+        target: 7,
+    },
+    {
+        id: 'streak_30',
+        name: 'Monthly Master',
+        description: 'Achieve a 30-day login streak',
+        icon: '👑',
+        category: 'streak',
+        target: 30,
+    },
+    {
+        id: 'streak_100',
+        name: 'Century Club',
+        description: 'Reach a 100-day login streak',
+        icon: '💯',
+        category: 'streak',
+        target: 100,
+    },
+    // Social Achievements
+    {
+        id: 'matches_10',
+        name: 'Connection Starter',
+        description: 'Get your first 10 matches',
+        icon: '💖',
+        category: 'social',
+        target: 10,
+    },
+    {
+        id: 'matches_50',
+        name: 'Social Butterfly',
+        description: 'Reach 50 total matches',
+        icon: '🦋',
+        category: 'social',
+        target: 50,
+    },
+    {
+        id: 'matches_100',
+        name: 'Matchmaking Pro',
+        description: 'Achieve 100 matches',
+        icon: '✨',
+        category: 'social',
+        target: 100,
+    },
+    // Engagement Achievements
+    {
+        id: 'messages_100',
+        name: 'Conversationalist',
+        description: 'Send 100 messages',
+        icon: '💬',
+        category: 'engagement',
+        target: 100,
+    },
+    {
+        id: 'messages_500',
+        name: 'Chat Master',
+        description: 'Send 500 messages',
+        icon: '📱',
+        category: 'engagement',
+        target: 500,
+    },
+    {
+        id: 'likes_50',
+        name: 'Generous Heart',
+        description: 'Give 50 likes',
+        icon: '❤️',
+        category: 'engagement',
+        target: 50,
+    },
+    {
+        id: 'gifts_10',
+        name: 'Gift Giver',
+        description: 'Send 10 gifts',
+        icon: '🎁',
+        category: 'engagement',
+        target: 10,
+    },
+    // Special Achievements
+    {
+        id: 'profile_complete',
+        name: 'All Set Up',
+        description: 'Complete your profile with photo and bio',
+        icon: '✅',
+        category: 'special',
+        target: 1,
+    },
+    {
+        id: 'verified',
+        name: 'Verified User',
+        description: 'Get your profile verified',
+        icon: '🔵',
+        category: 'special',
+        target: 1,
+    },
+    {
+        id: 'early_adopter',
+        name: 'Early Adopter',
+        description: 'Join in the first month of launch',
+        icon: '🚀',
+        category: 'special',
+        target: 1,
+    },
+];
+
+// Stories/Moments - 24h ephemeral content
+const now = Date.now();
+const hoursAgo = (hours: number) => new Date(now - hours * 60 * 60 * 1000).toISOString();
+const hoursFromNow = (hours: number) => new Date(now + hours * 60 * 60 * 1000).toISOString();
+
+export const USER_STORIES: UserStories[] = [
+    {
+        user: PROFILES[0], // Sophia
+        stories: [
+            {
+                id: 'story_1',
+                userId: 'prof_1',
+                mediaUrl: 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?q=80&w=1887&auto=format&fit=crop',
+                mediaType: 'image',
+                caption: 'Sunset views from my favorite hiking spot 🌅',
+                timestamp: hoursAgo(2),
+                expiresAt: hoursFromNow(22),
+                views: [],
+                reactions: [],
+            },
+            {
+                id: 'story_2',
+                userId: 'prof_1',
+                mediaUrl: 'https://images.unsplash.com/photo-1511405946472-a37e3b5ccd47?q=80&w=1887&auto=format&fit=crop',
+                mediaType: 'image',
+                caption: 'Working on a new painting! 🎨',
+                timestamp: hoursAgo(5),
+                expiresAt: hoursFromNow(19),
+                views: [],
+                reactions: [],
+            },
+        ],
+        hasUnviewedStories: true,
+        lastUpdated: hoursAgo(2),
+    },
+    {
+        user: PROFILES[1], // Liam
+        stories: [
+            {
+                id: 'story_3',
+                userId: 'prof_2',
+                mediaUrl: 'https://images.unsplash.com/photo-1511367461989-f85a21fda167?q=80&w=1887&auto=format&fit=crop',
+                mediaType: 'image',
+                caption: 'Live music night! 🎸',
+                timestamp: hoursAgo(8),
+                expiresAt: hoursFromNow(16),
+                views: [],
+                reactions: [],
+            },
+        ],
+        hasUnviewedStories: true,
+        lastUpdated: hoursAgo(8),
+    },
+    {
+        user: PROFILES[2], // Isabella
+        stories: [
+            {
+                id: 'story_4',
+                userId: 'prof_3',
+                mediaUrl: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=1887&auto=format&fit=crop',
+                mediaType: 'image',
+                caption: "Today's special: Homemade pasta! 🍝",
+                timestamp: hoursAgo(3),
+                expiresAt: hoursFromNow(21),
+                views: [],
+                reactions: [],
+            },
+            {
+                id: 'story_5',
+                userId: 'prof_3',
+                mediaUrl: 'https://images.unsplash.com/photo-1464454709131-ffd692591ee5?q=80&w=1887&auto=format&fit=crop',
+                mediaType: 'image',
+                caption: 'Garden harvest 🌿',
+                timestamp: hoursAgo(6),
+                expiresAt: hoursFromNow(18),
+                views: [],
+                reactions: [],
+            },
+        ],
+        hasUnviewedStories: true,
+        lastUpdated: hoursAgo(3),
     },
 ];

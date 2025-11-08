@@ -11,12 +11,49 @@ export interface UserProfile {
     hobbies: string[];
     country: string;
     lastSeen: string; // ISO string date
+    verified?: boolean; // Verification badge (for VIP users)
+    icebreakers?: string[]; // Conversation prompts (max 3)
 }
 
 export interface User extends Omit<UserProfile, 'age' | 'country' | 'lastSeen' | 'hobbies'> {
     credits: number;
     transactions: Transaction[];
     profilePictureUrl: string; // Renamed from imageUrl for clarity
+    subscription?: UserSubscription; // Current subscription
+    superLikesRemaining?: number; // Super likes available
+    boostsRemaining?: number; // Profile boosts available
+    rewindsRemaining?: number; // Rewinds available
+    likedBy?: ProfileLike[]; // Who liked this user
+    likedProfiles?: ProfileLike[]; // Who this user liked
+    stats?: UserStats; // Gamification stats, streaks, and achievements
+}
+
+export interface ProfileLike {
+    profileId: string;
+    profile: UserProfile;
+    timestamp: string; // ISO string date
+    isSuperLike: boolean;
+    isMatch?: boolean; // Mutual like
+}
+
+export interface UserSubscription {
+    tier: SubscriptionTier;
+    startDate: string; // ISO string date
+    expiryDate: string; // ISO string date
+    autoRenew: boolean;
+}
+
+export type SubscriptionTier = 'free' | 'basic' | 'premium' | 'vip';
+
+export interface SubscriptionPlan {
+    id: string;
+    tier: SubscriptionTier;
+    name: string;
+    price: number;
+    currency: SupportedCurrency;
+    duration: 'monthly' | 'yearly';
+    features: string[];
+    savings?: string; // e.g., "Save 20%" for yearly plans
 }
 
 export interface ChatMessage {
@@ -27,6 +64,7 @@ export interface ChatMessage {
     timestamp: string; // ISO string date
     reactions?: Record<string, string[]>; // emoji -> userIds[]
     gift?: Gift;
+    read?: boolean; // Whether the message has been read (for read receipts)
 }
 
 export interface Gift {
@@ -60,13 +98,93 @@ export interface Reel {
 
 // --- Locale & Internationalization ---
 
-export type SupportedLanguage = 'en' | 'cs';
-export type SupportedCountry = 'US' | 'GB' | 'DE' | 'FR' | 'ES' | 'IT' | 'CZ';
-export type SupportedCurrency = 'USD' | 'EUR' | 'GBP' | 'CZK';
+export type SupportedLanguage = 'en' | 'cs' | 'de' | 'fr' | 'es' | 'it' | 'pl' | 'pt';
+export type SupportedCountry = 'US' | 'GB' | 'DE' | 'FR' | 'ES' | 'IT' | 'CZ' | 'PL' | 'PT' | 'AT' | 'CH' | 'BE' | 'NL';
+export type SupportedCurrency = 'USD' | 'EUR' | 'GBP' | 'CZK' | 'PLN' | 'CHF';
 
 export interface LocaleContextState {
     locale: string;
     language: SupportedLanguage;
     country: SupportedCountry;
     currency: SupportedCurrency;
+}
+
+// --- Discovery Filters ---
+
+export interface DiscoveryFilters {
+    ageRange: [number, number]; // [min, max]
+    distance?: number; // in km
+    gender?: 'male' | 'female' | 'other' | 'all';
+    interests?: string[];
+    verified?: boolean; // Only verified profiles
+    hasPhotos?: boolean;
+    height?: [number, number]; // in cm
+    education?: EducationLevel[];
+    smoking?: SmokingPreference[];
+    drinking?: DrinkingPreference[];
+    pets?: PetPreference[];
+}
+
+export type EducationLevel = 'high_school' | 'bachelors' | 'masters' | 'phd';
+export type SmokingPreference = 'never' | 'sometimes' | 'regularly';
+export type DrinkingPreference = 'never' | 'socially' | 'regularly';
+export type PetPreference = 'no_pets' | 'has_cats' | 'has_dogs' | 'has_other';
+
+// --- Gamification & Streaks ---
+
+export interface UserStreak {
+    current: number; // Current streak count in days
+    longest: number; // Longest streak ever achieved
+    lastActivityDate: string; // ISO date string
+    isActive: boolean; // Whether streak is still active today
+}
+
+export interface Achievement {
+    id: string;
+    name: string;
+    description: string;
+    icon: string;
+    category: 'social' | 'engagement' | 'streak' | 'special';
+    unlockedAt?: string; // ISO date string when unlocked
+    progress?: number; // Progress towards unlocking (0-100)
+    target?: number; // Target value to unlock
+}
+
+export interface UserStats {
+    totalLikes: number;
+    totalMatches: number;
+    totalMessages: number;
+    profileViews: number;
+    points: number; // Gamification points
+    level: number; // User level based on points
+    achievements: Achievement[];
+    dailyStreak: UserStreak;
+    messageStreak: UserStreak;
+}
+
+// --- Stories/Moments (24h ephemeral content) ---
+
+export interface StoryItem {
+    id: string;
+    userId: string;
+    mediaUrl: string; // Image or video URL
+    mediaType: 'image' | 'video';
+    caption?: string;
+    timestamp: string; // ISO date string
+    expiresAt: string; // ISO date string (24h from timestamp)
+    views: string[]; // User IDs who viewed this story
+    reactions: StoryReaction[];
+}
+
+export interface StoryReaction {
+    userId: string;
+    emoji: string;
+    timestamp: string;
+}
+
+export interface UserStories {
+    user: UserProfile;
+    stories: StoryItem[];
+    hasUnviewedStories: boolean;
+    lastUpdated: string; // ISO date of most recent story
 }
