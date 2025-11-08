@@ -86,9 +86,9 @@ export interface Reel {
 
 // --- Locale & Internationalization ---
 
-export type SupportedLanguage = 'en' | 'cs';
-export type SupportedCountry = 'US' | 'GB' | 'DE' | 'FR' | 'ES' | 'IT' | 'CZ';
-export type SupportedCurrency = 'USD' | 'EUR' | 'GBP' | 'CZK';
+export type SupportedLanguage = 'en' | 'cs' | 'de' | 'fr' | 'es' | 'it' | 'pl' | 'pt';
+export type SupportedCountry = 'US' | 'GB' | 'DE' | 'FR' | 'ES' | 'IT' | 'CZ' | 'PL' | 'PT' | 'AT' | 'CH' | 'BE' | 'NL';
+export type SupportedCurrency = 'USD' | 'EUR' | 'GBP' | 'CZK' | 'PLN' | 'CHF';
 
 export interface LocaleContextState {
     locale: string;
