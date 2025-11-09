@@ -105,7 +105,7 @@ ORDER BY country, language;
 
 SELECT COUNT(*) as new_profiles_added 
 FROM public.discovery_profiles 
-WHERE id LIKE 'aaaaaaaa-%' OR id LIKE 'bbbbbbbb-%';
+WHERE id::text LIKE 'aaaaaaaa-%' OR id LIKE 'bbbbbbbb-%';
 
 COMMIT;
 
@@ -186,6 +186,6 @@ ORDER BY country, language;
 
 SELECT COUNT(*) as total_new_profiles 
 FROM public.discovery_profiles 
-WHERE id LIKE 'aaaaaaaa-%' OR id LIKE 'bbbbbbbb-%' OR id LIKE 'cccccccc-%' OR id LIKE 'dddddddd-%';
+WHERE id::text LIKE 'aaaaaaaa-%' OR id LIKE 'bbbbbbbb-%' OR id LIKE 'cccccccc-%' OR id LIKE 'dddddddd-%';
 
 COMMIT;
