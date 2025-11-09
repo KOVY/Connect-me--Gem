@@ -24,8 +24,8 @@ import HistoryTab from './components/tabs/HistoryTab';
 import AnalyticsTab from './components/tabs/AnalyticsTab';
 import PaymentMethodsTab from './components/tabs/PaymentMethodsTab';
 import SettingsTab from './components/tabs/SettingsTab';
-import { PayoutPage } from './src/pages/PayoutPage';
-import { GiftInventoryPage } from './src/pages/GiftInventoryPage';
+import { PayoutPage } from './pages/PayoutPage';
+import { GiftInventoryPage } from './pages/GiftInventoryPage';
 
 export const router = createBrowserRouter([
     {

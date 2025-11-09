@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { X, Gift as GiftIcon, Sparkles, AlertCircle } from 'lucide-react';
-import { AVAILABLE_GIFTS, Gift, calculateRecipientEarnings } from '../lib/gifts';
-import { sendGift, getUserCreditBalance, type SendGiftResponse } from '../lib/giftService';
-import { useUser } from '../hooks/useUser';
+import { AVAILABLE_GIFTS, Gift, calculateRecipientEarnings } from '../src/lib/gifts';
+import { sendGift, getUserCreditBalance, type SendGiftResponse } from '../src/lib/giftService';
+import { useUser } from '../contexts/UserContext';
 
 interface GiftModalProps {
   isOpen: boolean;

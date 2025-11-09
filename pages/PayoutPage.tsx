@@ -12,8 +12,8 @@ import {
   type PayoutHistoryItem,
   type PayPalDetails,
   type BankAccountDetails,
-} from '../lib/payoutService';
-import { useUser } from '../hooks/useUser';
+} from '../src/lib/payoutService';
+import { useUser } from '../contexts/UserContext';
 
 export function PayoutPage() {
   const navigate = useNavigate();

@@ -2,8 +2,8 @@ import React from 'react';
 import { Outlet, useParams } from 'react-router-dom';
 import { LocaleProvider } from '../contexts/LocaleContext';
 import { UserProvider } from '../contexts/UserContext';
-import { FloatingGlassNav } from '../src/components/FloatingGlassNav';
-import { BottomActionBar } from '../src/components/BottomActionBar';
+import { FloatingGlassNav } from './FloatingGlassNav';
+import { BottomActionBar } from './BottomActionBar';
 
 const LocaleLayout: React.FC = () => {
     const { locale } = useParams<{ locale: string }>();

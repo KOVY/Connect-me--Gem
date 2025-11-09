@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Package, Sparkles, TrendingUp, Gift as GiftIcon, Send } from 'lucide-react';
-import { AVAILABLE_GIFTS, type Gift } from '../lib/gifts';
+import { AVAILABLE_GIFTS, type Gift } from '../src/lib/gifts';
 
 interface InventoryItem extends Gift {
   quantity: number;

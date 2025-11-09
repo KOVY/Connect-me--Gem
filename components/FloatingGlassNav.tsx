@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Gift, Sparkles, User, Heart, Zap, ShoppingBag } from 'lucide-react';
-import { useUser } from '../hooks/useUser';
-import { getUserBalance } from '../lib/payoutService';
+import { useUser } from '../contexts/UserContext';
+import { getUserBalance } from '../src/lib/payoutService';
 import { useLocale } from '../contexts/LocaleContext';
 
 export function FloatingGlassNav() {
