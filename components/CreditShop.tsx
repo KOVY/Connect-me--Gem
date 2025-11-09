@@ -270,7 +270,11 @@ const CreditShop: React.FC = () => {
           </div>
           <div>
             <h3 className="text-lg font-semibold text-white mb-2">{t('did_you_know')}</h3>
-            <p className="text-white/70 text-sm" dangerouslySetInnerHTML={{ __html: t('earn_credits_info') }}></p>
+            <p className="text-white/70 text-sm">
+              {t('earn_credits_info_part1')}
+              <span className="font-semibold text-green-400">{t('earn_credits_info_part2')}</span>
+              {t('earn_credits_info_part3')}
+            </p>
             <span className="text-white/50 block mt-2 text-xs">
               {t('platform_commission')}
             </span>
