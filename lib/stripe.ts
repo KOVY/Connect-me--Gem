@@ -17,29 +17,30 @@ const STRIPE_PUBLISHABLE_KEY = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
  */
 export async function createCreditCheckoutSession(
   creditPackage: CreditPackage,
-  userId: string,
-  userEmail: string
+  authToken: string
 ): Promise<{ sessionId: string; url: string }> {
-  // TODO: Replace with actual Stripe API call
-  // This would call your backend endpoint which creates a Stripe Checkout Session
+  const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 
-  const response = await fetch('/api/stripe/create-checkout-session', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      packageId: creditPackage.id,
-      creditAmount: creditPackage.creditAmount,
-      price: creditPackage.price,
-      currency: creditPackage.currency,
-      userId,
-      userEmail,
-    }),
-  });
+  const response = await fetch(
+    `${SUPABASE_URL}/functions/v1/create-checkout-session`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authToken}`,
+      },
+      body: JSON.stringify({
+        packageId: creditPackage.id,
+        creditAmount: creditPackage.creditAmount,
+        price: creditPackage.price,
+        currency: creditPackage.currency,
+      }),
+    }
+  );
 
   if (!response.ok) {
-    throw new Error('Failed to create checkout session');
+    const error = await response.json();
+    throw new Error(error.error || 'Failed to create checkout session');
   }
 
   const data = await response.json();
@@ -54,11 +55,10 @@ export async function createCreditCheckoutSession(
  */
 export async function redirectToCheckout(
   creditPackage: CreditPackage,
-  userId: string,
-  userEmail: string
+  authToken: string
 ): Promise<void> {
   try {
-    const { url } = await createCreditCheckoutSession(creditPackage, userId, userEmail);
+    const { url } = await createCreditCheckoutSession(creditPackage, authToken);
 
     // Redirect to Stripe Checkout
     window.location.href = url;
@@ -72,8 +72,6 @@ export async function redirectToCheckout(
  * Request payout via Stripe
  */
 export async function requestPayout(
-  userId: string,
-  amountUsd: number,
   currency: string,
   paymentMethod: 'bank_account' | 'paypal',
   paymentDetails: {
@@ -81,37 +79,36 @@ export async function requestPayout(
     iban?: string;
     accountNumber?: string;
     routingNumber?: string;
-  }
-): Promise<{ payoutRequestId: string }> {
-  // TODO: Replace with actual API call to backend
-  // Backend will:
-  // 1. Validate user has enough balance
-  // 2. Calculate commission (60%)
-  // 3. Create payout_request in Supabase
-  // 4. Initiate Stripe Payout (or queue for manual processing)
+  },
+  authToken: string
+): Promise<{ payoutRequestId: string; message: string }> {
+  const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 
-  const response = await fetch('/api/stripe/request-payout', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      userId,
-      amountUsd,
-      currency,
-      paymentMethod,
-      paymentDetails,
-    }),
-  });
+  const response = await fetch(
+    `${SUPABASE_URL}/functions/v1/request-payout`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authToken}`,
+      },
+      body: JSON.stringify({
+        currency,
+        paymentMethod,
+        paymentDetails,
+      }),
+    }
+  );
 
   if (!response.ok) {
     const error = await response.json();
-    throw new Error(error.message || 'Failed to request payout');
+    throw new Error(error.error || 'Failed to request payout');
   }
 
   const data = await response.json();
   return {
     payoutRequestId: data.payoutRequestId,
+    message: data.message,
   };
 }
 
@@ -131,41 +128,39 @@ export function getStripePricingConfig() {
  * This deducts credits from sender and adds earned_credits to recipient
  */
 export async function processGiftPurchase(
-  senderId: string,
   recipientId: string,
   giftId: string,
-  creditCost: number
-): Promise<{ success: boolean; transactionId: string }> {
-  // TODO: Replace with actual Supabase function call
-  // This should be a Postgres function or Edge Function that:
-  // 1. Checks sender has enough credits
-  // 2. Deducts from sender's purchased_credits or balance
-  // 3. Adds to recipient's earned_credits
-  // 4. Creates transaction record
-  // 5. Updates cash_balance_usd for recipient
+  creditCost: number,
+  authToken: string
+): Promise<{ success: boolean; transactionId: string; senderNewBalance: number }> {
+  const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 
-  const response = await fetch('/api/credits/send-gift', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      senderId,
-      recipientId,
-      giftId,
-      creditCost,
-    }),
-  });
+  const response = await fetch(
+    `${SUPABASE_URL}/functions/v1/send-gift`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authToken}`,
+      },
+      body: JSON.stringify({
+        recipientId,
+        giftId,
+        creditCost,
+      }),
+    }
+  );
 
   if (!response.ok) {
     const error = await response.json();
-    throw new Error(error.message || 'Failed to send gift');
+    throw new Error(error.error || 'Failed to send gift');
   }
 
   const data = await response.json();
   return {
-    success: true,
+    success: data.success,
     transactionId: data.transactionId,
+    senderNewBalance: data.senderNewBalance,
   };
 }
 
