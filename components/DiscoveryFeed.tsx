@@ -5,15 +5,25 @@ import DiscoveryActions from './DiscoveryActions';
 
 interface DiscoveryFeedProps {
   profiles: UserProfile[];
+  onSwipe?: () => void;
+  canSwipe?: boolean;
 }
 
-const DiscoveryFeed: React.FC<DiscoveryFeedProps> = ({ profiles }) => {
+const DiscoveryFeed: React.FC<DiscoveryFeedProps> = ({ profiles, onSwipe, canSwipe = true }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const touchStartY = useRef(0);
 
   const handleNextProfile = () => {
     if (isAnimating || currentIndex >= profiles.length - 1) return;
+
+    // Zkontrolovat, jestli může swipovat
+    if (!canSwipe) return;
+
+    // Zavolat callback pro tracking swipes
+    if (onSwipe) {
+      onSwipe();
+    }
 
     setIsAnimating(true);
     setTimeout(() => {
@@ -29,6 +39,7 @@ const DiscoveryFeed: React.FC<DiscoveryFeedProps> = ({ profiles }) => {
   };
 
   const handleSuperLike = () => {
+    if (!canSwipe) return; // Zabránit super like pokud nelze swipovat
     handleNextProfile(); // Move to next profile after super like
   };
 
@@ -62,13 +73,22 @@ const DiscoveryFeed: React.FC<DiscoveryFeedProps> = ({ profiles }) => {
             </div>
           )}
           <div className={`absolute inset-0 z-20 ${isAnimating ? 'animate-card-exit' : ''}`}>
-            <ProfileCard profile={currentProfile} onLike={handleNextProfile} />
+            <ProfileCard profile={currentProfile} onLike={canSwipe ? handleNextProfile : undefined} />
             <DiscoveryActions
               profile={currentProfile}
               onSuperLike={handleSuperLike}
               onRewind={handleRewind}
             />
           </div>
+
+          {/* Overlay když uživatel nemůže swipovat */}
+          {!canSwipe && (
+            <div className="absolute inset-0 z-30 bg-black/50 backdrop-blur-sm flex items-center justify-center pointer-events-none">
+              <div className="text-center animate-pulse">
+                <p className="text-white text-lg font-semibold">Zaregistruj se pro pokračování</p>
+              </div>
+            </div>
+          )}
         </>
       ) : (
         <div className="flex items-center justify-center h-full text-center">

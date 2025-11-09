@@ -4,20 +4,40 @@ import DiscoveryFilters from '../components/DiscoveryFilters';
 import StreakWidget from '../components/StreakWidget';
 import StoriesBar from '../components/StoriesBar';
 import StoryViewer from '../components/StoryViewer';
-import { PROFILES, USER_STORIES } from '../constants';
+import AuthPromptModal from '../components/AuthPromptModal';
+import { USER_STORIES } from '../constants';
 import { DiscoveryFilters as IDiscoveryFilters, UserStories } from '../types';
+import { useDiscoveryProfiles } from '../hooks/useDiscoveryProfiles';
+import { useSwipeTracker } from '../hooks/useSwipeTracker';
+import { useLocale } from '../contexts/LocaleContext';
+import { useUser } from '../contexts/UserContext';
 
 const DiscoveryPage: React.FC = () => {
+  const { language } = useLocale();
+  const { isLoggedIn } = useUser();
+  const { profiles, loading, error } = useDiscoveryProfiles(language);
+  const swipeTracker = useSwipeTracker(isLoggedIn);
+
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState<IDiscoveryFilters>({
     ageRange: [18, 99],
   });
   const [selectedStory, setSelectedStory] = useState<UserStories | null>(null);
   const [currentStoryUserIndex, setCurrentStoryUserIndex] = useState(0);
+  const [showAuthPrompt, setShowAuthPrompt] = useState(false);
 
   const handleApplyFilters = (newFilters: IDiscoveryFilters) => {
     setFilters(newFilters);
     // TODO: Apply filters to profiles
+  };
+
+  const handleSwipe = () => {
+    swipeTracker.incrementSwipe();
+
+    // Zobrazit modal po dosažení limitu
+    if (swipeTracker.hasReachedLimit) {
+      setShowAuthPrompt(true);
+    }
   };
 
   const handleStoryClick = (userStories: UserStories) => {
@@ -67,7 +87,28 @@ const DiscoveryPage: React.FC = () => {
           </svg>
         </button>
 
-        <DiscoveryFeed profiles={PROFILES} />
+        {loading ? (
+          <div className="flex items-center justify-center h-full">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+              <p className="text-white/70">Loading profiles...</p>
+            </div>
+          </div>
+        ) : error ? (
+          <div className="flex items-center justify-center h-full text-center px-6">
+            <div>
+              <h2 className="text-2xl font-bold aurora-text mb-2">Oops!</h2>
+              <p className="text-white/70">Could not load profiles. Please check your connection.</p>
+              <p className="text-white/50 text-sm mt-2">{error.message}</p>
+            </div>
+          </div>
+        ) : (
+          <DiscoveryFeed
+            profiles={profiles}
+            onSwipe={handleSwipe}
+            canSwipe={swipeTracker.canSwipe}
+          />
+        )}
 
         {showFilters && (
           <DiscoveryFilters
@@ -76,6 +117,13 @@ const DiscoveryPage: React.FC = () => {
             onClose={() => setShowFilters(false)}
           />
         )}
+
+        {/* Auth Prompt Modal */}
+        <AuthPromptModal
+          isOpen={showAuthPrompt}
+          onClose={() => setShowAuthPrompt(false)}
+          swipeCount={swipeTracker.swipeCount}
+        />
       </div>
 
       {/* Story Viewer Modal */}

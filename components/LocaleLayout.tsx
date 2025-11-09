@@ -2,7 +2,8 @@ import React from 'react';
 import { Outlet, useParams } from 'react-router-dom';
 import { LocaleProvider } from '../contexts/LocaleContext';
 import { UserProvider } from '../contexts/UserContext';
-import BottomNavBar from './BottomNavBar';
+import { FloatingGlassNav } from './FloatingGlassNav';
+import { BottomActionBar } from './BottomActionBar';
 
 const LocaleLayout: React.FC = () => {
     const { locale } = useParams<{ locale: string }>();
@@ -16,13 +17,17 @@ const LocaleLayout: React.FC = () => {
     return (
         <LocaleProvider locale={locale}>
             <UserProvider>
-                <div className="h-screen w-screen bg-[#120B2E] text-white flex flex-col">
-                    {/* Main content area that fills the available space */}
-                    <main className="flex-1 min-h-0">
+                <div className="h-screen w-screen bg-gradient-to-br from-gray-900 via-purple-900/30 to-gray-900 text-white overflow-hidden">
+                    {/* Floating Glass Navigation */}
+                    <FloatingGlassNav />
+
+                    {/* Main content area with top padding for fixed nav */}
+                    <main className="h-full w-full overflow-y-auto">
                         <Outlet />
                     </main>
-                    {/* Nav bar is now part of the flex layout, not fixed */}
-                    <BottomNavBar />
+
+                    {/* Bottom Action Bar (Mobile Only) */}
+                    <BottomActionBar />
                 </div>
             </UserProvider>
         </LocaleProvider>
