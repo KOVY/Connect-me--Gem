@@ -1,4 +1,11 @@
 {
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "/cs-cz",
+      "permanent": false
+    }
+  ],
   "rewrites": [
     {
       "source": "/(.*)",
