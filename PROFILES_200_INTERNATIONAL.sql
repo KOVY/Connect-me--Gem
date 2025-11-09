@@ -99,13 +99,13 @@ SELECT
     COUNT(*) as count
 FROM public.discovery_profiles
 WHERE is_ai_profile = true
-AND id LIKE 'aaaaaaaa-%' OR id LIKE 'bbbbbbbb-%'
+AND (id::text LIKE 'aaaaaaaa-%' OR id::text LIKE 'bbbbbbbb-%')
 GROUP BY country, language
 ORDER BY country, language;
 
 SELECT COUNT(*) as new_profiles_added 
 FROM public.discovery_profiles 
-WHERE id::text LIKE 'aaaaaaaa-%' OR id LIKE 'bbbbbbbb-%';
+WHERE id::text LIKE 'aaaaaaaa-%' OR id::text LIKE 'bbbbbbbb-%';
 
 COMMIT;
 
@@ -180,12 +180,12 @@ SELECT
     COUNT(*) as count
 FROM public.discovery_profiles
 WHERE is_ai_profile = true
-AND (id LIKE 'aaaaaaaa-%' OR id LIKE 'bbbbbbbb-%' OR id LIKE 'cccccccc-%' OR id LIKE 'dddddddd-%')
+AND (id::text LIKE 'aaaaaaaa-%' OR id::text LIKE 'bbbbbbbb-%' OR id::text LIKE 'cccccccc-%' OR id::text LIKE 'dddddddd-%')
 GROUP BY country, language
 ORDER BY country, language;
 
 SELECT COUNT(*) as total_new_profiles 
 FROM public.discovery_profiles 
-WHERE id::text LIKE 'aaaaaaaa-%' OR id LIKE 'bbbbbbbb-%' OR id LIKE 'cccccccc-%' OR id LIKE 'dddddddd-%';
+WHERE (id::text LIKE 'aaaaaaaa-%' OR id::text LIKE 'bbbbbbbb-%' OR id::text LIKE 'cccccccc-%' OR id::text LIKE 'dddddddd-%');
 
 COMMIT;
