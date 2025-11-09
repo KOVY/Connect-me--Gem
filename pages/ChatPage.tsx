@@ -14,6 +14,7 @@ import signalingService from '../utils/signalingService';
 import ChatInterface from '../components/ChatInterface';
 import GiftWall from '../components/GiftWall';
 import GiftSelectionModal from '../components/GiftSelectionModal';
+import { GiftModal } from '../components/GiftModal';
 
 const ChatPage: React.FC = () => {
   // Hooks
@@ -30,8 +31,9 @@ const ChatPage: React.FC = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isSending, setIsSending] = useState(false);
   // In a real app, this would be persisted
-  const [isChatLocked, setIsChatLocked] = useState(true); 
+  const [isChatLocked, setIsChatLocked] = useState(true);
   const [isGiftModalOpen, setIsGiftModalOpen] = useState(false);
+  const [isNewGiftModalOpen, setIsNewGiftModalOpen] = useState(false);
 
   // WebRTC Call State
   const [isCallActive, setIsCallActive] = useState(false);
@@ -300,7 +302,7 @@ const ChatPage: React.FC = () => {
             isSending={isSending}
             recipient={recipient}
             recipientLastSeenStatus={calculateLastSeen(recipient.lastSeen)}
-            onOpenGiftModal={() => setIsGiftModalOpen(true)}
+            onOpenGiftModal={() => setIsNewGiftModalOpen(true)}
             onAddReaction={handleAddReaction}
             isCallActive={isCallActive}
             onStartCall={handleStartCall}
@@ -312,11 +314,22 @@ const ChatPage: React.FC = () => {
           />
         )}
       </div>
+      {/* Old gift modal for unlocking chat */}
       {isGiftModalOpen && (
         <GiftSelectionModal
           recipientName={recipient.name}
           onClose={() => setIsGiftModalOpen(false)}
           onGiftSent={handleGiftSent}
+        />
+      )}
+
+      {/* New gift modal with Edge Function integration */}
+      {isNewGiftModalOpen && recipient && user && (
+        <GiftModal
+          isOpen={isNewGiftModalOpen}
+          onClose={() => setIsNewGiftModalOpen(false)}
+          recipientId={recipient.id}
+          recipientName={recipient.name}
         />
       )}
     </div>
