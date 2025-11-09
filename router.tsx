@@ -25,6 +25,7 @@ import AnalyticsTab from './components/tabs/AnalyticsTab';
 import PaymentMethodsTab from './components/tabs/PaymentMethodsTab';
 import SettingsTab from './components/tabs/SettingsTab';
 import { PayoutPage } from './src/pages/PayoutPage';
+import { GiftInventoryPage } from './src/pages/GiftInventoryPage';
 
 export const router = createBrowserRouter([
     {
@@ -64,6 +65,7 @@ export const router = createBrowserRouter([
                                     { path: 'likes', element: <LikesTab /> },
                                     { path: 'subscription', element: <SubscriptionTab /> },
                                     { path: 'shop', element: <ShopTab /> },
+                                    { path: 'inventory', element: <GiftInventoryPage /> },
                                     { path: 'payout', element: <PayoutPage /> },
                                     { path: 'history', element: <HistoryTab /> },
                                     { path: 'analytics', element: <AnalyticsTab /> },
