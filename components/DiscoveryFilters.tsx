@@ -3,6 +3,7 @@ import { useUser } from '../contexts/UserContext';
 import { DiscoveryFilters as IDiscoveryFilters } from '../types';
 import { useNavigate } from 'react-router-dom';
 import { useLocale } from '../contexts/LocaleContext';
+import { useTranslations } from '../hooks/useTranslations';
 
 interface DiscoveryFiltersProps {
     filters: IDiscoveryFilters;
@@ -14,6 +15,7 @@ const DiscoveryFilters: React.FC<DiscoveryFiltersProps> = ({ filters, onApply, o
     const { user } = useUser();
     const navigate = useNavigate();
     const { locale } = useLocale();
+    const { t } = useTranslations();
     const [localFilters, setLocalFilters] = useState<IDiscoveryFilters>(filters);
 
     const hasPremium = user?.subscription &&
@@ -41,7 +43,7 @@ const DiscoveryFilters: React.FC<DiscoveryFiltersProps> = ({ filters, onApply, o
             <div className="bg-gray-900 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-white/10">
                 {/* Header */}
                 <div className="sticky top-0 bg-gray-900 border-b border-white/10 p-6 flex justify-between items-center z-10">
-                    <h2 className="text-2xl font-bold aurora-text">Discovery Filters</h2>
+                    <h2 className="text-2xl font-bold aurora-text">{t('discovery_filters')}</h2>
                     <button
                         onClick={onClose}
                         className="w-10 h-10 rounded-full hover:bg-white/10 flex items-center justify-center transition-colors"
@@ -55,7 +57,7 @@ const DiscoveryFilters: React.FC<DiscoveryFiltersProps> = ({ filters, onApply, o
                 {!hasPremium && (
                     <div className="mx-6 mt-6 p-4 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/50 rounded-lg">
                         <p className="text-sm text-white/90">
-                            <strong>Premium Feature:</strong> Unlock advanced filters with Premium or VIP subscription
+                            <strong>{t('premium_feature')}:</strong> {t('unlock_advanced_filters')}
                         </p>
                     </div>
                 )}
@@ -65,7 +67,7 @@ const DiscoveryFilters: React.FC<DiscoveryFiltersProps> = ({ filters, onApply, o
                     {/* Age Range */}
                     <div>
                         <label className="block text-sm font-semibold mb-3">
-                            Age Range: {localFilters.ageRange[0]} - {localFilters.ageRange[1]}
+                            {t('age_range')}: {localFilters.ageRange[0]} - {localFilters.ageRange[1]}
                         </label>
                         <div className="flex gap-4">
                             <div className="flex-1">
@@ -81,7 +83,7 @@ const DiscoveryFilters: React.FC<DiscoveryFiltersProps> = ({ filters, onApply, o
                                     className="w-full accent-pink-500"
                                     disabled={!hasPremium}
                                 />
-                                <div className="text-xs text-white/60 mt-1">Min: {localFilters.ageRange[0]}</div>
+                                <div className="text-xs text-white/60 mt-1">{t('min')}: {localFilters.ageRange[0]}</div>
                             </div>
                             <div className="flex-1">
                                 <input
@@ -96,7 +98,7 @@ const DiscoveryFilters: React.FC<DiscoveryFiltersProps> = ({ filters, onApply, o
                                     className="w-full accent-pink-500"
                                     disabled={!hasPremium}
                                 />
-                                <div className="text-xs text-white/60 mt-1">Max: {localFilters.ageRange[1]}</div>
+                                <div className="text-xs text-white/60 mt-1">{t('max')}: {localFilters.ageRange[1]}</div>
                             </div>
                         </div>
                     </div>
@@ -104,7 +106,7 @@ const DiscoveryFilters: React.FC<DiscoveryFiltersProps> = ({ filters, onApply, o
                     {/* Distance */}
                     <div>
                         <label className="block text-sm font-semibold mb-3">
-                            Distance: {localFilters.distance ? `${localFilters.distance} km` : 'Any'}
+                            {t('distance')}: {localFilters.distance ? `${localFilters.distance} km` : t('any')}
                         </label>
                         <input
                             type="range"
@@ -127,8 +129,8 @@ const DiscoveryFilters: React.FC<DiscoveryFiltersProps> = ({ filters, onApply, o
                     {/* Verified Only */}
                     <div className="flex items-center justify-between p-4 bg-white/5 rounded-lg">
                         <div>
-                            <div className="font-semibold">Verified Profiles Only</div>
-                            <div className="text-sm text-white/60">Show only profiles with verification badge</div>
+                            <div className="font-semibold">{t('verified_profiles_only')}</div>
+                            <div className="text-sm text-white/60">{t('show_verified_badge')}</div>
                         </div>
                         <label className="relative inline-flex items-center cursor-pointer">
                             <input
@@ -147,14 +149,14 @@ const DiscoveryFilters: React.FC<DiscoveryFiltersProps> = ({ filters, onApply, o
 
                     {/* Education */}
                     <div>
-                        <label className="block text-sm font-semibold mb-3">Education Level</label>
+                        <label className="block text-sm font-semibold mb-3">{t('education_level')}</label>
                         <div className="grid grid-cols-2 gap-2">
                             {(['high_school', 'bachelors', 'masters', 'phd'] as const).map((level) => {
                                 const labels = {
-                                    high_school: 'High School',
-                                    bachelors: "Bachelor's",
-                                    masters: "Master's",
-                                    phd: 'PhD'
+                                    high_school: t('high_school'),
+                                    bachelors: t('bachelors'),
+                                    masters: t('masters'),
+                                    phd: t('phd')
                                 };
                                 return (
                                     <label
@@ -189,11 +191,11 @@ const DiscoveryFilters: React.FC<DiscoveryFiltersProps> = ({ filters, onApply, o
 
                     {/* Lifestyle Filters */}
                     <div className="space-y-4">
-                        <h3 className="font-semibold text-lg">Lifestyle</h3>
+                        <h3 className="font-semibold text-lg">{t('lifestyle')}</h3>
 
                         {/* Smoking */}
                         <div>
-                            <label className="block text-sm font-medium mb-2">Smoking</label>
+                            <label className="block text-sm font-medium mb-2">{t('smoking')}</label>
                             <div className="grid grid-cols-3 gap-2">
                                 {(['never', 'sometimes', 'regularly'] as const).map((pref) => (
                                     <label
@@ -219,7 +221,7 @@ const DiscoveryFilters: React.FC<DiscoveryFiltersProps> = ({ filters, onApply, o
                                             className="sr-only"
                                             disabled={!hasPremium}
                                         />
-                                        {pref.charAt(0).toUpperCase() + pref.slice(1)}
+                                        {t(pref as 'never' | 'sometimes' | 'regularly')}
                                     </label>
                                 ))}
                             </div>
@@ -227,7 +229,7 @@ const DiscoveryFilters: React.FC<DiscoveryFiltersProps> = ({ filters, onApply, o
 
                         {/* Drinking */}
                         <div>
-                            <label className="block text-sm font-medium mb-2">Drinking</label>
+                            <label className="block text-sm font-medium mb-2">{t('drinking')}</label>
                             <div className="grid grid-cols-3 gap-2">
                                 {(['never', 'socially', 'regularly'] as const).map((pref) => (
                                     <label
@@ -253,7 +255,7 @@ const DiscoveryFilters: React.FC<DiscoveryFiltersProps> = ({ filters, onApply, o
                                             className="sr-only"
                                             disabled={!hasPremium}
                                         />
-                                        {pref.charAt(0).toUpperCase() + pref.slice(1)}
+                                        {t(pref as 'never' | 'socially' | 'regularly')}
                                     </label>
                                 ))}
                             </div>
@@ -267,13 +269,13 @@ const DiscoveryFilters: React.FC<DiscoveryFiltersProps> = ({ filters, onApply, o
                         onClick={handleReset}
                         className="flex-1 px-6 py-3 bg-white/10 hover:bg-white/20 rounded-lg font-semibold transition-colors"
                     >
-                        Reset
+                        {t('reset')}
                     </button>
                     <button
                         onClick={handleApply}
                         className="flex-1 px-6 py-3 aurora-gradient rounded-lg font-semibold hover:scale-105 transition-transform"
                     >
-                        {hasPremium ? 'Apply Filters' : 'Upgrade to Premium'}
+                        {hasPremium ? t('apply_filters') : t('upgrade_to_premium')}
                     </button>
                 </div>
             </div>
