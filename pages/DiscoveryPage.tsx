@@ -4,14 +4,19 @@ import DiscoveryFilters from '../components/DiscoveryFilters';
 import StreakWidget from '../components/StreakWidget';
 import StoriesBar from '../components/StoriesBar';
 import StoryViewer from '../components/StoryViewer';
+import AuthPromptModal from '../components/AuthPromptModal';
 import { USER_STORIES } from '../constants';
 import { DiscoveryFilters as IDiscoveryFilters, UserStories } from '../types';
 import { useDiscoveryProfiles } from '../hooks/useDiscoveryProfiles';
+import { useSwipeTracker } from '../hooks/useSwipeTracker';
 import { useLocale } from '../contexts/LocaleContext';
+import { useUser } from '../contexts/UserContext';
 
 const DiscoveryPage: React.FC = () => {
   const { language } = useLocale();
+  const { isLoggedIn } = useUser();
   const { profiles, loading, error } = useDiscoveryProfiles(language);
+  const swipeTracker = useSwipeTracker(isLoggedIn);
 
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState<IDiscoveryFilters>({
@@ -19,10 +24,20 @@ const DiscoveryPage: React.FC = () => {
   });
   const [selectedStory, setSelectedStory] = useState<UserStories | null>(null);
   const [currentStoryUserIndex, setCurrentStoryUserIndex] = useState(0);
+  const [showAuthPrompt, setShowAuthPrompt] = useState(false);
 
   const handleApplyFilters = (newFilters: IDiscoveryFilters) => {
     setFilters(newFilters);
     // TODO: Apply filters to profiles
+  };
+
+  const handleSwipe = () => {
+    swipeTracker.incrementSwipe();
+
+    // Zobrazit modal po dosažení limitu
+    if (swipeTracker.hasReachedLimit) {
+      setShowAuthPrompt(true);
+    }
   };
 
   const handleStoryClick = (userStories: UserStories) => {
@@ -88,7 +103,11 @@ const DiscoveryPage: React.FC = () => {
             </div>
           </div>
         ) : (
-          <DiscoveryFeed profiles={profiles} />
+          <DiscoveryFeed
+            profiles={profiles}
+            onSwipe={handleSwipe}
+            canSwipe={swipeTracker.canSwipe}
+          />
         )}
 
         {showFilters && (
@@ -98,6 +117,13 @@ const DiscoveryPage: React.FC = () => {
             onClose={() => setShowFilters(false)}
           />
         )}
+
+        {/* Auth Prompt Modal */}
+        <AuthPromptModal
+          isOpen={showAuthPrompt}
+          onClose={() => setShowAuthPrompt(false)}
+          swipeCount={swipeTracker.swipeCount}
+        />
       </div>
 
       {/* Story Viewer Modal */}
