@@ -1,31 +1,33 @@
 import { Link, useLocation } from 'react-router-dom';
 import { Heart, Zap, MessageCircle, User, Plus } from 'lucide-react';
 import { useLocale } from '../contexts/LocaleContext';
+import { useTranslations } from '../hooks/useTranslations';
 import { useState } from 'react';
 
 export function BottomActionBar() {
   const { locale } = useLocale();
+  const { t } = useTranslations();
   const location = useLocation();
   const [activeIndex, setActiveIndex] = useState(0);
 
   const actions = [
     {
       icon: Heart,
-      label: 'Objevuj',
+      label: t('discover'),
       path: `/${locale}/`,
       color: 'from-pink-500 to-rose-500',
       activeColor: 'text-pink-400',
     },
     {
       icon: Zap,
-      label: 'Reels',
+      label: t('reels'),
       path: `/${locale}/reels`,
       color: 'from-purple-500 to-indigo-500',
       activeColor: 'text-purple-400',
     },
     {
       icon: Plus,
-      label: 'Shop',
+      label: t('shop'),
       path: `/${locale}/profile/me/shop`,
       color: 'from-yellow-500 to-orange-500',
       activeColor: 'text-yellow-400',
@@ -33,14 +35,14 @@ export function BottomActionBar() {
     },
     {
       icon: MessageCircle,
-      label: 'Zprávy',
+      label: t('messages'),
       path: `/${locale}/messages`,
       color: 'from-blue-500 to-cyan-500',
       activeColor: 'text-blue-400',
     },
     {
       icon: User,
-      label: 'Profil',
+      label: t('profile'),
       path: `/${locale}/profile/me`,
       color: 'from-emerald-500 to-teal-500',
       activeColor: 'text-emerald-400',
