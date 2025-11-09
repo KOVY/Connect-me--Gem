@@ -4,10 +4,12 @@ import { Menu, X, Gift, Sparkles, User, Heart, Zap, ShoppingBag } from 'lucide-r
 import { useUser } from '../contexts/UserContext';
 import { getUserBalance } from '../src/lib/payoutService';
 import { useLocale } from '../contexts/LocaleContext';
+import { useTranslations } from '../hooks/useTranslations';
 
 export function FloatingGlassNav() {
   const { user, isLoggedIn } = useUser();
   const { locale } = useLocale();
+  const { t } = useTranslations();
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [balance, setBalance] = useState(0);
@@ -30,11 +32,11 @@ export function FloatingGlassNav() {
   }, []);
 
   const menuItems = [
-    { icon: Heart, label: 'Objevuj', path: `/${locale}/`, gradient: 'from-pink-500 to-rose-500' },
-    { icon: Zap, label: 'Reels', path: `/${locale}/reels`, gradient: 'from-purple-500 to-indigo-500' },
-    { icon: ShoppingBag, label: 'Shop', path: `/${locale}/profile/me/shop`, gradient: 'from-yellow-500 to-orange-500' },
-    { icon: Gift, label: 'Dárky', path: `/${locale}/profile/me/inventory`, gradient: 'from-emerald-500 to-teal-500' },
-    { icon: User, label: 'Profil', path: `/${locale}/profile/me`, gradient: 'from-blue-500 to-cyan-500' },
+    { icon: Heart, label: t('discover'), path: `/${locale}/`, gradient: 'from-pink-500 to-rose-500' },
+    { icon: Zap, label: t('reels'), path: `/${locale}/reels`, gradient: 'from-purple-500 to-indigo-500' },
+    { icon: ShoppingBag, label: t('shop'), path: `/${locale}/profile/me/shop`, gradient: 'from-yellow-500 to-orange-500' },
+    { icon: Gift, label: t('gifts'), path: `/${locale}/profile/me/inventory`, gradient: 'from-emerald-500 to-teal-500' },
+    { icon: User, label: t('profile'), path: `/${locale}/profile/me`, gradient: 'from-blue-500 to-cyan-500' },
   ];
 
   return (
@@ -72,7 +74,7 @@ export function FloatingGlassNav() {
                   >
                     <Sparkles className="w-5 h-5 text-yellow-400 animate-pulse" />
                     <span className="text-white font-bold">{balance.toLocaleString()}</span>
-                    <span className="text-yellow-300 text-sm">kreditů</span>
+                    <span className="text-yellow-300 text-sm">{t('credits_unit')}</span>
                   </Link>
                 </div>
 
@@ -82,7 +84,7 @@ export function FloatingGlassNav() {
                   className="group relative flex items-center space-x-2 bg-white/5 backdrop-blur-xl border border-white/10 rounded-full px-4 py-2 hover:bg-white/10 transition-all duration-300"
                 >
                   <Gift className="w-5 h-5 text-purple-400 group-hover:rotate-12 transition-transform duration-300" />
-                  <span className="text-white text-sm">Sklad</span>
+                  <span className="text-white text-sm">{t('inventory')}</span>
                   <span className="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
                     5
                   </span>
@@ -149,7 +151,7 @@ export function FloatingGlassNav() {
                         <Sparkles className="w-4 h-4 text-yellow-400" />
                         <span className="text-white font-bold text-lg">{balance}</span>
                       </div>
-                      <p className="text-gray-400 text-xs">kreditů</p>
+                      <p className="text-gray-400 text-xs">{t('credits_unit')}</p>
                     </div>
                   </div>
                 </div>
@@ -222,12 +224,12 @@ export function FloatingGlassNav() {
                       <div className="flex items-center space-x-3">
                         <Sparkles className="w-6 h-6 text-yellow-400 animate-pulse" />
                         <div>
-                          <p className="text-yellow-300 text-sm">Tvůj zůstatek</p>
-                          <p className="text-white font-bold text-2xl">{balance.toLocaleString()} kreditů</p>
+                          <p className="text-yellow-300 text-sm">{t('your_balance')}</p>
+                          <p className="text-white font-bold text-2xl">{balance.toLocaleString()} {t('credits_unit')}</p>
                         </div>
                       </div>
                       <div className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-sm font-bold px-4 py-2 rounded-full group-hover:scale-105 transition-transform">
-                        Nabít
+                        {t('top_up')}
                       </div>
                     </div>
                   </div>

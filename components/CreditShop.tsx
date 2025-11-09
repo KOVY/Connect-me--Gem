@@ -5,10 +5,12 @@ import { useLocale } from '../contexts/LocaleContext';
 import { useUser } from '../contexts/UserContext';
 import { CreditPackage } from '../lib/creditPricing';
 import { calculateDiscount, formatPrice } from '../lib/creditPricing';
+import { useTranslations } from '../hooks/useTranslations';
 
 const CreditShop: React.FC = () => {
   const { currency } = useLocale();
   const { user, isLoading: userLoading } = useUser();
+  const { t } = useTranslations();
   const [packages, setPackages] = useState<CreditPackage[]>([]);
   const [loading, setLoading] = useState(true);
   const [purchasing, setPurchasing] = useState<string | null>(null);
@@ -97,7 +99,7 @@ const CreditShop: React.FC = () => {
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto mb-4"></div>
-          <p className="text-white/70">Loading shop...</p>
+          <p className="text-white/70">{t('loading_shop')}</p>
         </div>
       </div>
     );
@@ -107,9 +109,9 @@ const CreditShop: React.FC = () => {
     <div className="p-6 max-w-6xl mx-auto">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold mb-3 aurora-text">Credit Shop</h1>
+        <h1 className="text-4xl font-bold mb-3 aurora-text">{t('credit_shop')}</h1>
         <p className="text-white/70 text-lg">
-          Get credits to send gifts, boost your profile, and stand out! 💎
+          {t('get_credits_description')} 💎
         </p>
 
         {/* Current Balance */}
@@ -118,8 +120,8 @@ const CreditShop: React.FC = () => {
             <div className="flex items-center gap-2">
               <span className="text-2xl">🪙</span>
               <div className="text-left">
-                <p className="text-white/60 text-xs">Your Balance</p>
-                <p className="text-white font-bold text-xl">{user.credits || 0} Credits</p>
+                <p className="text-white/60 text-xs">{t('your_balance')}</p>
+                <p className="text-white font-bold text-xl">{user.credits || 0} {t('credits_label')}</p>
               </div>
             </div>
           </div>
@@ -168,7 +170,7 @@ const CreditShop: React.FC = () => {
               {/* Credit Amount */}
               <div className="flex items-baseline gap-2 mb-4">
                 <span className="text-4xl font-bold aurora-text">{pkg.creditAmount}</span>
-                <span className="text-white/60">credits</span>
+                <span className="text-white/60">{t('credits_unit')}</span>
               </div>
 
               {/* Price */}
@@ -179,7 +181,7 @@ const CreditShop: React.FC = () => {
                 {pkg.discountPercent > 0 && (
                   <div className="mt-1">
                     <span className="inline-block bg-green-500/20 text-green-400 text-xs font-semibold px-2 py-1 rounded">
-                      Save {pkg.discountPercent}%
+                      {t('save_percent', { percent: pkg.discountPercent.toString() })}
                     </span>
                   </div>
                 )}
@@ -187,7 +189,7 @@ const CreditShop: React.FC = () => {
 
               {/* Cost per credit */}
               <p className="text-white/50 text-sm mb-6">
-                {formatPrice(pkg.price / pkg.creditAmount, pkg.currency, getCurrencySymbol(pkg.currency))} per credit
+                {formatPrice(pkg.price / pkg.creditAmount, pkg.currency, getCurrencySymbol(pkg.currency))} {t('per_credit')}
               </p>
 
               {/* Buy Button */}
@@ -207,12 +209,12 @@ const CreditShop: React.FC = () => {
                 {isPurchasing ? (
                   <span className="flex items-center justify-center gap-2">
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    Processing...
+                    {t('processing')}
                   </span>
                 ) : !user ? (
-                  'Login Required'
+                  t('login_required')
                 ) : (
-                  'Buy Now'
+                  t('buy_now')
                 )}
               </button>
             </div>
@@ -222,7 +224,7 @@ const CreditShop: React.FC = () => {
 
       {/* What you can do with credits */}
       <div className="bg-white/5 rounded-2xl p-8">
-        <h2 className="text-2xl font-bold mb-6 text-center aurora-text">What can you do with credits?</h2>
+        <h2 className="text-2xl font-bold mb-6 text-center aurora-text">{t('what_can_you_do')}</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Gifts */}
@@ -230,9 +232,9 @@ const CreditShop: React.FC = () => {
             <div className="w-16 h-16 rounded-full bg-gradient-to-br from-pink-500 to-red-500 flex items-center justify-center mx-auto mb-4">
               <span className="text-3xl">💝</span>
             </div>
-            <h3 className="text-lg font-semibold text-white mb-2">Send Gifts</h3>
+            <h3 className="text-lg font-semibold text-white mb-2">{t('send_gifts_title')}</h3>
             <p className="text-white/60 text-sm">
-              Send micro-gifts to your matches to show appreciation. Gifts range from 10-500 credits.
+              {t('send_gifts_description')}
             </p>
           </div>
 
@@ -241,9 +243,9 @@ const CreditShop: React.FC = () => {
             <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center mx-auto mb-4">
               <span className="text-3xl">⭐</span>
             </div>
-            <h3 className="text-lg font-semibold text-white mb-2">Super Likes</h3>
+            <h3 className="text-lg font-semibold text-white mb-2">{t('super_likes_title')}</h3>
             <p className="text-white/60 text-sm">
-              Stand out with Super Likes (20 credits each). They see your like first!
+              {t('super_likes_description')}
             </p>
           </div>
 
@@ -252,9 +254,9 @@ const CreditShop: React.FC = () => {
             <div className="w-16 h-16 rounded-full bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center mx-auto mb-4">
               <span className="text-3xl">🚀</span>
             </div>
-            <h3 className="text-lg font-semibold text-white mb-2">Boost Profile</h3>
+            <h3 className="text-lg font-semibold text-white mb-2">{t('boost_profile_title')}</h3>
             <p className="text-white/60 text-sm">
-              Boost your profile to the top for 30 minutes (30 credits). Get 10× more views!
+              {t('boost_profile_description')}
             </p>
           </div>
         </div>
@@ -267,14 +269,11 @@ const CreditShop: React.FC = () => {
             <span className="text-2xl">💡</span>
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-white mb-2">Did you know?</h3>
-            <p className="text-white/70 text-sm">
-              You can <span className="font-semibold text-green-400">earn credits</span> by receiving gifts from other users!
-              When someone sends you a gift, you get those credits and can cash them out.
-              <span className="text-white/50 block mt-2 text-xs">
-                *Platform takes 60% commission on payouts (standard in creator economy).
-              </span>
-            </p>
+            <h3 className="text-lg font-semibold text-white mb-2">{t('did_you_know')}</h3>
+            <p className="text-white/70 text-sm" dangerouslySetInnerHTML={{ __html: t('earn_credits_info') }}></p>
+            <span className="text-white/50 block mt-2 text-xs">
+              {t('platform_commission')}
+            </span>
           </div>
         </div>
       </div>
