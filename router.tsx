@@ -24,6 +24,7 @@ import HistoryTab from './components/tabs/HistoryTab';
 import AnalyticsTab from './components/tabs/AnalyticsTab';
 import PaymentMethodsTab from './components/tabs/PaymentMethodsTab';
 import SettingsTab from './components/tabs/SettingsTab';
+import { PayoutPage } from './src/pages/PayoutPage';
 
 export const router = createBrowserRouter([
     {
@@ -63,6 +64,7 @@ export const router = createBrowserRouter([
                                     { path: 'likes', element: <LikesTab /> },
                                     { path: 'subscription', element: <SubscriptionTab /> },
                                     { path: 'shop', element: <ShopTab /> },
+                                    { path: 'payout', element: <PayoutPage /> },
                                     { path: 'history', element: <HistoryTab /> },
                                     { path: 'analytics', element: <AnalyticsTab /> },
                                     { path: 'payments', element: <PaymentMethodsTab /> },

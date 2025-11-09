@@ -9,6 +9,7 @@ const TABS = [
   { name: 'Likes', path: 'likes' },
   { name: 'Subscription', path: 'subscription' },
   { name: 'Shop', path: 'shop' },
+  { name: 'Payout', path: 'payout' },
   { name: 'History', path: 'history' },
   { name: 'Analytics', path: 'analytics' },
   { name: 'Payments', path: 'payments' },
