@@ -1,17 +1,50 @@
 -- ========================================
--- 🏆 SEED: Achievements (Gamification)
+-- 🏆 ACHIEVEMENTS TABLE + SEED DATA
+-- Kompletní vytvoření tabulky a vložení 49 achievementů
 -- ========================================
 
--- Insert achievement categories
+-- KROK 1: Smazání staré tabulky (pokud existuje)
+DROP TABLE IF EXISTS public.achievements CASCADE;
+
+-- KROK 2: Vytvoření nové tabulky se VŠEMI sloupci
+CREATE TABLE public.achievements (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    description TEXT NOT NULL,
+    category TEXT NOT NULL CHECK (category IN ('profile', 'matching', 'conversation', 'streak', 'engagement', 'premium', 'special')),
+    icon TEXT NOT NULL,
+    requirement_type TEXT NOT NULL,
+    requirement_value INTEGER NOT NULL DEFAULT 1,
+    points_reward INTEGER NOT NULL DEFAULT 0,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Index pro rychlé vyhledávání podle kategorie
+CREATE INDEX idx_achievements_category ON public.achievements(category);
+
+-- Komentáře k tabulce
+COMMENT ON TABLE public.achievements IS 'Gamification achievements that users can unlock';
+COMMENT ON COLUMN public.achievements.requirement_type IS 'Type of requirement (e.g., profile_complete, matches, messages_sent)';
+COMMENT ON COLUMN public.achievements.requirement_value IS 'Value needed to unlock achievement (e.g., 10 for "10 matches")';
+
+-- KROK 3: RLS Policies (všichni mohou číst achievementy)
+ALTER TABLE public.achievements ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Achievements are viewable by everyone"
+    ON public.achievements FOR SELECT
+    USING (true);
+
+-- KROK 4: Vložení dat (49 achievementů)
 INSERT INTO public.achievements (id, name, description, category, icon, requirement_type, requirement_value, points_reward) VALUES
--- === PROFILE ACHIEVEMENTS ===
+
+-- === PROFILE ACHIEVEMENTS (5) ===
 ('ach_001', 'First Impression', 'Complete your profile with a photo and bio', 'profile', '✨', 'profile_complete', 1, 50),
 ('ach_002', 'Show Off', 'Add 5 photos to your profile', 'profile', '📸', 'photos_uploaded', 5, 100),
 ('ach_003', 'Verified', 'Get your profile verified', 'profile', '✓', 'verified', 1, 200),
 ('ach_004', 'Trendsetter', 'Post your first Story', 'profile', '🎬', 'stories_posted', 1, 75),
 ('ach_005', 'Popular', 'Get 100 profile views', 'profile', '👀', 'profile_views', 100, 150),
 
--- === MATCHING ACHIEVEMENTS ===
+-- === MATCHING ACHIEVEMENTS (7) ===
 ('ach_101', 'First Like', 'Send your first like', 'matching', '💙', 'likes_sent', 1, 25),
 ('ach_102', 'Liked Back', 'Receive your first like', 'matching', '💕', 'likes_received', 1, 25),
 ('ach_103', 'It''s a Match!', 'Get your first match', 'matching', '💘', 'matches', 1, 100),
@@ -20,7 +53,7 @@ INSERT INTO public.achievements (id, name, description, category, icon, requirem
 ('ach_106', 'Love Magnet', 'Get 100 matches', 'matching', '🧲', 'matches', 100, 1000),
 ('ach_107', 'Picky', 'Like 100 profiles', 'matching', '🎯', 'likes_sent', 100, 200),
 
--- === CONVERSATION ACHIEVEMENTS ===
+-- === CONVERSATION ACHIEVEMENTS (7) ===
 ('ach_201', 'Icebreaker', 'Send your first message', 'conversation', '👋', 'messages_sent', 1, 50),
 ('ach_202', 'Conversationalist', 'Send 50 messages', 'conversation', '💬', 'messages_sent', 50, 150),
 ('ach_203', 'Chatterbox', 'Send 200 messages', 'conversation', '🗨️', 'messages_sent', 200, 300),
@@ -29,7 +62,7 @@ INSERT INTO public.achievements (id, name, description, category, icon, requirem
 ('ach_206', 'Night Owl', 'Send a message after midnight', 'conversation', '🦉', 'night_messages', 1, 100),
 ('ach_207', 'Early Bird', 'Send a message before 6 AM', 'conversation', '🐦', 'morning_messages', 1, 100),
 
--- === STREAK ACHIEVEMENTS ===
+-- === STREAK ACHIEVEMENTS (7) ===
 ('ach_301', 'Getting Started', 'Login for 3 days in a row', 'streak', '🔥', 'daily_streak', 3, 100),
 ('ach_302', 'Committed', 'Login for 7 days in a row', 'streak', '📅', 'daily_streak', 7, 250),
 ('ach_303', 'Dedicated', 'Login for 14 days in a row', 'streak', '⭐', 'daily_streak', 14, 500),
@@ -38,7 +71,7 @@ INSERT INTO public.achievements (id, name, description, category, icon, requirem
 ('ach_306', 'Engaged', 'Message 3 days in a row', 'streak', '💌', 'message_streak', 3, 150),
 ('ach_307', 'Consistent', 'Message 7 days in a row', 'streak', '📬', 'message_streak', 7, 300),
 
--- === ENGAGEMENT ACHIEVEMENTS ===
+-- === ENGAGEMENT ACHIEVEMENTS (7) ===
 ('ach_401', 'Generous', 'Send your first micro-gift', 'engagement', '🎁', 'gifts_sent', 1, 100),
 ('ach_402', 'Gift Giver', 'Send 10 micro-gifts', 'engagement', '🎀', 'gifts_sent', 10, 300),
 ('ach_403', 'Santa Claus', 'Send 50 micro-gifts', 'engagement', '🎅', 'gifts_sent', 50, 1000),
@@ -47,14 +80,14 @@ INSERT INTO public.achievements (id, name, description, category, icon, requirem
 ('ach_406', 'Story Star', 'Get 100 Story views', 'engagement', '⭐', 'story_views_received', 100, 300),
 ('ach_407', 'Reactor', 'React to 25 Stories', 'engagement', '❤️', 'story_reactions_sent', 25, 100),
 
--- === PREMIUM ACHIEVEMENTS ===
+-- === PREMIUM ACHIEVEMENTS (5) ===
 ('ach_501', 'VIP', 'Subscribe to Premium', 'premium', '💎', 'premium_subscription', 1, 500),
 ('ach_502', 'Supporter', 'Make your first purchase', 'premium', '💳', 'purchase', 1, 200),
 ('ach_503', 'Credit Collector', 'Earn 1000 credits', 'premium', '🪙', 'credits_earned', 1000, 250),
 ('ach_504', 'Boosted', 'Use your first Boost', 'premium', '🚀', 'boosts_used', 1, 150),
 ('ach_505', 'Super Star', 'Send 10 Super Likes', 'premium', '⭐', 'super_likes_sent', 10, 200),
 
--- === SPECIAL ACHIEVEMENTS ===
+-- === SPECIAL ACHIEVEMENTS (11) ===
 ('ach_601', 'Early Adopter', 'Join during beta period', 'special', '🎉', 'early_adopter', 1, 1000),
 ('ach_602', 'Influencer', 'Refer 5 friends', 'special', '📣', 'referrals', 5, 500),
 ('ach_603', 'Ambassador', 'Refer 20 friends', 'special', '🌟', 'referrals', 20, 2000),
@@ -63,13 +96,21 @@ INSERT INTO public.achievements (id, name, description, category, icon, requirem
 ('ach_606', 'Global Citizen', 'Match with someone from another country', 'special', '🌍', 'international_match', 1, 200),
 ('ach_607', 'Polyglot', 'Chat in 3 different languages', 'special', '🗣️', 'languages_used', 3, 400);
 
--- Verify insertion
+-- KROK 5: Ověření
 SELECT
     category,
-    COUNT(*) as achievement_count,
-    SUM(points_reward) as total_points
+    COUNT(*) as pocet_achievementu,
+    SUM(points_reward) as celkem_bodu
 FROM public.achievements
 GROUP BY category
 ORDER BY category;
 
-COMMIT;
+-- Očekávaný výsledek:
+-- conversation | 7  | 1550
+-- engagement   | 7  | 2050
+-- matching     | 7  | 2100
+-- premium      | 5  | 1300
+-- profile      | 5  | 575
+-- special      | 7  | 5000
+-- streak       | 7  | 2300
+-- CELKEM: 49 achievementů, 14875 bodů
