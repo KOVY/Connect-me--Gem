@@ -108,3 +108,84 @@ FROM public.discovery_profiles
 WHERE id LIKE 'aaaaaaaa-%' OR id LIKE 'bbbbbbbb-%';
 
 COMMIT;
+
+-- 🇩🇪 NĚMECKO - Deutsche Frauen (25 profilů)
+INSERT INTO public.discovery_profiles (
+    id, name, age, gender, bio, language, country, city, 
+    photo_url, interests, is_ai_profile, created_at
+) VALUES
+('cccccccc-cccc-cccc-cccc-cccccccccc01', 'Anna Müller', 26, 'female', 'Architektin in Berlin 🏛️ Moderne Designs sind meine Leidenschaft!', 'de', 'DE', 'Berlin', 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=800&h=1000&fit=crop', ARRAY['architektur', 'design', 'kunst'], true, NOW()),
+('cccccccc-cccc-cccc-cccc-cccccccccc02', 'Sophie Weber', 28, 'female', 'Marketing Managerin 💼 Kreativ und ambitioniert!', 'de', 'DE', 'München', 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=800&h=1000&fit=crop', ARRAY['marketing', 'business', 'kreativität'], true, NOW()),
+('cccccccc-cccc-cccc-cccc-cccccccccc03', 'Emma Schneider', 25, 'female', 'Yoga-Lehrerin 🧘‍♀️ Balance und Harmonie!', 'de', 'DE', 'Hamburg', 'https://images.unsplash.com/photo-1531746020798-e44692c8addb?w=800&h=1000&fit=crop', ARRAY['yoga', 'wellness', 'meditation'], true, NOW()),
+('cccccccc-cccc-cccc-cccc-cccccccccc04', 'Mia Fischer', 27, 'female', 'Fotografin 📸 Die Welt durch meine Linse!', 'de', 'DE', 'Köln', 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=800&h=1000&fit=crop', ARRAY['fotografie', 'reisen', 'kunst'], true, NOW()),
+('cccccccc-cccc-cccc-cccc-cccccccccc05', 'Hannah Schmidt', 29, 'female', 'Köchin & Food-Bloggerin 👩‍🍳 Leidenschaftlich!', 'de', 'DE', 'Frankfurt', 'https://images.unsplash.com/photo-1500917293891-ef795e70e1f6?w=800&h=1000&fit=crop', ARRAY['kochen', 'food', 'blogging'], true, NOW()),
+('cccccccc-cccc-cccc-cccc-cccccccccc06', 'Lena Meyer', 24, 'female', 'Tänzerin 💃 Salsa ist mein Leben!', 'de', 'DE', 'Stuttgart', 'https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=800&h=1000&fit=crop', ARRAY['tanzen', 'salsa', 'musik'], true, NOW()),
+('cccccccc-cccc-cccc-cccc-cccccccccc07', 'Lea Wagner', 26, 'female', 'Grafikdesignerin 🎨 Kreativität ohne Grenzen!', 'de', 'DE', 'Düsseldorf', 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=800&h=1000&fit=crop', ARRAY['design', 'kunst', 'digital'], true, NOW()),
+('cccccccc-cccc-cccc-cccc-cccccccccc08', 'Laura Becker', 28, 'female', 'Ärztin 👩‍⚕️ Menschen helfen!', 'de', 'DE', 'Leipzig', 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=800&h=1000&fit=crop', ARRAY['medizin', 'gesundheit', 'helfen'], true, NOW()),
+('cccccccc-cccc-cccc-cccc-cccccccccc09', 'Marie Hoffmann', 27, 'female', 'Lehrerin 📚 Bildung ist wichtig!', 'de', 'DE', 'Dresden', 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=800&h=1000&fit=crop', ARRAY['bildung', 'lehren', 'kinder'], true, NOW()),
+('cccccccc-cccc-cccc-cccc-cccccccccc10', 'Sarah Schulz', 25, 'female', 'Personal Trainerin 💪 Fitness ist Leben!', 'de', 'DE', 'Nürnberg', 'https://images.unsplash.com/photo-1501196354995-cbb51c65aaea?w=800&h=1000&fit=crop', ARRAY['fitness', 'sport', 'training'], true, NOW()),
+('cccccccc-cccc-cccc-cccc-cccccccccc11', 'Lisa Hofmann', 29, 'female', 'Anwältin ⚖️ Gerechtigkeit!', 'de', 'DE', 'Hannover', 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=800&h=1000&fit=crop', ARRAY['recht', 'justiz', 'politik'], true, NOW()),
+('cccccccc-cccc-cccc-cccc-cccccccccc12', 'Julia Klein', 26, 'female', 'Barista ☕ Perfekter Kaffee!', 'de', 'DE', 'Bremen', 'https://images.unsplash.com/photo-1542596768-5d1d21f1cf98?w=800&h=1000&fit=crop', ARRAY['kaffee', 'barista', 'cafés'], true, NOW()),
+('cccccccc-cccc-cccc-cccc-cccccccccc13', 'Amelie Wolf', 28, 'female', 'Event-Managerin 🎉 Beste Partys!', 'de', 'DE', 'Dortmund', 'https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?w=800&h=1000&fit=crop', ARRAY['events', 'partys', 'organisation'], true, NOW()),
+('cccccccc-cccc-cccc-cccc-cccccccccc14', 'Charlotte Richter', 27, 'female', 'Psychologin 🧠 Zuhören und verstehen!', 'de', 'DE', 'Essen', 'https://images.unsplash.com/photo-1506863530036-1efeddceb993?w=800&h=1000&fit=crop', ARRAY['psychologie', 'therapie', 'empathie'], true, NOW()),
+('cccccccc-cccc-cccc-cccc-cccccccccc15', 'Emilia Zimmermann', 25, 'female', 'Sommelière 🍷 Wein-Expertin!', 'de', 'DE', 'München', 'https://images.unsplash.com/photo-1521119989659-a83eee488004?w=800&h=1000&fit=crop', ARRAY['wein', 'gastronomie', 'genuss'], true, NOW()),
+('cccccccc-cccc-cccc-cccc-cccccccccc16', 'Johanna Braun', 26, 'female', 'Tierärztin 🐕 Tierliebe!', 'de', 'DE', 'Berlin', 'https://images.unsplash.com/photo-1513956589380-bad6acb9b9d4?w=800&h=1000&fit=crop', ARRAY['tiere', 'veterinär', 'natur'], true, NOW()),
+('cccccccc-cccc-cccc-cccc-cccccccccc17', 'Luisa Krüger', 29, 'female', 'Software-Entwicklerin 💻 Code & Kaffee!', 'de', 'DE', 'Hamburg', 'https://images.unsplash.com/photo-1509967419530-da38b4704bc6?w=800&h=1000&fit=crop', ARRAY['programmieren', 'tech', 'code'], true, NOW()),
+('cccccccc-cccc-cccc-cccc-cccccccccc18', 'Paula Lange', 24, 'female', 'Influencerin 📱 Mode & Lifestyle!', 'de', 'DE', 'Köln', 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=800&h=1000&fit=crop', ARRAY['mode', 'beauty', 'lifestyle'], true, NOW()),
+('cccccccc-cccc-cccc-cccc-cccccccccc19', 'Frieda Schmitt', 27, 'female', 'Konditorin 🧁 Süße Träume!', 'de', 'DE', 'Frankfurt', 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=800&h=1000&fit=crop', ARRAY['backen', 'konditorei', 'desserts'], true, NOW()),
+('cccccccc-cccc-cccc-cccc-cccccccccc20', 'Greta Neumann', 28, 'female', 'Journalistin 📰 Geschichten erzählen!', 'de', 'DE', 'Stuttgart', 'https://images.unsplash.com/photo-1500917293891-ef795e70e1f6?w=800&h=1000&fit=crop', ARRAY['journalismus', 'schreiben', 'news'], true, NOW()),
+('cccccccc-cccc-cccc-cccc-cccccccccc21', 'Ida Vogt', 26, 'female', 'Meeresbiologin 🐠 Ozean-Liebe!', 'de', 'DE', 'Kiel', 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=800&h=1000&fit=crop', ARRAY['biologie', 'ozean', 'umwelt'], true, NOW()),
+('cccccccc-cccc-cccc-cccc-cccccccccc22', 'Klara Herrmann', 25, 'female', 'Model & Schauspielerin 🎭 Kreativ!', 'de', 'DE', 'Berlin', 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=800&h=1000&fit=crop', ARRAY['schauspiel', 'modeling', 'kunst'], true, NOW()),
+('cccccccc-cccc-cccc-cccc-cccccccccc23', 'Lotte König', 27, 'female', 'Musikerin 🎸 Rock ist Leben!', 'de', 'DE', 'Leipzig', 'https://images.unsplash.com/photo-1531746020798-e44692c8addb?w=800&h=1000&fit=crop', ARRAY['musik', 'rock', 'gitarre'], true, NOW()),
+('cccccccc-cccc-cccc-cccc-cccccccccc24', 'Martha Kaiser', 29, 'female', 'Immobilienmaklerin 🏡 Traumhäuser!', 'de', 'DE', 'Düsseldorf', 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=800&h=1000&fit=crop', ARRAY['immobilien', 'business', 'architektur'], true, NOW()),
+('cccccccc-cccc-cccc-cccc-cccccccccc25', 'Nora Sommer', 26, 'female', 'Krankenschwester ❤️ Pflege!', 'de', 'DE', 'München', 'https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=800&h=1000&fit=crop', ARRAY['pflege', 'gesundheit', 'hilfe'], true, NOW())
+ON CONFLICT (id) DO NOTHING;
+
+-- 🇫🇷 FRANCIE - Françaises (25 profilů)
+INSERT INTO public.discovery_profiles (
+    id, name, age, gender, bio, language, country, city, 
+    photo_url, interests, is_ai_profile, created_at
+) VALUES
+('dddddddd-dddd-dddd-dddd-dddddddddd01', 'Amélie Dubois', 25, 'female', 'Photographe à Paris 📸 Art et beauté!', 'fr', 'FR', 'Paris', 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=800&h=1000&fit=crop', ARRAY['photographie', 'art', 'voyage'], true, NOW()),
+('dddddddd-dddd-dddd-dddd-dddddddddd02', 'Chloé Martin', 27, 'female', 'Chef pâtissière 🥐 Les meilleurs croissants!', 'fr', 'FR', 'Lyon', 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=800&h=1000&fit=crop', ARRAY['pâtisserie', 'cuisine', 'gastronomie'], true, NOW()),
+('dddddddd-dddd-dddd-dddd-dddddddddd03', 'Emma Bernard', 26, 'female', 'Professeur de yoga 🧘‍♀️ Paix intérieure!', 'fr', 'FR', 'Marseille', 'https://images.unsplash.com/photo-1531746020798-e44692c8addb?w=800&h=1000&fit=crop', ARRAY['yoga', 'méditation', 'bien-être'], true, NOW()),
+('dddddddd-dddd-dddd-dddd-dddddddddd04', 'Inès Petit', 28, 'female', 'Architecte 🏛️ Créer la beauté!', 'fr', 'FR', 'Nice', 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=800&h=1000&fit=crop', ARRAY['architecture', 'design', 'art'], true, NOW()),
+('dddddddd-dddd-dddd-dddd-dddddddddd05', 'Léa Robert', 29, 'female', 'Sommelière 🍷 Passion du vin!', 'fr', 'FR', 'Bordeaux', 'https://images.unsplash.com/photo-1521119989659-a83eee488004?w=800&h=1000&fit=crop', ARRAY['vin', 'gastronomie', 'dégustation'], true, NOW()),
+('dddddddd-dddd-dddd-dddd-dddddddddd06', 'Manon Richard', 24, 'female', 'Danseuse de ballet 🩰 Grâce!', 'fr', 'FR', 'Paris', 'https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=800&h=1000&fit=crop', ARRAY['danse', 'ballet', 'musique'], true, NOW()),
+('dddddddd-dddd-dddd-dddd-dddddddddd07', 'Zoé Simon', 26, 'female', 'Designer de mode 👗 Créatrice!', 'fr', 'FR', 'Cannes', 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&h=1000&fit=crop', ARRAY['mode', 'design', 'couture'], true, NOW()),
+('dddddddd-dddd-dddd-dddd-dddddddddd08', 'Camille Laurent', 27, 'female', 'Médecin 👩‍⚕️ Aider les gens!', 'fr', 'FR', 'Toulouse', 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=800&h=1000&fit=crop', ARRAY['médecine', 'santé', 'aide'], true, NOW()),
+('dddddddd-dddd-dddd-dddd-dddddddddd09', 'Juliette Moreau', 25, 'female', 'Barista ☕ Café parfait!', 'fr', 'FR', 'Lille', 'https://images.unsplash.com/photo-1542596768-5d1d21f1cf98?w=800&h=1000&fit=crop', ARRAY['café', 'barista', 'cafés'], true, NOW()),
+('dddddddd-dddd-dddd-dddd-dddddddddd10', 'Lou Fournier', 28, 'female', 'Psychologue 🧠 Écoute active!', 'fr', 'FR', 'Nantes', 'https://images.unsplash.com/photo-1506863530036-1efeddceb993?w=800&h=1000&fit=crop', ARRAY['psychologie', 'thérapie', 'écoute'], true, NOW()),
+('dddddddd-dddd-dddd-dddd-dddddddddd11', 'Alice Girard', 26, 'female', 'Coach sportive 💪 Santé!', 'fr', 'FR', 'Strasbourg', 'https://images.unsplash.com/photo-1501196354995-cbb51c65aaea?w=800&h=1000&fit=crop', ARRAY['fitness', 'sport', 'coaching'], true, NOW()),
+('dddddddd-dddd-dddd-dddd-dddddddddd12', 'Rose Bonnet', 27, 'female', 'Avocate ⚖️ Justice!', 'fr', 'FR', 'Paris', 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=800&h=1000&fit=crop', ARRAY['droit', 'justice', 'défense'], true, NOW()),
+('dddddddd-dddd-dddd-dddd-dddddddddd13', 'Sarah Blanc', 25, 'female', 'Vétérinaire 🐕 Amour des animaux!', 'fr', 'FR', 'Rennes', 'https://images.unsplash.com/photo-1513956589380-bad6acb9b9d4?w=800&h=1000&fit=crop', ARRAY['animaux', 'vétérinaire', 'nature'], true, NOW()),
+('dddddddd-dddd-dddd-dddd-dddddddddd14', 'Jade Faure', 29, 'female', 'Journaliste 📰 Vérité!', 'fr', 'FR', 'Montpellier', 'https://images.unsplash.com/photo-1500917293891-ef795e70e1f6?w=800&h=1000&fit=crop', ARRAY['journalisme', 'actualité', 'écriture'], true, NOW()),
+('dddddddd-dddd-dddd-dddd-dddddddddd15', 'Lola Roux', 24, 'female', 'Développeuse web 💻 Code!', 'fr', 'FR', 'Paris', 'https://images.unsplash.com/photo-1509967419530-da38b4704bc6?w=800&h=1000&fit=crop', ARRAY['code', 'tech', 'web'], true, NOW()),
+('dddddddd-dddd-dddd-dddd-dddddddddd16', 'Nina Garnier', 26, 'female', 'Event planner 🎉 Fêtes!', 'fr', 'FR', 'Aix-en-Provence', 'https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?w=800&h=1000&fit=crop', ARRAY['événements', 'fêtes', 'organisation'], true, NOW()),
+('dddddddd-dddd-dddd-dddd-dddddddddd17', 'Clara Chevalier', 27, 'female', 'Professeure 📚 Éducation!', 'fr', 'FR', 'Tours', 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=800&h=1000&fit=crop', ARRAY['éducation', 'enseignement', 'enfants'], true, NOW()),
+('dddddddd-dddd-dddd-dddd-dddddddddd18', 'Lucie Dupont', 28, 'female', 'Graphiste 🎨 Créativité!', 'fr', 'FR', 'Lyon', 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=800&h=1000&fit=crop', ARRAY['design', 'graphisme', 'art'], true, NOW()),
+('dddddddd-dddd-dddd-dddd-dddddddddd19', 'Margot Leroy', 25, 'female', 'Infirmière ❤️ Soins!', 'fr', 'FR', 'Dijon', 'https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=800&h=1000&fit=crop', ARRAY['santé', 'soins', 'compassion'], true, NOW()),
+('dddddddd-dddd-dddd-dddd-dddddddddd20', 'Océane André', 26, 'female', 'Musicienne 🎸 Rock!', 'fr', 'FR', 'Paris', 'https://images.unsplash.com/photo-1531746020798-e44692c8addb?w=800&h=1000&fit=crop', ARRAY['musique', 'rock', 'guitare'], true, NOW()),
+('dddddddd-dddd-dddd-dddd-dddddddddd21', 'Pauline Thomas', 27, 'female', 'Biologiste marine 🐠 Océan!', 'fr', 'FR', 'Brest', 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=800&h=1000&fit=crop', ARRAY['océan', 'biologie', 'nature'], true, NOW()),
+('dddddddd-dddd-dddd-dddd-dddddddddd22', 'Victoria Bertrand', 28, 'female', 'Agent immobilier 🏡 Maisons de rêve!', 'fr', 'FR', 'Nice', 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=800&h=1000&fit=crop', ARRAY['immobilier', 'vente', 'business'], true, NOW()),
+('dddddddd-dddd-dddd-dddd-dddddddddd23', 'Agathe Rousseau', 26, 'female', 'Influenceuse 📱 Mode!', 'fr', 'FR', 'Paris', 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=800&h=1000&fit=crop', ARRAY['mode', 'beauté', 'social media'], true, NOW()),
+('dddddddd-dddd-dddd-dddd-dddddddddd24', 'Anaïs Vincent', 25, 'female', 'Coach sportive 🏋️‍♀️ Fitness!', 'fr', 'FR', 'Marseille', 'https://images.unsplash.com/photo-1501196354995-cbb51c65aaea?w=800&h=1000&fit=crop', ARRAY['fitness', 'sport', 'coaching'], true, NOW()),
+('dddddddd-dddd-dddd-dddd-dddddddddd25', 'Capucine Dumas', 27, 'female', 'Travel blogger ✈️ Aventures!', 'fr', 'FR', 'Lyon', 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=800&h=1000&fit=crop', ARRAY['voyage', 'blog', 'aventure'], true, NOW())
+ON CONFLICT (id) DO NOTHING;
+
+-- Aktualizovaný výsledek
+SELECT 
+    country,
+    language,
+    COUNT(*) as count
+FROM public.discovery_profiles
+WHERE is_ai_profile = true
+AND (id LIKE 'aaaaaaaa-%' OR id LIKE 'bbbbbbbb-%' OR id LIKE 'cccccccc-%' OR id LIKE 'dddddddd-%')
+GROUP BY country, language
+ORDER BY country, language;
+
+SELECT COUNT(*) as total_new_profiles 
+FROM public.discovery_profiles 
+WHERE id LIKE 'aaaaaaaa-%' OR id LIKE 'bbbbbbbb-%' OR id LIKE 'cccccccc-%' OR id LIKE 'dddddddd-%';
+
+COMMIT;
