@@ -189,6 +189,54 @@ const DiscoveryFilters: React.FC<DiscoveryFiltersProps> = ({ filters, onApply, o
                         </div>
                     </div>
 
+                    {/* Professional Categories */}
+                    <div>
+                        <label className="block text-sm font-semibold mb-3">{t('professional_categories')}</label>
+                        <div className="grid grid-cols-2 gap-2">
+                            {([
+                                'therapist',
+                                'couples_therapist',
+                                'psychologist',
+                                'couples_psychologist',
+                                'coach',
+                                'life_coach',
+                                'fitness_coach',
+                                'business_coach',
+                                'sports_coach',
+                                'nutritionist',
+                                'counselor',
+                                'psychiatrist',
+                                'social_worker'
+                            ] as const).map((category) => (
+                                <label
+                                    key={category}
+                                    className={`px-3 py-2 rounded-lg border transition-colors cursor-pointer ${
+                                        localFilters.professionalCategories?.includes(category)
+                                            ? 'bg-gradient-to-r from-purple-500 to-pink-500 border-purple-500'
+                                            : 'bg-white/5 border-white/10 hover:border-white/30'
+                                    } ${!hasPremium ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                >
+                                    <input
+                                        type="checkbox"
+                                        checked={localFilters.professionalCategories?.includes(category) || false}
+                                        onChange={(e) => {
+                                            const current = localFilters.professionalCategories || [];
+                                            setLocalFilters({
+                                                ...localFilters,
+                                                professionalCategories: e.target.checked
+                                                    ? [...current, category]
+                                                    : current.filter(c => c !== category)
+                                            });
+                                        }}
+                                        className="sr-only"
+                                        disabled={!hasPremium}
+                                    />
+                                    <span className="text-sm">{t(category)}</span>
+                                </label>
+                            ))}
+                        </div>
+                    </div>
+
                     {/* Lifestyle Filters */}
                     <div className="space-y-4">
                         <h3 className="font-semibold text-lg">{t('lifestyle')}</h3>
