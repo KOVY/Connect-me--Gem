@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLocale } from '../contexts/LocaleContext';
+import { useTranslations } from '../hooks/useTranslations';
 import { UserProfile } from '../types';
 
 interface ProfileCardProps {
@@ -50,10 +51,15 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ profile, onLike }) => {
   const [isBioExpanded, setIsBioExpanded] = useState(false);
   const navigate = useNavigate();
   const { locale } = useLocale();
+  const { t } = useTranslations();
 
   const handleIcebreakerClick = (icebreaker: string) => {
     // Navigate to chat with the icebreaker message as a URL parameter
     navigate(`/${locale}/chat/${profile.id}?message=${encodeURIComponent(icebreaker)}`);
+  };
+
+  const handleChatClick = () => {
+    navigate(`/${locale}/chat/${profile.id}`);
   };
 
   const BIO_TRUNCATE_LENGTH = 120;
@@ -127,14 +133,31 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ profile, onLike }) => {
                 </div>
             )}
         </div>
-        <button
-          onClick={onLike}
-          disabled={!onLike}
-          className={`relative w-20 h-20 rounded-full flex items-center justify-center transition-all duration-200 ease-in-out aurora-gradient mt-4 ${onLike ? 'hover:scale-110 active:scale-90 aurora-pulse' : 'opacity-60 cursor-default'}`}
-          aria-label={`Like ${profile.name}`}
-        >
-         <HeartIcon />
-        </button>
+
+        {/* Action Buttons */}
+        <div className="flex items-center gap-4 mt-4">
+          {/* Chat Button */}
+          <button
+            onClick={handleChatClick}
+            className="relative flex-1 h-16 rounded-full flex items-center justify-center gap-2 transition-all duration-200 ease-in-out bg-gradient-to-r from-purple-600 to-blue-600 hover:scale-105 active:scale-95 shadow-lg"
+            aria-label={`${t('chat_with_name', { name: profile.name })}`}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6 text-white">
+              <path fillRule="evenodd" d="M4.848 2.771A49.144 49.144 0 0 1 12 2.25c2.43 0 4.817.178 7.152.52 1.978.292 3.348 2.024 3.348 3.97v6.02c0 1.946-1.37 3.678-3.348 3.97a48.901 48.901 0 0 1-3.476.383.39.39 0 0 0-.297.17l-2.755 4.133a.75.75 0 0 1-1.248 0l-2.755-4.133a.39.39 0 0 0-.297-.17 48.9 48.9 0 0 1-3.476-.384c-1.978-.29-3.348-2.024-3.348-3.97V6.741c0-1.946 1.37-3.68 3.348-3.97Z" clipRule="evenodd" />
+            </svg>
+            <span className="font-semibold text-white">{t('chat')}</span>
+          </button>
+
+          {/* Like Button */}
+          <button
+            onClick={onLike}
+            disabled={!onLike}
+            className={`relative w-16 h-16 rounded-full flex items-center justify-center transition-all duration-200 ease-in-out aurora-gradient ${onLike ? 'hover:scale-110 active:scale-90 aurora-pulse' : 'opacity-60 cursor-default'}`}
+            aria-label={`${t('like')} ${profile.name}`}
+          >
+           <HeartIcon />
+          </button>
+        </div>
       </div>
     </div>
   );
