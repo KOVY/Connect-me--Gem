@@ -123,12 +123,27 @@ export interface DiscoveryFilters {
     smoking?: SmokingPreference[];
     drinking?: DrinkingPreference[];
     pets?: PetPreference[];
+    professionalCategories?: ProfessionalCategory[]; // Profesní kategorie (terapeut, kouč, atd.)
 }
 
 export type EducationLevel = 'high_school' | 'bachelors' | 'masters' | 'phd';
 export type SmokingPreference = 'never' | 'sometimes' | 'regularly';
 export type DrinkingPreference = 'never' | 'socially' | 'regularly';
 export type PetPreference = 'no_pets' | 'has_cats' | 'has_dogs' | 'has_other';
+export type ProfessionalCategory =
+    | 'therapist'           // Terapeut
+    | 'couples_therapist'   // Párový terapeut
+    | 'psychologist'        // Psycholog
+    | 'couples_psychologist' // Párový psycholog
+    | 'coach'               // Kouč / Coach
+    | 'life_coach'          // Životní kouč
+    | 'fitness_coach'       // Fitness trenér
+    | 'business_coach'      // Byznys kouč
+    | 'sports_coach'        // Sportovní trenér
+    | 'nutritionist'        // Nutriční poradce
+    | 'counselor'           // Poradce
+    | 'psychiatrist'        // Psychiatr
+    | 'social_worker';      // Sociální pracovník
 
 // --- Gamification & Streaks ---
 
