@@ -137,6 +137,9 @@ export const translations = {
     about: 'About',
     interests: 'Interests & Hobbies',
     start_conversation: 'Start a Conversation',
+    // Profile Hub
+    my_hub: 'My Hub',
+    back_to_discovery: 'Back to Discovery',
   },
   cs: {
     online: 'Online',
@@ -275,6 +278,9 @@ export const translations = {
     about: 'O mně',
     interests: 'Zájmy a koníčky',
     start_conversation: 'Začít konverzaci',
+    // Profile Hub
+    my_hub: 'Můj profil',
+    back_to_discovery: 'Zpět k objevování',
   },
   de: {
     online: 'Online',
@@ -411,6 +417,9 @@ export const translations = {
     about: 'Über mich',
     interests: 'Interessen & Hobbys',
     start_conversation: 'Gespräch beginnen',
+    // Profile Hub
+    my_hub: 'Mein Hub',
+    back_to_discovery: 'Zurück zur Entdeckung',
   },
   fr: {
     online: 'En ligne',
@@ -547,6 +556,9 @@ export const translations = {
     about: 'À propos',
     interests: 'Intérêts & Loisirs',
     start_conversation: 'Commencer une conversation',
+    // Profile Hub
+    my_hub: 'Mon Hub',
+    back_to_discovery: 'Retour à la découverte',
   },
   es: {
     online: 'En línea',
@@ -683,6 +695,9 @@ export const translations = {
     about: 'Acerca de',
     interests: 'Intereses y aficiones',
     start_conversation: 'Iniciar una conversación',
+    // Profile Hub
+    my_hub: 'Mi Hub',
+    back_to_discovery: 'Volver a descubrir',
   },
   it: {
     online: 'Online',
@@ -819,6 +834,9 @@ export const translations = {
     about: 'Informazioni',
     interests: 'Interessi e hobby',
     start_conversation: 'Inizia una conversazione',
+    // Profile Hub
+    my_hub: 'Il mio Hub',
+    back_to_discovery: 'Torna alla scoperta',
   },
   pl: {
     online: 'Online',
@@ -955,6 +973,9 @@ export const translations = {
     about: 'O mnie',
     interests: 'Zainteresowania i hobby',
     start_conversation: 'Rozpocznij rozmowę',
+    // Profile Hub
+    my_hub: 'Mój Hub',
+    back_to_discovery: 'Powrót do odkrywania',
   },
   pt: {
     online: 'Online',
@@ -1091,5 +1112,8 @@ export const translations = {
     about: 'Sobre',
     interests: 'Interesses e hobbies',
     start_conversation: 'Iniciar uma conversa',
+    // Profile Hub
+    my_hub: 'Meu Hub',
+    back_to_discovery: 'Voltar à descoberta',
   }
 };

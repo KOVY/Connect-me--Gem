@@ -66,6 +66,9 @@ const DiscoveryPage: React.FC = () => {
 
   return (
     <div className="h-full w-full flex flex-col">
+      {/* Top spacing for FloatingGlassNav to prevent overlap */}
+      <div className="h-16"></div>
+
       {/* Stories Bar */}
       <StoriesBar stories={USER_STORIES} onStoryClick={handleStoryClick} />
 
