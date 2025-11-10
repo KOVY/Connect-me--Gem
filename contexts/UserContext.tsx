@@ -18,6 +18,7 @@ interface UserContextState {
   useRewind: () => Promise<void>;
   profileCompleteness: number;
   completionSuggestions: string[];
+  getUserTier: () => 'free' | 'premium' | 'vip';
 }
 
 const UserContext = createContext<UserContextState | null>(null);
@@ -87,6 +88,30 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const profileCompleteness = useMemo(() => calculateProfileCompleteness(user), [user]);
   const completionSuggestions = useMemo(() => getProfileCompletionSuggestions(user), [user]);
 
+  const getUserTier = useCallback((): 'free' | 'premium' | 'vip' => {
+    if (!user || !user.subscription) {
+      return 'free';
+    }
+
+    const subscription = user.subscription;
+    const isActive = new Date(subscription.expiryDate) > new Date();
+
+    if (!isActive) {
+      return 'free';
+    }
+
+    // Check tier (case-insensitive)
+    const tier = subscription.tier?.toLowerCase();
+    if (tier === 'vip') {
+      return 'vip';
+    }
+    if (tier === 'premium') {
+      return 'premium';
+    }
+
+    return 'free';
+  }, [user]);
+
 
   const value: UserContextState = {
     user,
@@ -103,6 +128,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     useRewind,
     profileCompleteness,
     completionSuggestions,
+    getUserTier,
   };
 
   return (

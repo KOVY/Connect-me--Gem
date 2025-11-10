@@ -15,6 +15,9 @@ import ChatInterface from '../components/ChatInterface';
 import GiftWall from '../components/GiftWall';
 import GiftSelectionModal from '../components/GiftSelectionModal';
 import { GiftModal } from '../components/GiftModal';
+import GiftUnlockModal from '../components/GiftUnlockModal';
+import MessageLimitBanner from '../components/MessageLimitBanner';
+import { useMessageTracker } from '../hooks/useMessageTracker';
 
 const ChatPage: React.FC = () => {
   // Hooks
@@ -22,8 +25,12 @@ const ChatPage: React.FC = () => {
   const navigate = useNavigate();
   const { locale } = useLocale();
   const { t } = useTranslations();
-  const { user, isLoggedIn } = useUser();
+  const { user, isLoggedIn, getUserTier } = useUser();
   const [searchParams, setSearchParams] = useSearchParams();
+
+  // Message tracking for FREE users
+  const userTier = getUserTier();
+  const messageTracker = useMessageTracker(userTier, isLoggedIn);
 
   // State
   const [prefilledMessage, setPrefilledMessage] = useState<string | null>(null);
@@ -34,6 +41,8 @@ const ChatPage: React.FC = () => {
   const [isChatLocked, setIsChatLocked] = useState(true);
   const [isGiftModalOpen, setIsGiftModalOpen] = useState(false);
   const [isNewGiftModalOpen, setIsNewGiftModalOpen] = useState(false);
+  const [isGiftUnlockModalOpen, setIsGiftUnlockModalOpen] = useState(false);
+  const [unlockModalReason, setUnlockModalReason] = useState<'cooldown' | 'daily_limit' | 'profile_limit'>('cooldown');
 
   // WebRTC Call State
   const [isCallActive, setIsCallActive] = useState(false);
@@ -113,6 +122,22 @@ const ChatPage: React.FC = () => {
   const handleSendMessage = async (message: string) => {
     if (!chatRef.current || isSending) return;
 
+    // Check message limits for FREE users
+    if (userTier === 'free' && recipient) {
+      if (!messageTracker.canMessageProfile(recipient.id)) {
+        // Determine the reason for blocking
+        if (messageTracker.hasDailyLimit) {
+          setUnlockModalReason('daily_limit');
+        } else if (messageTracker.hasProfileCooldown(recipient.id)) {
+          setUnlockModalReason('cooldown');
+        } else {
+          setUnlockModalReason('profile_limit');
+        }
+        setIsGiftUnlockModalOpen(true);
+        return;
+      }
+    }
+
     const userMessage: ChatMessage = {
       id: `msg-${Date.now()}`,
       sender: 'user',
@@ -121,6 +146,11 @@ const ChatPage: React.FC = () => {
       timestamp: new Date().toISOString(),
     };
     setMessages(prev => [...prev, userMessage]);
+
+    // Track message for FREE users
+    if (userTier === 'free' && recipient) {
+      messageTracker.incrementMessage(recipient.id);
+    }
     
     // Simulate reading time before showing typing indicator
     const readingDelay = Math.random() * 1000 + 500; // 0.5s to 1.5s
@@ -283,6 +313,14 @@ const ChatPage: React.FC = () => {
     );
   }
 
+  const handleGiftUnlock = (giftType: 'coffee' | 'rose' | 'diamond') => {
+    // TODO: Implement gift payment flow
+    console.log(`User wants to purchase ${giftType} gift`);
+    setIsGiftUnlockModalOpen(false);
+    // For now, just show a message
+    alert(`Gift purchase coming soon! You selected: ${giftType}`);
+  };
+
   return (
     <div className="h-full w-full max-w-5xl mx-auto p-4 flex flex-col">
       <div className="mb-4">
@@ -290,6 +328,20 @@ const ChatPage: React.FC = () => {
           &larr; Back to Discovery
         </Link>
       </div>
+
+      {/* Message Limit Banner for FREE users */}
+      {userTier === 'free' && !isChatLocked && recipient && (
+        <div className="mb-4">
+          <MessageLimitBanner
+            messagesRemaining={messageTracker.dailyMessagesRemaining}
+            profileMessagesRemaining={messageTracker.getProfileMessagesRemaining(recipient.id)}
+            cooldownMinutes={messageTracker.getCooldownTime(recipient.id)}
+            recipientName={recipient.name}
+            onUpgradeClick={() => setIsGiftUnlockModalOpen(true)}
+          />
+        </div>
+      )}
+
       <div className="flex-1 min-h-0">
         {isChatLocked ? (
           <div className="h-full flex items-center justify-center">
@@ -330,6 +382,18 @@ const ChatPage: React.FC = () => {
           onClose={() => setIsNewGiftModalOpen(false)}
           recipientId={recipient.id}
           recipientName={recipient.name}
+        />
+      )}
+
+      {/* Gift Unlock Modal for FREE users hitting limits */}
+      {isGiftUnlockModalOpen && recipient && (
+        <GiftUnlockModal
+          isOpen={isGiftUnlockModalOpen}
+          onClose={() => setIsGiftUnlockModalOpen(false)}
+          recipient={recipient}
+          reason={unlockModalReason}
+          cooldownMinutes={messageTracker.getCooldownTime(recipient.id)}
+          onGiftSelect={handleGiftUnlock}
         />
       )}
     </div>
