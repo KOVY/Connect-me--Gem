@@ -8,6 +8,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import DiscoveryPage from './pages/DiscoveryPage';
 import ReelsPage from './pages/ReelsPage';
 import ChatPage from './pages/ChatPage';
+import MessagesPage from './pages/MessagesPage';
 import PublicProfilePage from './pages/PublicProfilePage';
 import ProfileHubPage from './pages/ProfileHubPage';
 import LoginPage from './pages/LoginPage';
@@ -48,6 +49,10 @@ export const router = createBrowserRouter([
                     {
                         path: 'reels',
                         element: <ReelsPage />
+                    },
+                    {
+                        path: 'messages',
+                        element: <MessagesPage />
                     },
                     {
                         path: 'chat/:userId',
