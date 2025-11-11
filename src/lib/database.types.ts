@@ -331,6 +331,10 @@ export interface Database {
           verified: boolean
           last_seen: string
           created_at: string
+          // New fields for SLM & Professional Categories
+          personality: PersonalityType
+          professional_category: ProfessionalCategory | null
+          ai_model_config: AIModelConfig
         }
         Insert: {
           id?: string
@@ -350,6 +354,9 @@ export interface Database {
           verified?: boolean
           last_seen?: string
           created_at?: string
+          personality?: PersonalityType
+          professional_category?: ProfessionalCategory | null
+          ai_model_config?: AIModelConfig
         }
         Update: {
           id?: string
@@ -369,8 +376,54 @@ export interface Database {
           verified?: boolean
           last_seen?: string
           created_at?: string
+          personality?: PersonalityType
+          professional_category?: ProfessionalCategory | null
+          ai_model_config?: AIModelConfig
         }
       }
     }
   }
+}
+
+// ========================================
+// ENUMS & ADDITIONAL TYPES
+// ========================================
+
+export type PersonalityType =
+  | 'friendly'
+  | 'professional'
+  | 'flirty'
+  | 'intellectual'
+  | 'funny'
+  | 'romantic'
+  | 'adventurous'
+  | 'calm'
+  | 'energetic'
+  | 'mysterious';
+
+export type ProfessionalCategory =
+  | 'therapist'
+  | 'couples_therapist'
+  | 'psychologist'
+  | 'couples_psychologist'
+  | 'coach'
+  | 'life_coach'
+  | 'fitness_coach'
+  | 'business_coach'
+  | 'sports_coach'
+  | 'nutritionist'
+  | 'counselor'
+  | 'psychiatrist'
+  | 'social_worker'
+  | 'other';
+
+export interface AIModelConfig {
+  system_prompt?: string;
+  temperature?: number;
+  max_tokens?: number;
+  model_endpoint?: string | null;
+  personality_traits?: string[];
+  conversation_style?: 'casual' | 'formal' | 'playful';
+  language_preference?: string;
+  custom_params?: Record<string, any>;
 }

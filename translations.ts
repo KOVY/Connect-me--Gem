@@ -179,6 +179,16 @@ export const translations = {
     next_message_in: 'Next message in',
     upgrade_premium: 'Upgrade to Premium',
     send_gift: 'Send Gift',
+    // Direct Gift Purchase (Pay-per-Gift)
+    send_to: 'Send to',
+    gift_price: 'Gift Price',
+    one_time_payment: 'One-time payment',
+    no_credits_needed: 'No credits needed',
+    instant_delivery: 'Instant delivery',
+    tip: 'Tip',
+    buy_credits_save_money: 'Buy credit packs to save money on multiple gifts!',
+    buy_and_send_gift: 'Buy & Send Gift for',
+    secure_payment_stripe: 'Secure payment powered by Stripe',
   },
   cs: {
     online: 'Online',
@@ -359,6 +369,16 @@ export const translations = {
     next_message_in: 'Další zpráva za',
     upgrade_premium: 'Upgradovat na Premium',
     send_gift: 'Poslat dárek',
+    // Direct Gift Purchase (Pay-per-Gift)
+    send_to: 'Poslat pro',
+    gift_price: 'Cena dárku',
+    one_time_payment: 'Jednorázová platba',
+    no_credits_needed: 'Bez kreditů',
+    instant_delivery: 'Okamžité doručení',
+    tip: 'Tip',
+    buy_credits_save_money: 'Kupte kreditové balíčky a ušetřete na více dárcích!',
+    buy_and_send_gift: 'Koupit a poslat dárek za',
+    secure_payment_stripe: 'Bezpečná platba přes Stripe',
   },
   de: {
     online: 'Online',
