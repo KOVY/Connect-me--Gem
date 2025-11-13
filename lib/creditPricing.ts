@@ -110,15 +110,19 @@ export function calculateDiscount(creditAmount: number, priceUsd: number): numbe
 
 /**
  * Get display price with currency symbol
+ * Rounded to whole numbers (no decimals)
  */
 export function formatPrice(amount: number, currency: string, symbol: string): string {
+  // Round to whole number (no decimals)
+  const roundedAmount = Math.round(amount);
+
   // Different currencies have different formatting
   if (currency === 'CZK' || currency === 'PLN' || currency === 'HUF') {
     // Symbol after amount for some currencies
-    return `${amount.toFixed(2)} ${symbol}`;
+    return `${roundedAmount} ${symbol}`;
   }
   // Symbol before amount for USD, EUR, GBP, etc.
-  return `${symbol}${amount.toFixed(2)}`;
+  return `${symbol}${roundedAmount}`;
 }
 
 /**
