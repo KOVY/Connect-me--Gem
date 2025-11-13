@@ -1,25 +1,30 @@
 import React from 'react';
 import { useUser } from '../contexts/UserContext';
 import { useTranslations } from '../hooks/useTranslations';
-import { calculatePayoutAmount, formatPrice, MIN_PAYOUT_USD } from '../lib/creditPricing';
+import { useUserReelsAnalytics } from '../hooks/useUserReelsAnalytics';
+import { calculatePayoutAmount, MIN_PAYOUT_USD } from '../lib/creditPricing';
 
 const ReelsAnalyticsPanel: React.FC = () => {
     const { user } = useUser();
     const { t } = useTranslations();
 
-    // Mock data - will be replaced with real Supabase data
-    const reelsStats = {
-        totalReels: user?.reelsStats?.totalReels || 0,
-        totalViews: user?.reelsStats?.totalViews || 0,
-        totalLikes: user?.reelsStats?.totalLikes || 0,
-        totalComments: user?.reelsStats?.totalComments || 0,
-        giftsReceived: user?.reelsStats?.giftsReceived || 0,
-        totalGiftsValue: user?.reelsStats?.totalGiftsValue || 0, // in credits
-    };
+    // Real-time analytics subscription
+    const { analytics: reelsStats, isLoading } = useUserReelsAnalytics(user?.id);
 
     // Calculate earnings
     const { userPayoutUsd } = calculatePayoutAmount(reelsStats.totalGiftsValue);
     const canPayout = userPayoutUsd >= MIN_PAYOUT_USD;
+
+    if (isLoading) {
+        return (
+            <div className="bg-gray-800/50 rounded-lg p-8 border border-white/10 text-center">
+                <div className="animate-pulse">
+                    <div className="h-8 bg-white/10 rounded w-1/2 mx-auto mb-4"></div>
+                    <div className="h-4 bg-white/10 rounded w-1/3 mx-auto"></div>
+                </div>
+            </div>
+        );
+    }
 
     if (reelsStats.totalReels === 0) {
         return (
