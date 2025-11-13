@@ -2,22 +2,24 @@
 import React from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { useLocale } from '../contexts/LocaleContext';
+import { useTranslations } from '../hooks/useTranslations';
 
 const TABS = [
-  { name: 'Overview', path: '' },
-  { name: 'My Profile', path: 'profile' },
-  { name: 'Likes', path: 'likes' },
-  { name: 'Subscription', path: 'subscription' },
-  { name: 'Shop', path: 'shop' },
-  { name: 'Payout', path: 'payout' },
-  { name: 'History', path: 'history' },
-  { name: 'Analytics', path: 'analytics' },
-  { name: 'Payments', path: 'payments' },
-  { name: 'Settings', path: 'settings' },
+  { key: 'profile_hub_overview', path: '' },
+  { key: 'profile_hub_my_profile', path: 'profile' },
+  { key: 'profile_hub_likes', path: 'likes' },
+  { key: 'profile_hub_subscription', path: 'subscription' },
+  { key: 'profile_hub_shop', path: 'shop' },
+  { key: 'profile_hub_payout', path: 'payout' },
+  { key: 'profile_hub_history', path: 'history' },
+  { key: 'profile_hub_analytics', path: 'analytics' },
+  { key: 'profile_hub_payments', path: 'payments' },
+  { key: 'profile_hub_settings', path: 'settings' },
 ];
 
 const ProfileHub: React.FC = () => {
     const { locale } = useLocale();
+    const { t } = useTranslations();
     const location = useLocation();
 
     // Determine the base path for NavLink 'end' prop
@@ -29,7 +31,7 @@ const ProfileHub: React.FC = () => {
                 <nav className="flex flex-row md:flex-col gap-2 overflow-x-auto md:overflow-x-visible pb-2 md:pb-0">
                     {TABS.map(tab => (
                          <NavLink
-                            key={tab.name}
+                            key={tab.key}
                             to={tab.path ? `${baseProfilePath}/${tab.path}` : baseProfilePath}
                             // The 'end' prop is crucial for the base path to not stay active for all child routes
                             end={tab.path === ''}
@@ -41,7 +43,7 @@ const ProfileHub: React.FC = () => {
                                 }`
                             }
                         >
-                            {tab.name}
+                            {t(tab.key)}
                         </NavLink>
                     ))}
                 </nav>
