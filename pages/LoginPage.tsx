@@ -3,6 +3,41 @@ import { useTranslations } from '../hooks/useTranslations';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLocale } from '../contexts/LocaleContext';
 import { supabase } from '../src/lib/supabase';
+import { AuthError } from '@supabase/supabase-js';
+
+// Helper function to get user-friendly error messages
+const getAuthErrorMessage = (error: AuthError | Error | any, t: (key: string) => string): string => {
+    // Log full error in development only
+    if (import.meta.env.DEV) {
+        console.error('[Auth] Error:', error);
+    }
+
+    // Map Supabase error codes to user-friendly messages
+    if (error?.status === 400) {
+        return t('invalid_credentials');
+    }
+    if (error?.status === 422) {
+        return t('invalid_email_format');
+    }
+    if (error?.message?.includes('Invalid login credentials')) {
+        return t('invalid_credentials');
+    }
+    if (error?.message?.includes('Email not confirmed')) {
+        return t('email_not_confirmed');
+    }
+    if (error?.message?.includes('User already registered')) {
+        return t('email_already_exists');
+    }
+    if (error?.message?.includes('Password should be')) {
+        return t('password_too_short');
+    }
+    if (error?.message?.includes('rate limit')) {
+        return t('too_many_attempts');
+    }
+
+    // Generic error message
+    return t('auth_error');
+};
 
 const LoginPage: React.FC = () => {
     const { t } = useTranslations();
@@ -57,8 +92,7 @@ const LoginPage: React.FC = () => {
                 }
             }
         } catch (err: any) {
-            console.error('Auth error:', err);
-            setError(err.message || t('auth_error'));
+            setError(getAuthErrorMessage(err, t));
         } finally {
             setIsLoading(false);
         }
@@ -79,8 +113,7 @@ const LoginPage: React.FC = () => {
 
             if (error) throw error;
         } catch (err: any) {
-            console.error('Google auth error:', err);
-            setError(err.message || t('auth_error'));
+            setError(getAuthErrorMessage(err, t));
             setIsLoading(false);
         }
     };
@@ -100,8 +133,7 @@ const LoginPage: React.FC = () => {
 
             if (error) throw error;
         } catch (err: any) {
-            console.error('Apple auth error:', err);
-            setError(err.message || t('auth_error'));
+            setError(getAuthErrorMessage(err, t));
             setIsLoading(false);
         }
     };
@@ -125,8 +157,7 @@ const LoginPage: React.FC = () => {
 
             setSuccessMessage(t('password_reset_sent'));
         } catch (err: any) {
-            console.error('Password reset error:', err);
-            setError(err.message || t('password_reset_error'));
+            setError(getAuthErrorMessage(err, t));
         } finally {
             setIsLoading(false);
         }
