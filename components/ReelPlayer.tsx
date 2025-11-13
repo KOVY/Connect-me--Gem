@@ -2,6 +2,8 @@ import React, { useRef, useEffect, useState } from 'react';
 import { Reel } from '../types';
 import { GiftModal } from './GiftModal';
 import { ReelCommentsPanel } from './ReelCommentsPanel';
+import { useReelRealtime } from '../hooks/useReelRealtime';
+import { useUser } from '../contexts/UserContext';
 
 interface ReelPlayerProps {
     reel: Reel;
@@ -16,13 +18,23 @@ const PlayOverlayIcon: React.FC = () => (
 
 
 const ReelPlayer: React.FC<ReelPlayerProps> = ({ reel, isVisible }) => {
+    const { user } = useUser();
     const videoRef = useRef<HTMLVideoElement>(null);
     const [isPlaying, setIsPlaying] = useState(false);
     const [showPlayIcon, setShowPlayIcon] = useState(false);
-    const [isLiked, setIsLiked] = useState(reel.isLiked || false);
-    const [likeCount, setLikeCount] = useState(reel.likeCount || 0);
     const [isGiftModalOpen, setIsGiftModalOpen] = useState(false);
     const [isCommentsOpen, setIsCommentsOpen] = useState(false);
+
+    // Real-time stats subscription
+    const { stats } = useReelRealtime(reel.id, user?.id);
+    const [isLiked, setIsLiked] = useState(stats.isLiked || false);
+    const [likeCount, setLikeCount] = useState(stats.likeCount || 0);
+
+    // Update local state when real-time stats change
+    useEffect(() => {
+        setIsLiked(stats.isLiked || false);
+        setLikeCount(stats.likeCount || 0);
+    }, [stats.isLiked, stats.likeCount]);
 
     useEffect(() => {
         const videoElement = videoRef.current;
@@ -103,7 +115,7 @@ const ReelPlayer: React.FC<ReelPlayerProps> = ({ reel, isVisible }) => {
                             </svg>
                         </div>
                         <span className="text-white text-xs font-medium drop-shadow-lg">
-                            {reel.commentCount && reel.commentCount > 0 ? (reel.commentCount > 999 ? `${(reel.commentCount/1000).toFixed(1)}K` : reel.commentCount) : 'Comment'}
+                            {stats.commentCount && stats.commentCount > 0 ? (stats.commentCount > 999 ? `${(stats.commentCount/1000).toFixed(1)}K` : stats.commentCount) : 'Comment'}
                         </span>
                     </button>
 
@@ -118,7 +130,7 @@ const ReelPlayer: React.FC<ReelPlayerProps> = ({ reel, isVisible }) => {
                             </svg>
                         </div>
                         <span className="text-white text-xs font-medium drop-shadow-lg">
-                            {reel.giftCount && reel.giftCount > 0 ? reel.giftCount : 'Gift'}
+                            {stats.giftCount && stats.giftCount > 0 ? stats.giftCount : 'Gift'}
                         </span>
                     </button>
                 </div>
@@ -147,7 +159,7 @@ const ReelPlayer: React.FC<ReelPlayerProps> = ({ reel, isVisible }) => {
                 onClose={() => setIsCommentsOpen(false)}
                 reelId={reel.id}
                 reelOwner={reel.userProfile}
-                commentCount={reel.commentCount || 0}
+                commentCount={stats.commentCount || 0}
             />
         </>
     );

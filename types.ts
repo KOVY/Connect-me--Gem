@@ -43,7 +43,7 @@ export interface UserSubscription {
     autoRenew: boolean;
 }
 
-export type SubscriptionTier = 'free' | 'basic' | 'premium' | 'vip';
+export type SubscriptionTier = 'anonymous' | 'free' | 'premium' | 'vip';
 
 export interface SubscriptionPlan {
     id: string;
@@ -289,4 +289,66 @@ export interface UserStories {
     stories: StoryItem[];
     hasUnviewedStories: boolean;
     lastUpdated: string; // ISO date of most recent story
+}
+
+// --- User Tiers & Monetization System ---
+
+export interface UserTierLimits {
+  tier: SubscriptionTier;
+  swipesLimit: number;
+  messagesLimit: number;
+  superLikesLimit: number;
+  boostsLimit: number;
+  canSendGifts: boolean;
+  giftFeePercentage: number; // Platform fee (60%, 50%, 30%)
+  hasAds: boolean;
+  canSeeWhoLiked: boolean;
+}
+
+export interface UserDailyLimits {
+  id: string;
+  userId: string;
+  date: string; // ISO date
+  swipesToday: number;
+  swipesLimit: number;
+  messagesToday: number;
+  messagesLimit: number;
+  aiMessagesToday: number; // Secret tracking
+  realMessagesToday: number; // Secret tracking
+  superLikesToday: number;
+  superLikesLimit: number;
+  boostsThisMonth: number;
+  boostsLimit: number;
+}
+
+export interface MessageCooldown {
+  id: string;
+  userId: string;
+  targetProfileId: string;
+  messagesSentToday: number;
+  messagesLimitPerProfile: number; // 2-3 for FREE
+  lastMessageSentAt: string; // ISO date
+  cooldownUntil: string | null; // 3h cooldown
+  cooldown24hUntil: string | null; // 24h cooldown after limit
+  unlockedUntil: string | null; // Unlocked with gift
+  unlockType: 'coffee' | 'rose' | 'diamond' | null; // Gift type used to unlock
+}
+
+export interface MessageSendResult {
+  canSend: boolean;
+  reason: 'ok' | 'daily_limit_reached' | 'profile_cooldown_3h' | 'profile_cooldown_24h' | 'profile_daily_limit' | 'unlimited' | 'unlocked_with_gift';
+  cooldownUntil: string | null;
+  messagesRemaining: number;
+}
+
+export interface SubscriptionHistory {
+  id: string;
+  userId: string;
+  tier: SubscriptionTier;
+  subscriptionStatus: 'active' | 'cancelled' | 'expired' | 'trial';
+  startedAt: string; // ISO date
+  endedAt: string | null; // ISO date
+  stripeSubscriptionId: string | null;
+  amountPaid: number;
+  currency: string;
 }
