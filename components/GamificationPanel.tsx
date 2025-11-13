@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { useUser } from '../contexts/UserContext';
+import { useTranslations } from '../hooks/useTranslations';
 import { Achievement } from '../types';
 import { ACHIEVEMENTS } from '../constants';
 
@@ -23,6 +24,7 @@ const LockIcon: React.FC<{ className?: string }> = ({ className }) => (
 
 const GamificationPanel: React.FC = () => {
     const { user } = useUser();
+    const { t } = useTranslations();
 
     // Calculate user level from points (100 points per level)
     const pointsPerLevel = 100;
@@ -81,7 +83,7 @@ const GamificationPanel: React.FC = () => {
     if (!user?.stats) {
         return (
             <div className="p-8 text-center text-white/60">
-                <p>Gamification stats not available. Log in to track your progress!</p>
+                <p>{t('gamification_not_available')}</p>
             </div>
         );
     }
@@ -96,9 +98,9 @@ const GamificationPanel: React.FC = () => {
                     <div>
                         <h2 className="text-2xl font-bold text-white flex items-center gap-2">
                             <StarIcon className="w-6 h-6 text-yellow-400" />
-                            Level {currentLevel}
+                            {t('level')} {currentLevel}
                         </h2>
-                        <p className="text-white/70 text-sm">{currentPoints} total points earned</p>
+                        <p className="text-white/70 text-sm">{t('total_points_earned', { points: currentPoints })}</p>
                     </div>
                     <div className="text-right">
                         <div className="text-3xl font-bold text-white">{pointsInCurrentLevel}</div>
@@ -112,56 +114,56 @@ const GamificationPanel: React.FC = () => {
                     />
                 </div>
                 <p className="text-xs text-white/60 mt-2">
-                    {pointsPerLevel - pointsInCurrentLevel} XP to next level
+                    {t('xp_to_next_level', { xp: pointsPerLevel - pointsInCurrentLevel })}
                 </p>
             </div>
 
             {/* Streak Stats */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="bg-gray-800/50 rounded-lg p-4 border border-white/10">
-                    <h3 className="text-sm font-semibold text-white/70 mb-2">Daily Login Streak</h3>
+                    <h3 className="text-sm font-semibold text-white/70 mb-2">{t('daily_login_streak')}</h3>
                     <div className="flex items-baseline gap-2">
                         <span className="text-4xl font-bold text-orange-400">🔥</span>
                         <span className="text-3xl font-bold text-white">{stats.dailyStreak.current}</span>
-                        <span className="text-white/60">days</span>
+                        <span className="text-white/60">{t('days')}</span>
                     </div>
                     <p className="text-xs text-white/50 mt-2">
-                        Longest: {stats.dailyStreak.longest} days
+                        {t('longest')}: {stats.dailyStreak.longest} {t('days')}
                     </p>
                 </div>
 
                 <div className="bg-gray-800/50 rounded-lg p-4 border border-white/10">
-                    <h3 className="text-sm font-semibold text-white/70 mb-2">Message Streak</h3>
+                    <h3 className="text-sm font-semibold text-white/70 mb-2">{t('message_streak')}</h3>
                     <div className="flex items-baseline gap-2">
                         <span className="text-4xl font-bold">💬</span>
                         <span className="text-3xl font-bold text-white">{stats.messageStreak.current}</span>
-                        <span className="text-white/60">days</span>
+                        <span className="text-white/60">{t('days')}</span>
                     </div>
                     <p className="text-xs text-white/50 mt-2">
-                        Longest: {stats.messageStreak.longest} days
+                        {t('longest')}: {stats.messageStreak.longest} {t('days')}
                     </p>
                 </div>
             </div>
 
             {/* Activity Stats */}
             <div className="bg-gray-800/50 rounded-lg p-6 border border-white/10">
-                <h3 className="text-lg font-bold text-white mb-4">Activity Overview</h3>
+                <h3 className="text-lg font-bold text-white mb-4">{t('activity_overview')}</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div className="text-center">
                         <div className="text-2xl font-bold text-pink-400">{stats.totalMatches}</div>
-                        <div className="text-xs text-white/60">Matches</div>
+                        <div className="text-xs text-white/60">{t('matches')}</div>
                     </div>
                     <div className="text-center">
                         <div className="text-2xl font-bold text-red-400">{stats.totalLikes}</div>
-                        <div className="text-xs text-white/60">Likes Given</div>
+                        <div className="text-xs text-white/60">{t('likes_given')}</div>
                     </div>
                     <div className="text-center">
                         <div className="text-2xl font-bold text-blue-400">{stats.totalMessages}</div>
-                        <div className="text-xs text-white/60">Messages Sent</div>
+                        <div className="text-xs text-white/60">{t('messages_sent')}</div>
                     </div>
                     <div className="text-center">
                         <div className="text-2xl font-bold text-purple-400">{stats.profileViews}</div>
-                        <div className="text-xs text-white/60">Profile Views</div>
+                        <div className="text-xs text-white/60">{t('profile_views')}</div>
                     </div>
                 </div>
             </div>
@@ -171,7 +173,7 @@ const GamificationPanel: React.FC = () => {
                 <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-bold text-white flex items-center gap-2">
                         <TrophyIcon className="w-6 h-6 text-yellow-400" />
-                        Achievements
+                        {t('achievements')}
                     </h3>
                     <span className="text-sm text-white/60">
                         {unlockedAchievements.length} / {ACHIEVEMENTS.length}
@@ -181,7 +183,7 @@ const GamificationPanel: React.FC = () => {
                 {/* Unlocked Achievements */}
                 {unlockedAchievements.length > 0 && (
                     <div className="mb-6">
-                        <h4 className="text-sm font-semibold text-white/70 mb-3">Unlocked</h4>
+                        <h4 className="text-sm font-semibold text-white/70 mb-3">{t('unlocked')}</h4>
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                             {unlockedAchievements.map(achievement => (
                                 <div
@@ -207,7 +209,7 @@ const GamificationPanel: React.FC = () => {
                 {/* Locked Achievements */}
                 {lockedAchievements.length > 0 && (
                     <div>
-                        <h4 className="text-sm font-semibold text-white/70 mb-3">In Progress</h4>
+                        <h4 className="text-sm font-semibold text-white/70 mb-3">{t('in_progress')}</h4>
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                             {lockedAchievements.map(achievement => (
                                 <div
