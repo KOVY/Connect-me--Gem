@@ -11,12 +11,18 @@ export const isPushSupported = (): boolean => {
 // Request notification permission
 export const requestNotificationPermission = async (): Promise<NotificationPermission> => {
   if (!isPushSupported()) {
-    console.warn('Push notifications not supported');
+    if (import.meta.env.DEV) {
+      console.warn('[Push] Not supported in this browser');
+    }
     return 'denied';
   }
 
   const permission = await Notification.requestPermission();
-  console.log('Notification permission:', permission);
+
+  if (import.meta.env.DEV) {
+    console.log('[Push] Permission status:', permission);
+  }
+
   return permission;
 };
 
@@ -26,38 +32,46 @@ export const showNotification = async (
   options?: NotificationOptions
 ): Promise<void> => {
   if (!isPushSupported()) {
-    console.warn('Notifications not supported');
     return;
   }
 
   const permission = await Notification.requestPermission();
 
   if (permission === 'granted') {
-    const registration = await navigator.serviceWorker.ready;
+    try {
+      const registration = await navigator.serviceWorker.ready;
 
-    await registration.showNotification(title, {
-      icon: '/logo.png',
-      badge: '/badge.png',
-      vibrate: [200, 100, 200],
-      ...options,
-    });
+      await registration.showNotification(title, {
+        icon: '/logo.png',
+        badge: '/badge.png',
+        vibrate: [200, 100, 200],
+        ...options,
+      });
+    } catch (error) {
+      if (import.meta.env.DEV) {
+        console.error('[Push] Show notification error:', error instanceof Error ? error.message : 'Unknown error');
+      }
+    }
   }
 };
 
 // Subscribe to push notifications
-export const subscribeToPush = async (userId: string): Promise<PushSubscription | null> => {
+export const subscribeToPush = async (): Promise<PushSubscription | null> => {
   if (!isPushSupported()) {
     return null;
   }
 
   try {
     const registration = await navigator.serviceWorker.ready;
-    
+
     // Get VAPID public key from environment
     const vapidPublicKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
-    
+
     if (!vapidPublicKey) {
-      console.error('VAPID public key not configured');
+      // Avoid logging config details in production
+      if (import.meta.env.DEV) {
+        console.warn('[Push] VAPID key not configured');
+      }
       return null;
     }
 
@@ -66,28 +80,43 @@ export const subscribeToPush = async (userId: string): Promise<PushSubscription 
       applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
     });
 
-    // Save subscription to backend
-    await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/save-push-subscription`, {
+    // Get authenticated session token
+    const { supabase } = await import('./supabase');
+    const { data: { session } } = await supabase.auth.getSession();
+
+    if (!session?.access_token) {
+      throw new Error('Not authenticated');
+    }
+
+    // Save subscription to backend with auth token
+    const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/save-push-subscription`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session.access_token}`,
         'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
       },
       body: JSON.stringify({
-        userId,
         subscription,
       }),
     });
 
+    if (!response.ok) {
+      throw new Error(`Failed to save subscription: ${response.status}`);
+    }
+
     return subscription;
   } catch (error) {
-    console.error('Error subscribing to push:', error);
+    // Log error without sensitive details
+    if (import.meta.env.DEV) {
+      console.error('[Push] Subscription error:', error instanceof Error ? error.message : 'Unknown error');
+    }
     return null;
   }
 };
 
 // Unsubscribe from push notifications
-export const unsubscribeFromPush = async (userId: string): Promise<boolean> => {
+export const unsubscribeFromPush = async (): Promise<boolean> => {
   if (!isPushSupported()) {
     return false;
   }
@@ -102,21 +131,35 @@ export const unsubscribeFromPush = async (userId: string): Promise<boolean> => {
 
     await subscription.unsubscribe();
 
-    // Remove subscription from backend
-    await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/remove-push-subscription`, {
+    // Get authenticated session token
+    const { supabase } = await import('./supabase');
+    const { data: { session } } = await supabase.auth.getSession();
+
+    if (!session?.access_token) {
+      throw new Error('Not authenticated');
+    }
+
+    // Remove subscription from backend with auth token
+    const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/remove-push-subscription`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session.access_token}`,
         'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
       },
-      body: JSON.stringify({
-        userId,
-      }),
+      body: JSON.stringify({}),
     });
+
+    if (!response.ok) {
+      throw new Error(`Failed to remove subscription: ${response.status}`);
+    }
 
     return true;
   } catch (error) {
-    console.error('Error unsubscribing from push:', error);
+    // Log error without sensitive details
+    if (import.meta.env.DEV) {
+      console.error('[Push] Unsubscribe error:', error instanceof Error ? error.message : 'Unknown error');
+    }
     return false;
   }
 };
