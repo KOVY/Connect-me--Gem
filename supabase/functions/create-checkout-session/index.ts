@@ -1,108 +1,85 @@
-// Supabase Edge Function: Create Stripe Checkout Session
-// Deno Deploy environment
-
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import Stripe from "https://esm.sh/stripe@14.11.0?target=deno";
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
+import Stripe from 'https://esm.sh/stripe@13.10.0?target=deno'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+}
 
 serve(async (req) => {
-  // Handle CORS preflight
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
+    return new Response('ok', { headers: corsHeaders })
   }
 
   try {
-    // Initialize Stripe
-    const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
+    const stripeKey = Deno.env.get('STRIPE_SECRET_KEY')
+    if (!stripeKey) {
+      throw new Error('Missing STRIPE_SECRET_KEY environment variable')
+    }
+
+    const stripe = new Stripe(stripeKey, {
       apiVersion: '2023-10-16',
       httpClient: Stripe.createFetchHttpClient(),
-    });
+    })
 
-    // Initialize Supabase client
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      {
-        global: {
-          headers: { Authorization: req.headers.get('Authorization')! },
+    const { priceId, userId, tier, billingPeriod, successUrl, cancelUrl } = await req.json()
+
+    if (!priceId || !userId || !tier || !billingPeriod) {
+      throw new Error('Missing required parameters')
+    }
+
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+    const supabase = createClient(supabaseUrl, supabaseKey)
+
+    const { data: profile } = await supabase
+      .from('user_profiles')
+      .select('stripe_customer_id, email')
+      .eq('id', userId)
+      .single()
+
+    let customerId = profile?.stripe_customer_id
+
+    if (!customerId) {
+      const customer = await stripe.customers.create({
+        email: profile?.email,
+        metadata: {
+          supabase_user_id: userId,
         },
-      }
-    );
+      })
+      customerId = customer.id
 
-    // Get authenticated user
-    const {
-      data: { user },
-    } = await supabaseClient.auth.getUser();
-
-    if (!user) {
-      throw new Error('Unauthorized');
+      await supabase
+        .from('user_profiles')
+        .update({ stripe_customer_id: customerId })
+        .eq('id', userId)
     }
 
-    // Parse request body
-    const {
-      packageId,
-      creditAmount,
-      price,
-      currency,
-    }: {
-      packageId: string;
-      creditAmount: number;
-      price: number;
-      currency: string;
-    } = await req.json();
-
-    // Validate input
-    if (!packageId || !creditAmount || !price || !currency) {
-      throw new Error('Missing required fields');
-    }
-
-    // Get user email from auth
-    const userEmail = user.email;
-
-    // Create Stripe Checkout Session
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
+      customer: customerId,
       line_items: [
         {
-          price_data: {
-            currency: currency.toLowerCase(),
-            product_data: {
-              name: `${creditAmount} Credits`,
-              description: `Credit package for AURA dating app`,
-              images: ['https://your-domain.com/credit-icon.png'], // TODO: Replace with actual image
-            },
-            unit_amount: Math.round(price * 100), // Convert to cents
-          },
+          price: priceId,
           quantity: 1,
         },
       ],
-      mode: 'payment',
-      success_url: `${Deno.env.get('APP_URL')}/profile/me/shop?session_id={CHECKOUT_SESSION_ID}&payment=success`,
-      cancel_url: `${Deno.env.get('APP_URL')}/profile/me/shop?payment=cancelled`,
-      client_reference_id: user.id, // Link to our user
+      mode: 'subscription',
+      success_url: successUrl,
+      cancel_url: cancelUrl,
       metadata: {
-        userId: user.id,
-        packageId,
-        creditAmount: creditAmount.toString(),
-        currency,
+        user_id: userId,
+        tier,
+        billing_period: billingPeriod,
       },
-    });
-
-    // Log transaction attempt
-    await supabaseClient.from('transactions').insert({
-      user_id: user.id,
-      type: 'credit_purchase',
-      amount: price,
-      currency,
-      stripe_payment_intent_id: session.id,
-      status: 'pending',
-      credit_amount: creditAmount,
-    });
+      subscription_data: {
+        metadata: {
+          user_id: userId,
+          tier,
+          billing_period: billingPeriod,
+        },
+      },
+    })
 
     return new Response(
       JSON.stringify({
@@ -112,19 +89,16 @@ serve(async (req) => {
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
-      }
-    );
+      },
+    )
   } catch (error) {
-    console.error('Error creating checkout session:', error);
-
+    console.error('Error creating checkout session:', error)
     return new Response(
-      JSON.stringify({
-        error: error.message || 'Internal server error',
-      }),
+      JSON.stringify({ error: error.message }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 400,
-      }
-    );
+      },
+    )
   }
-});
+})
