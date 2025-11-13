@@ -335,7 +335,7 @@ export const translations = {
     continue_with_google: 'Pokračovat s Google',
     continue_with_apple: 'Pokračovat s Apple',
     already_have_account: 'Již máte účet?',
-    dont_have_account: 'Nemáte účet?',
+    dont_have_account: 'Ještě nemáte účet?',
     by_continuing_agree: 'Pokračováním souhlasíte s našimi',
     terms: 'Podmínkami',
     and: 'a',
