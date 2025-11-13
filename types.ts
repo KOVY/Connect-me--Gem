@@ -93,6 +93,93 @@ export interface Reel {
     videoUrl: string;
     description: string;
     userProfile: UserProfile;
+    // Statistics
+    viewCount?: number;
+    likeCount?: number;
+    commentCount?: number;
+    giftCount?: number;
+    totalGiftsValue?: number; // In credits
+    // Trending
+    trendingScore?: number;
+    trendingScore24h?: number;
+    trendingScore7d?: number;
+    // User interaction state
+    isLiked?: boolean; // Whether current user liked this
+    createdAt?: string;
+}
+
+// Reel Statistics
+export interface ReelStats {
+    reelId: string;
+    viewCount: number;
+    likeCount: number;
+    commentCount: number;
+    giftCount: number;
+    totalGiftsValueCredits: number;
+    totalGiftsValueUsd: number;
+    trendingScore: number;
+    trendingScore24h: number;
+    trendingScore7d: number;
+}
+
+// Reel View
+export interface ReelView {
+    id: string;
+    reelId: string;
+    viewerId: string | null;
+    watchDurationSeconds: number;
+    completed: boolean;
+    viewedAt: string;
+}
+
+// Reel Like
+export interface ReelLike {
+    id: string;
+    reelId: string;
+    userId: string;
+    user?: UserProfile;
+    createdAt: string;
+}
+
+// Reel Comment
+export interface ReelComment {
+    id: string;
+    reelId: string;
+    userId: string;
+    user: UserProfile;
+    commentText: string;
+    parentCommentId?: string | null;
+    // Gift integration
+    includesGift: boolean;
+    giftId?: string | null;
+    giftIcon?: string | null;
+    giftName?: string | null;
+    giftValueCredits?: number;
+    // Engagement
+    likeCount: number;
+    replyCount: number;
+    replies?: ReelComment[]; // Nested replies
+    // State
+    isFlagged: boolean;
+    isDeleted: boolean;
+    createdAt: string;
+    updatedAt: string;
+}
+
+// Reel Gift
+export interface ReelGift {
+    id: string;
+    reelId: string;
+    senderId: string;
+    sender: UserProfile;
+    recipientId: string;
+    recipient: UserProfile;
+    giftId: string;
+    giftName: string;
+    giftIcon: string;
+    creditCost: number;
+    commentId?: string | null;
+    createdAt: string;
 }
 
 
