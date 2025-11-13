@@ -189,9 +189,12 @@ const DiscoveryFilters: React.FC<DiscoveryFiltersProps> = ({ filters, onApply, o
                         </div>
                     </div>
 
-                    {/* Professional Categories */}
-                    <div>
-                        <label className="block text-sm font-semibold mb-3">{t('professional_categories')}</label>
+                    {/* Looking for Professional Services - Opt-in Filter */}
+                    <div className="p-4 bg-gradient-to-br from-purple-500/10 to-indigo-500/10 border border-purple-500/30 rounded-lg">
+                        <div className="mb-3">
+                            <label className="block text-sm font-semibold mb-1">{t('looking_for_professional_services')}</label>
+                            <p className="text-xs text-white/60">{t('looking_for_professional_services_description')}</p>
+                        </div>
                         <div className="grid grid-cols-2 gap-2">
                             {([
                                 'therapist',
