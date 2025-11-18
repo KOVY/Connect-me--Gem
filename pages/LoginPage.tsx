@@ -31,11 +31,19 @@ const getAuthErrorMessage = (error: AuthError | Error | any, t: (key: string) =>
     if (error?.message?.includes('Password should be')) {
         return t('password_too_short');
     }
-    if (error?.message?.includes('rate limit')) {
+    // More specific rate limit check - only show if it's actually a rate limit error
+    if (error?.status === 429 || (error?.message && error.message.toLowerCase().includes('rate limit exceeded'))) {
         return t('too_many_attempts');
     }
+    // For other authentication errors, provide more helpful message
+    if (error?.message?.includes('email') || error?.message?.includes('password')) {
+        return t('invalid_credentials');
+    }
 
-    // Generic error message
+    // Generic error message with more detail in dev mode
+    if (import.meta.env.DEV && error?.message) {
+        return `${t('auth_error')} (${error.message})`;
+    }
     return t('auth_error');
 };
 
@@ -190,8 +198,13 @@ const LoginPage: React.FC = () => {
 
                 {/* Error Message */}
                 {error && (
-                    <div className="mb-6 p-4 bg-red-500/20 border border-red-500/50 rounded-xl text-red-200 text-sm">
-                        {error}
+                    <div className="mb-6 p-4 bg-red-500/20 border border-red-500/50 rounded-xl">
+                        <div className="text-red-200 text-sm mb-2">{error}</div>
+                        {!isSignUp && (
+                            <div className="text-red-300/60 text-xs">
+                                💡 Tip: Zkontroluj email a heslo. Pokud jsi nový, klikni na "Vytvořit účet" níže.
+                            </div>
+                        )}
                     </div>
                 )}
 
