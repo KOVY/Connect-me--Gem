@@ -14,6 +14,14 @@ const getAuthErrorMessage = (error: AuthError | Error | any, t: (key: string) =>
         console.error('[Auth] Error status:', error?.status);
     }
 
+    // Rate limit - check first (most specific)
+    if (error?.status === 429 ||
+        error?.message?.toLowerCase().includes('rate limit') ||
+        error?.message?.toLowerCase().includes('too many requests') ||
+        error?.code === 'over_request_rate_limit') {
+        return t('too_many_attempts');
+    }
+
     // Map Supabase error codes to user-friendly messages
     if (error?.status === 400) {
         return t('invalid_credentials');
@@ -32,10 +40,6 @@ const getAuthErrorMessage = (error: AuthError | Error | any, t: (key: string) =>
     }
     if (error?.message?.includes('Password should be')) {
         return t('password_too_short');
-    }
-    // ONLY show rate limit for actual 429 status or very specific message
-    if (error?.status === 429 || error?.message?.toLowerCase() === 'rate limit exceeded') {
-        return t('too_many_attempts');
     }
 
     // In dev mode, show the actual error message for debugging
