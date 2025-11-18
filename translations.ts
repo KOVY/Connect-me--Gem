@@ -236,7 +236,7 @@ export const translations = {
     profile_hub_payments: 'Payments',
     profile_hub_settings: 'Settings',
     // Profile Tab Content
-    welcome_back: 'Welcome back, {name}!',
+    welcome_back_user: 'Welcome back, {name}!',
     hub_quick_look: 'Here\'s a quick look at your hub.',
     need_more_credits: 'Need more credits?',
     purchase_package_fun: 'Purchase a package to continue the fun.',
@@ -525,7 +525,7 @@ export const translations = {
     profile_hub_payments: 'Platby',
     profile_hub_settings: 'Nastavení',
     // Profile Tab Content
-    welcome_back: 'Vítejte zpět, {name}!',
+    welcome_back_user: 'Vítejte zpět, {name}!',
     hub_quick_look: 'Zde je rychlý přehled vašeho hubu.',
     need_more_credits: 'Potřebujete více kreditů?',
     purchase_package_fun: 'Kupte si balíček a pokračujte v zábavě.',
@@ -769,7 +769,7 @@ export const translations = {
     profile_hub_payments: 'Zahlungen',
     profile_hub_settings: 'Einstellungen',
     // Profile Tab Content
-    welcome_back: 'Willkommen zurück, {name}!',
+    welcome_back_user: 'Willkommen zurück, {name}!',
     hub_quick_look: 'Hier ist ein schneller Überblick über deinen Hub.',
     need_more_credits: 'Brauchst du mehr Credits?',
     purchase_package_fun: 'Kaufe ein Paket, um den Spaß fortzusetzen.',
@@ -1001,7 +1001,7 @@ export const translations = {
     profile_hub_payments: 'Paiements',
     profile_hub_settings: 'Paramètres',
     // Profile Tab Content
-    welcome_back: 'Bon retour, {name}!',
+    welcome_back_user: 'Bon retour, {name}!',
     hub_quick_look: 'Voici un aperçu rapide de votre hub.',
     need_more_credits: 'Besoin de plus de crédits?',
     purchase_package_fun: 'Achetez un pack pour continuer le plaisir.',
@@ -1233,7 +1233,7 @@ export const translations = {
     profile_hub_payments: 'Pagos',
     profile_hub_settings: 'Configuración',
     // Profile Tab Content
-    welcome_back: '¡Bienvenido de nuevo, {name}!',
+    welcome_back_user: '¡Bienvenido de nuevo, {name}!',
     hub_quick_look: 'Aquí tienes un vistazo rápido a tu hub.',
     need_more_credits: '¿Necesitas más créditos?',
     purchase_package_fun: 'Compra un paquete para continuar la diversión.',
@@ -1465,7 +1465,7 @@ export const translations = {
     profile_hub_payments: 'Pagamenti',
     profile_hub_settings: 'Impostazioni',
     // Profile Tab Content
-    welcome_back: 'Bentornato, {name}!',
+    welcome_back_user: 'Bentornato, {name}!',
     hub_quick_look: 'Ecco una rapida occhiata al tuo hub.',
     need_more_credits: 'Hai bisogno di più crediti?',
     purchase_package_fun: 'Acquista un pacchetto per continuare il divertimento.',
@@ -1697,7 +1697,7 @@ export const translations = {
     profile_hub_payments: 'Płatności',
     profile_hub_settings: 'Ustawienia',
     // Profile Tab Content
-    welcome_back: 'Witaj ponownie, {name}!',
+    welcome_back_user: 'Witaj ponownie, {name}!',
     hub_quick_look: 'Oto szybki przegląd twojego hubu.',
     need_more_credits: 'Potrzebujesz więcej kredytów?',
     purchase_package_fun: 'Kup pakiet, aby kontynuować zabawę.',
@@ -1929,7 +1929,7 @@ export const translations = {
     profile_hub_payments: 'Pagamentos',
     profile_hub_settings: 'Configurações',
     // Profile Tab Content
-    welcome_back: 'Bem-vindo de volta, {name}!',
+    welcome_back_user: 'Bem-vindo de volta, {name}!',
     hub_quick_look: 'Aqui está uma visão rápida do seu hub.',
     need_more_credits: 'Precisa de mais créditos?',
     purchase_package_fun: 'Compre um pacote para continuar a diversão.',
