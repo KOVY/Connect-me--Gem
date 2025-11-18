@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Faktura - Connect Me</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { margin: 0 !important; padding: 0 !important; width: 100% !important; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f5f5f7; }
+        table { border-collapse: collapse; border-spacing: 0; }
+        .button { display: inline-block; padding: 16px 32px; background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%); color: #ffffff !important; font-size: 16px; font-weight: 600; text-decoration: none; border-radius: 12px; }
+        @media only screen and (max-width: 600px) {
+            .container { width: 100% !important; }
+        }
+    </style>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f5f5f7;">
+    <div style="display: none; max-height: 0; overflow: hidden;">
+        Faktura #{{ INVOICE_NUMBER }} - Děkujeme za nákup!
+    </div>
+
+    <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f5f5f7;">
+        <tr>
+            <td align="center" style="padding: 40px 20px;">
+                <table role="presentation" class="container" width="600" border="0" cellspacing="0" cellpadding="0" style="max-width: 600px; background-color: #ffffff; border-radius: 16px; overflow: hidden;">
+
+                    <!-- Header -->
+                    <tr>
+                        <td align="center" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 40px 20px;">
+                            <h1 style="margin: 0; font-size: 48px; line-height: 1;">✅</h1>
+                            <h2 style="margin: 12px 0 0 0; color: #ffffff; font-size: 24px; font-weight: 700;">Platba úspěšná!</h2>
+                        </td>
+                    </tr>
+
+                    <!-- Content -->
+                    <tr>
+                        <td style="padding: 40px 32px;">
+                            <h1 style="margin: 0 0 8px 0; color: #111827; font-size: 28px; font-weight: 700;">
+                                Děkujeme! 💖
+                            </h1>
+
+                            <p style="margin: 0 0 32px 0; color: #6b7280; font-size: 14px;">
+                                Faktura č. <strong>{{ INVOICE_NUMBER }}</strong>
+                            </p>
+
+                            <!-- Order Summary -->
+                            <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f9fafb; border-radius: 12px; margin: 0 0 24px 0;">
+                                <tr>
+                                    <td style="padding: 24px;">
+                                        <h3 style="margin: 0 0 16px 0; color: #111827; font-size: 16px; font-weight: 700;">
+                                            📦 Detaily objednávky
+                                        </h3>
+
+                                        <!-- Item -->
+                                        <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="border-bottom: 1px solid #e5e7eb; padding-bottom: 12px; margin-bottom: 12px;">
+                                            <tr>
+                                                <td style="color: #374151; font-size: 15px; padding: 8px 0;">
+                                                    {{ ITEM_NAME }}
+                                                </td>
+                                                <td align="right" style="color: #111827; font-size: 15px; font-weight: 600; padding: 8px 0;">
+                                                    {{ ITEM_PRICE }} Kč
+                                                </td>
+                                            </tr>
+                                        </table>
+
+                                        <!-- Total -->
+                                        <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
+                                            <tr>
+                                                <td style="color: #111827; font-size: 18px; font-weight: 700; padding: 12px 0;">
+                                                    Celkem
+                                                </td>
+                                                <td align="right" style="color: #111827; font-size: 24px; font-weight: 700; padding: 12px 0;">
+                                                    {{ TOTAL_AMOUNT }} Kč
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- Payment Details -->
+                            <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="margin: 0 0 24px 0;">
+                                <tr>
+                                    <td style="padding: 4px 0;">
+                                        <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
+                                            <tr>
+                                                <td style="color: #6b7280; font-size: 14px; padding: 6px 0;">
+                                                    Platební metoda:
+                                                </td>
+                                                <td align="right" style="color: #111827; font-size: 14px; font-weight: 600; padding: 6px 0;">
+                                                    {{ PAYMENT_METHOD }}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="color: #6b7280; font-size: 14px; padding: 6px 0;">
+                                                    Datum platby:
+                                                </td>
+                                                <td align="right" style="color: #111827; font-size: 14px; font-weight: 600; padding: 6px 0;">
+                                                    {{ PAYMENT_DATE }}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="color: #6b7280; font-size: 14px; padding: 6px 0;">
+                                                    ID transakce:
+                                                </td>
+                                                <td align="right" style="color: #6b7280; font-size: 12px; font-family: monospace; padding: 6px 0;">
+                                                    {{ TRANSACTION_ID }}
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- Credit Balance (if applicable) -->
+                            <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background: linear-gradient(135deg, #fdf2f8 0%, #f3e8ff 100%); border-radius: 12px; margin: 0 0 32px 0;">
+                                <tr>
+                                    <td style="padding: 20px;">
+                                        <p style="margin: 0 0 8px 0; color: #374151; font-size: 14px;">
+                                            💰 <strong>Tvůj aktuální zůstatek:</strong>
+                                        </p>
+                                        <p style="margin: 0; color: #111827; font-size: 24px; font-weight: 700;">
+                                            {{ CREDIT_BALANCE }} kreditů
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- CTA Button -->
+                            <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
+                                <tr>
+                                    <td align="center" style="padding: 8px 0 24px 0;">
+                                        <a href="{{ APP_URL }}" class="button" style="display: inline-block; padding: 16px 48px; background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%); color: #ffffff !important; font-size: 16px; font-weight: 600; text-decoration: none; border-radius: 12px;">
+                                            🚀 Použít kredity
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- Support Info -->
+                            <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f0f9ff; border-left: 4px solid #0ea5e9; border-radius: 8px;">
+                                <tr>
+                                    <td style="padding: 16px 20px;">
+                                        <p style="margin: 0 0 8px 0; color: #075985; font-size: 14px; font-weight: 600;">
+                                            💬 Máš otázky?
+                                        </p>
+                                        <p style="margin: 0; color: #0c4a6e; font-size: 13px; line-height: 1.6;">
+                                            Pokud máš jakékoliv dotazy ohledně tvé objednávky,
+                                            kontaktuj nás na <a href="mailto:support@connectme.cz" style="color: #0284c7; text-decoration: underline;">support@connectme.cz</a>
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                        <td style="padding: 32px; background-color: #f9fafb; border-top: 1px solid #e5e7eb;">
+                            <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
+                                <tr>
+                                    <td align="center" style="padding-bottom: 16px;">
+                                        <a href="https://connectme.cz" style="color: #6b7280; font-size: 14px; text-decoration: none; margin: 0 12px;">Web</a>
+                                        <span style="color: #d1d5db;">|</span>
+                                        <a href="mailto:support@connectme.cz" style="color: #6b7280; font-size: 14px; text-decoration: none; margin: 0 12px;">Podpora</a>
+                                        <span style="color: #d1d5db;">|</span>
+                                        <a href="{{ INVOICE_PDF_URL }}" style="color: #6b7280; font-size: 14px; text-decoration: none; margin: 0 12px;">📄 Stáhnout fakturu</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="center" style="color: #9ca3af; font-size: 12px; line-height: 1.6;">
+                                        © 2024 Connect Me. Všechna práva vyhrazena.<br>
+                                        IČ: 12345678 | Praha, Česká republika
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

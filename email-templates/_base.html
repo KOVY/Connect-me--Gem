@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="cs" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="x-apple-disable-message-reformatting">
+    <meta name="format-detection" content="telephone=no, date=no, address=no, email=no">
+    <meta name="color-scheme" content="light dark">
+    <meta name="supported-color-schemes" content="light dark">
+    <!--[if mso]>
+    <noscript>
+        <xml>
+            <o:OfficeDocumentSettings>
+                <o:PixelsPerInch>96</o:PixelsPerInch>
+            </o:OfficeDocumentSettings>
+        </xml>
+    </noscript>
+    <![endif]-->
+    <title>{{ TITLE }}</title>
+    <style>
+        /* Reset & Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f5f5f7;
+        }
+        table {
+            border-collapse: collapse;
+            border-spacing: 0;
+            mso-table-lspace: 0pt;
+            mso-table-rspace: 0pt;
+        }
+        img {
+            border: 0;
+            height: auto;
+            line-height: 100%;
+            outline: none;
+            text-decoration: none;
+            -ms-interpolation-mode: bicubic;
+        }
+        a {
+            text-decoration: none;
+        }
+
+        /* Brand Colors */
+        .gradient-bg {
+            background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
+        }
+
+        /* Button Styles */
+        .button {
+            display: inline-block;
+            padding: 16px 32px;
+            background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
+            color: #ffffff !important;
+            font-size: 16px;
+            font-weight: 600;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);
+        }
+        .button:hover {
+            box-shadow: 0 6px 16px rgba(236, 72, 153, 0.4);
+        }
+
+        /* Responsive */
+        @media only screen and (max-width: 600px) {
+            .container {
+                width: 100% !important;
+                padding: 0 16px !important;
+            }
+            .button {
+                width: 100% !important;
+                display: block !important;
+            }
+            h1 {
+                font-size: 24px !important;
+            }
+        }
+
+        /* Dark Mode Support */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #1a1a1a !important;
+            }
+            .card {
+                background-color: #2a2a2a !important;
+                border-color: #3a3a3a !important;
+            }
+            .text-gray {
+                color: #d1d1d1 !important;
+            }
+        }
+    </style>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f5f5f7;">
+    <!-- Preheader (hidden) -->
+    <div style="display: none; max-height: 0; overflow: hidden; mso-hide: all;">
+        {{ PREHEADER }}
+    </div>
+
+    <!-- Main Container -->
+    <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f5f5f7;">
+        <tr>
+            <td align="center" style="padding: 40px 20px;">
+                <!-- Email Card -->
+                <table role="presentation" class="container" width="600" border="0" cellspacing="0" cellpadding="0" style="max-width: 600px; background-color: #ffffff; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); overflow: hidden;">
+
+                    <!-- Header with Gradient -->
+                    <tr>
+                        <td align="center" style="background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%); padding: 40px 20px;">
+                            <h1 style="margin: 0; font-size: 48px; line-height: 1;">💖</h1>
+                            <h2 style="margin: 12px 0 0 0; color: #ffffff; font-size: 24px; font-weight: 700;">Connect Me</h2>
+                        </td>
+                    </tr>
+
+                    <!-- Content -->
+                    <tr>
+                        <td style="padding: 40px 32px;">
+                            {{ CONTENT }}
+                        </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                        <td style="padding: 32px; background-color: #f9fafb; border-top: 1px solid #e5e7eb;">
+                            <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
+                                <tr>
+                                    <td align="center" style="padding-bottom: 16px;">
+                                        <a href="https://connectme.cz" style="color: #6b7280; font-size: 14px; text-decoration: none; margin: 0 12px;">Web</a>
+                                        <span style="color: #d1d5db;">|</span>
+                                        <a href="mailto:support@connectme.cz" style="color: #6b7280; font-size: 14px; text-decoration: none; margin: 0 12px;">Podpora</a>
+                                        <span style="color: #d1d5db;">|</span>
+                                        <a href="{{ UNSUBSCRIBE_URL }}" style="color: #6b7280; font-size: 14px; text-decoration: none; margin: 0 12px;">Odhlásit</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="center" style="color: #9ca3af; font-size: 12px; line-height: 1.6;">
+                                        © 2024 Connect Me. Všechna práva vyhrazena.<br>
+                                        Praha, Česká republika
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
