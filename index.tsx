@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
+import './src/index.css';
 // FIX: The error "File 'file:///router.tsx' is not a module." is resolved by adding exported content to the 'router.tsx' file. The import path is correct.
 import { router } from './router';
 
