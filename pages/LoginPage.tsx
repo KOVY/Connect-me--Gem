@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslations } from '../hooks/useTranslations';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useLocale } from '../contexts/LocaleContext';
 import { supabase } from '../src/lib/supabase';
 import { AuthError } from '@supabase/supabase-js';
@@ -55,24 +55,34 @@ interface LoginPageProps {
     mode?: 'login' | 'register';
 }
 
-const LoginPage: React.FC<LoginPageProps> = ({ mode = 'register' }) => {
+const LoginPage: React.FC<LoginPageProps> = ({ mode }) => {
     const { t } = useTranslations();
     const { locale } = useLocale();
     const navigate = useNavigate();
+    const location = useLocation();
+
+    // Determine mode from URL path if prop not provided
+    const isRegisterPage = mode === 'register' || location.pathname.includes('/register');
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [isSignUp, setIsSignUp] = useState(mode === 'register'); // Use mode prop
+    const [isSignUp, setIsSignUp] = useState(isRegisterPage);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-    // Update isSignUp when mode prop changes
+    // Debug logging
     useEffect(() => {
-        setIsSignUp(mode === 'register');
+        console.log('[LoginPage] Mode:', mode, 'Path:', location.pathname, 'isSignUp:', isSignUp);
+    }, [mode, location.pathname, isSignUp]);
+
+    // Update isSignUp when URL or mode changes
+    useEffect(() => {
+        const shouldBeSignUp = mode === 'register' || location.pathname.includes('/register');
+        setIsSignUp(shouldBeSignUp);
         setError(null);
         setSuccessMessage(null);
-    }, [mode]);
+    }, [mode, location.pathname]);
 
     // Email/Password Login
     const handleEmailLogin = async (e: React.FormEvent) => {
@@ -81,9 +91,12 @@ const LoginPage: React.FC<LoginPageProps> = ({ mode = 'register' }) => {
         setError(null);
         setSuccessMessage(null);
 
+        console.log('[LoginPage] Submit - isSignUp:', isSignUp, 'email:', email);
+
         try {
             if (isSignUp) {
                 // Sign Up
+                console.log('[LoginPage] Attempting SIGNUP');
                 const { data, error } = await supabase.auth.signUp({
                     email,
                     password,
@@ -103,6 +116,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ mode = 'register' }) => {
                 }
             } else {
                 // Sign In
+                console.log('[LoginPage] Attempting SIGNIN');
                 const { data, error } = await supabase.auth.signInWithPassword({
                     email,
                     password,
@@ -111,6 +125,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ mode = 'register' }) => {
                 if (error) throw error;
 
                 if (data?.user) {
+                    console.log('[LoginPage] Login successful, user:', data.user.id);
                     // Redirect to discovery after successful login
                     navigate(`/${locale}/discovery`);
                 }
