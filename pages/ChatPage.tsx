@@ -10,6 +10,7 @@ import { useUser } from '../contexts/UserContext';
 import { useTranslations } from '../hooks/useTranslations';
 import { showLocalNotification } from '../utils/notifications';
 import signalingService from '../utils/signalingService';
+import { supabase } from '../src/lib/supabase';
 
 import ChatInterface from '../components/ChatInterface';
 import GiftWall from '../components/GiftWall';
@@ -64,15 +65,54 @@ const ChatPage: React.FC = () => {
     }
   }, [searchParams, setSearchParams]);
 
-  // Find recipient profile
+  // Find recipient profile (from Supabase or PROFILES fallback)
   useEffect(() => {
-    const profile = PROFILES.find(p => p.id === userId);
-    if (profile) {
-      setRecipient(profile);
-    } else {
-      // Handle user not found, maybe redirect after a delay
-      setTimeout(() => navigate(`/${locale}/`), 3000);
-    }
+    const loadProfile = async () => {
+      if (!userId) return;
+
+      // Try to find in PROFILES first (for backward compatibility)
+      const profileInConstants = PROFILES.find(p => p.id === userId);
+      if (profileInConstants) {
+        setRecipient(profileInConstants);
+        return;
+      }
+
+      // Fetch from Supabase discovery_profiles
+      try {
+        const { data, error } = await supabase
+          .from('discovery_profiles')
+          .select('*')
+          .eq('user_id', userId)
+          .single();
+
+        if (error) throw error;
+
+        if (data) {
+          setRecipient({
+            id: data.user_id,
+            name: data.name,
+            age: data.age,
+            imageUrl: data.photo_url || 'https://via.placeholder.com/100',
+            occupation: data.occupation || 'User',
+            bio: data.bio || '',
+            interests: data.interests || [],
+            hobbies: data.hobbies || [],
+            country: data.country || 'Unknown',
+            lastSeen: new Date().toISOString(),
+            verified: data.verified || false,
+            icebreakers: data.icebreakers || []
+          });
+        } else {
+          // Handle user not found
+          setTimeout(() => navigate(`/${locale}/`), 3000);
+        }
+      } catch (error) {
+        console.error('Error loading profile:', error);
+        setTimeout(() => navigate(`/${locale}/`), 3000);
+      }
+    };
+
+    loadProfile();
   }, [userId, navigate, locale]);
 
   // Initialize Gemini Chat

@@ -30,6 +30,7 @@ export function ReelCommentsPanel({
   const [isLoading, setIsLoading] = useState(false);
   const [showGiftPicker, setShowGiftPicker] = useState(false);
   const [selectedGift, setSelectedGift] = useState<typeof AVAILABLE_GIFTS[0] | null>(null);
+  const [replyingTo, setReplyingTo] = useState<ReelComment | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Load comments from Supabase
@@ -172,6 +173,7 @@ export function ReelCommentsPanel({
           reel_id: reelId,
           user_id: user.id,
           comment_text: newComment.trim() || '',
+          parent_comment_id: replyingTo?.id || null, // Support replies
           includes_gift: !!selectedGift,
           gift_id: selectedGift?.id || null,
           gift_value_credits: selectedGift?.creditCost || 0,
@@ -206,6 +208,7 @@ export function ReelCommentsPanel({
       setNewComment('');
       setSelectedGift(null);
       setShowGiftPicker(false);
+      setReplyingTo(null);
 
       // Comments will auto-refresh via real-time subscription
     } catch (error) {
@@ -214,6 +217,11 @@ export function ReelCommentsPanel({
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleReplyClick = (comment: ReelComment) => {
+    setReplyingTo(comment);
+    inputRef.current?.focus();
   };
 
   const formatTimeAgo = (dateString: string) => {
@@ -303,7 +311,10 @@ export function ReelCommentsPanel({
                       <Heart className="w-4 h-4" />
                       {comment.likeCount > 0 && <span>{comment.likeCount}</span>}
                     </button>
-                    <button className="text-gray-400 hover:text-white transition-colors">
+                    <button
+                      onClick={() => handleReplyClick(comment)}
+                      className="text-gray-400 hover:text-white transition-colors"
+                    >
                       Reply
                     </button>
                     {comment.replyCount > 0 && (
@@ -360,6 +371,23 @@ export function ReelCommentsPanel({
 
         {/* Input Area */}
         <div className="border-t border-white/10 p-4 bg-gray-900">
+          {/* Replying To Indicator */}
+          {replyingTo && (
+            <div className="flex items-center gap-2 mb-2 p-2 bg-blue-500/20 border border-blue-500/30 rounded-lg">
+              <div className="flex-1">
+                <p className="text-xs text-blue-300">Replying to</p>
+                <p className="text-sm font-medium text-white">@{replyingTo.user.name}</p>
+              </div>
+              <button
+                onClick={() => setReplyingTo(null)}
+                className="p-1 hover:bg-white/10 rounded-full"
+              >
+                <X className="w-4 h-4 text-white" />
+              </button>
+            </div>
+          )}
+
+          {/* Selected Gift Indicator */}
           {selectedGift && (
             <div className="flex items-center gap-2 mb-2 p-2 bg-purple-500/20 border border-purple-500/30 rounded-lg">
               <span className="text-2xl">{selectedGift.icon}</span>
@@ -394,7 +422,13 @@ export function ReelCommentsPanel({
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSendComment()}
-              placeholder={selectedGift ? `Send ${selectedGift.name} with a message...` : 'Add a comment...'}
+              placeholder={
+                replyingTo
+                  ? `Reply to @${replyingTo.user.name}...`
+                  : selectedGift
+                  ? `Send ${selectedGift.name} with a message...`
+                  : 'Add a comment...'
+              }
               className="flex-1 bg-white/10 border border-white/20 rounded-full px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-pink-500 transition-colors"
             />
 

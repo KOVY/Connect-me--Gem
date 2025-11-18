@@ -4,12 +4,13 @@ import { useUser } from '../contexts/UserContext';
 import { useLocale } from '../contexts/LocaleContext';
 import { useTranslations } from '../hooks/useTranslations';
 import { UserProfile } from '../types';
-import { PROFILES } from '../constants';
+import { supabase } from '../src/lib/supabase';
 
 interface Conversation {
   id: string;
   user: UserProfile;
   lastMessage: string;
+  lastMessageType: string;
   timestamp: string;
   unreadCount: number;
   isOnline: boolean;
@@ -22,28 +23,121 @@ const MessagesPage: React.FC = () => {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Load conversations (mock data for now)
+  // Load conversations from Supabase
   useEffect(() => {
-    if (!isLoggedIn) {
+    if (!isLoggedIn || !user) {
       setLoading(false);
       return;
     }
 
-    // Mock conversations - in real app, fetch from Supabase
-    const mockConversations: Conversation[] = PROFILES.slice(0, 5).map((profile, index) => ({
-      id: `conv-${profile.id}`,
-      user: profile,
-      lastMessage: index === 0 ? 'Hey! How are you?' : index === 1 ? 'Thanks for the gift! 💝' : 'Nice to meet you!',
-      timestamp: new Date(Date.now() - index * 3600000).toISOString(),
-      unreadCount: index === 0 ? 2 : index === 2 ? 1 : 0,
-      isOnline: index === 0 || index === 3,
-    }));
+    const loadConversations = async () => {
+      try {
+        // Fetch conversations where user is participant
+        const { data: conversationsData, error } = await supabase
+          .from('conversations')
+          .select('*')
+          .or(`participant1_id.eq.${user.id},participant2_id.eq.${user.id}`)
+          .order('last_message_at', { ascending: false });
 
-    setTimeout(() => {
-      setConversations(mockConversations);
-      setLoading(false);
-    }, 500);
-  }, [isLoggedIn]);
+        if (error) throw error;
+
+        if (conversationsData && conversationsData.length > 0) {
+          // Get all other participant IDs
+          const otherUserIds = conversationsData.map(conv =>
+            conv.participant1_id === user.id ? conv.participant2_id : conv.participant1_id
+          );
+
+          // Fetch profiles for other participants
+          const { data: profilesData } = await supabase
+            .from('discovery_profiles')
+            .select('id, user_id, name, age, photo_url, occupation, verified, country, bio, interests, hobbies')
+            .in('user_id', otherUserIds);
+
+          // Create profile map
+          const profileMap = new Map(
+            profilesData?.map(p => [p.user_id, p]) || []
+          );
+
+          // Map conversations to UI format
+          const mappedConversations: Conversation[] = conversationsData.map(conv => {
+            const otherUserId = conv.participant1_id === user.id ? conv.participant2_id : conv.participant1_id;
+            const profile = profileMap.get(otherUserId);
+            const myUnreadCount = conv.participant1_id === user.id ? conv.unread_count_p1 : conv.unread_count_p2;
+
+            return {
+              id: conv.id,
+              user: profile ? {
+                id: profile.user_id, // Use user_id for routing to ChatPage
+                name: profile.name,
+                age: profile.age,
+                imageUrl: profile.photo_url || 'https://via.placeholder.com/100',
+                occupation: profile.occupation || 'User',
+                bio: profile.bio || '',
+                interests: profile.interests || [],
+                hobbies: profile.hobbies || [],
+                country: profile.country || 'Unknown',
+                lastSeen: new Date().toISOString(),
+                verified: profile.verified || false,
+                icebreakers: []
+              } : {
+                id: otherUserId,
+                name: 'Unknown User',
+                age: 0,
+                imageUrl: 'https://via.placeholder.com/100',
+                occupation: 'User',
+                bio: '',
+                interests: [],
+                hobbies: [],
+                country: 'Unknown',
+                lastSeen: new Date().toISOString(),
+                verified: false,
+                icebreakers: []
+              },
+              lastMessage: conv.last_message_type === 'gift'
+                ? `🎁 ${conv.last_message_text}`
+                : conv.last_message_text || 'Start a conversation',
+              lastMessageType: conv.last_message_type,
+              timestamp: conv.last_message_at,
+              unreadCount: myUnreadCount,
+              isOnline: false, // TODO: Implement online status
+            };
+          });
+
+          setConversations(mappedConversations);
+        } else {
+          setConversations([]);
+        }
+      } catch (error) {
+        console.error('Error loading conversations:', error);
+        setConversations([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadConversations();
+
+    // Subscribe to real-time updates
+    const subscription = supabase
+      .channel(`conversations-${user.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'conversations',
+          filter: `participant1_id=eq.${user.id},participant2_id=eq.${user.id}`
+        },
+        () => {
+          loadConversations();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [isLoggedIn, user]);
 
   const formatTimestamp = (isoString: string) => {
     const date = new Date(isoString);
