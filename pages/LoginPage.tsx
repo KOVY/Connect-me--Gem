@@ -47,7 +47,11 @@ const getAuthErrorMessage = (error: AuthError | Error | any, t: (key: string) =>
     return t('auth_error');
 };
 
-const LoginPage: React.FC = () => {
+interface LoginPageProps {
+    mode?: 'login' | 'register';
+}
+
+const LoginPage: React.FC<LoginPageProps> = ({ mode = 'register' }) => {
     const { t } = useTranslations();
     const { locale } = useLocale();
     const navigate = useNavigate();
@@ -56,7 +60,7 @@ const LoginPage: React.FC = () => {
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [isSignUp, setIsSignUp] = useState(true); // Default to Sign Up for new apps
+    const [isSignUp, setIsSignUp] = useState(mode === 'register'); // Use mode prop
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
     // Email/Password Login
@@ -83,7 +87,8 @@ const LoginPage: React.FC = () => {
                     setSuccessMessage(t('check_email_confirmation'));
                     setEmail('');
                     setPassword('');
-                    setTimeout(() => setIsSignUp(false), 3000);
+                    // Redirect to login page after 3 seconds
+                    setTimeout(() => navigate(`/${locale}/login`), 3000);
                 }
             } else {
                 // Sign In
@@ -316,14 +321,9 @@ const LoginPage: React.FC = () => {
 
                 {/* Toggle Sign In / Sign Up */}
                 <div className="text-center">
-                    <button
-                        onClick={() => {
-                            setIsSignUp(!isSignUp);
-                            setError(null);
-                            setSuccessMessage(null);
-                        }}
-                        disabled={isLoading}
-                        className="text-white/80 hover:text-white text-sm transition-colors disabled:opacity-50"
+                    <Link
+                        to={`/${locale}/${isSignUp ? 'login' : 'register'}`}
+                        className="text-white/80 hover:text-white text-sm transition-colors inline-block"
                     >
                         {isSignUp ? (
                             <>
@@ -334,7 +334,7 @@ const LoginPage: React.FC = () => {
                                 {t('dont_have_account')} <span className="font-semibold text-pink-300">{t('sign_up')}</span>
                             </>
                         )}
-                    </button>
+                    </Link>
                 </div>
 
                 {/* Privacy Policy */}
