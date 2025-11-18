@@ -123,12 +123,12 @@ export function StoryCreateModal({ isOpen, onClose, onSuccess }: StoryCreateModa
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/80 z-[60] animate-fade-in"
+        className="fixed inset-0 bg-black/80 z-50 animate-fade-in"
         onClick={handleClose}
       />
 
       {/* Modal */}
-      <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 pointer-events-none">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
         <div className="bg-gradient-to-b from-gray-900 to-black rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto pointer-events-auto animate-slide-up">
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-white/10">
@@ -146,31 +146,19 @@ export function StoryCreateModal({ isOpen, onClose, onSuccess }: StoryCreateModa
             {/* Upload Area */}
             <div>
               <label className="block text-sm font-semibold mb-3 text-white">
-                📸 Upload Photo or Video
+                Upload Photo or Video
               </label>
 
               {!previewUrl ? (
                 <div
                   onClick={() => fileInputRef.current?.click()}
-                  className="border-2 border-dashed border-pink-500/40 rounded-xl p-10 text-center cursor-pointer hover:border-pink-500 hover:bg-pink-500/5 transition-all bg-gradient-to-br from-purple-900/20 to-pink-900/20"
+                  className="border-2 border-dashed border-white/20 rounded-xl p-8 text-center cursor-pointer hover:border-pink-500 transition-colors bg-white/5"
                 >
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-pink-500 to-purple-500 flex items-center justify-center">
-                    <Upload className="w-8 h-8 text-white" />
-                  </div>
-                  <p className="text-white font-semibold mb-2 text-lg">Klikni pro nahrání</p>
-                  <p className="text-sm text-white/60 mb-4">
-                    Vyber fotku nebo video ze svého zařízení
+                  <Upload className="w-12 h-12 text-white/40 mx-auto mb-4" />
+                  <p className="text-white/70 mb-2">Click to upload</p>
+                  <p className="text-sm text-white/50">
+                    Images up to 10MB, Videos up to 50MB
                   </p>
-                  <div className="flex items-center justify-center gap-4 text-xs text-white/50">
-                    <div className="flex items-center gap-1">
-                      <ImageIcon className="w-4 h-4" />
-                      <span>Fotky do 10MB</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Video className="w-4 h-4" />
-                      <span>Videa do 50MB</span>
-                    </div>
-                  </div>
                   <input
                     ref={fileInputRef}
                     type="file"
@@ -238,31 +226,17 @@ export function StoryCreateModal({ isOpen, onClose, onSuccess }: StoryCreateModa
             </div>
 
             {/* Alternative: URL Input */}
-            <div className="relative">
-              <div className="flex items-center justify-between mb-3">
-                <label className="block text-sm font-semibold text-white">
-                  🔗 Nebo vlož URL odkaz na médium
-                </label>
-              </div>
+            <div>
+              <label className="block text-sm font-semibold mb-3 text-white">
+                Or paste media URL
+              </label>
               <input
                 type="text"
                 value={mediaUrl}
-                onChange={(e) => {
-                  setMediaUrl(e.target.value);
-                  // Auto-detect media type from URL
-                  const url = e.target.value.toLowerCase();
-                  if (url.match(/\.(jpg|jpeg|png|gif|webp)$/)) {
-                    setMediaType('image');
-                  } else if (url.match(/\.(mp4|webm|mov|avi)$/)) {
-                    setMediaType('video');
-                  }
-                }}
-                placeholder="https://example.com/image.jpg nebo video.mp4"
-                className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
+                onChange={(e) => setMediaUrl(e.target.value)}
+                placeholder="https://example.com/image.jpg"
+                className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-pink-500 transition-colors"
               />
-              <p className="text-xs text-white/50 mt-2">
-                💡 Můžeš vložit přímý odkaz na obrázek (.jpg, .png) nebo video (.mp4, .webm)
-              </p>
             </div>
 
             {/* Caption */}
