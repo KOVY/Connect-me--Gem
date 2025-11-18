@@ -143,8 +143,29 @@ serve(async (req) => {
       },
     });
 
-    // TODO: Send notification to admin for review
-    // TODO: If auto-approved, initiate Stripe payout
+    // Send notification to admin for review
+    await supabaseAdmin.from('notifications').insert({
+      user_id: null, // Admin notification
+      type: 'payout_request',
+      title: `New Payout Request - $${amountUsd.toFixed(2)}`,
+      message: `User ${user.email || user.id} requested payout of $${amountUsd.toFixed(2)} (${payoutAmount.toFixed(2)} ${currency} after commission)`,
+      data: {
+        payout_request_id: payoutRequest.id,
+        user_id: user.id,
+        user_email: user.email,
+        amount_usd: amountUsd,
+        payout_amount: payoutAmount,
+        currency: currency,
+        payment_method: paymentMethod,
+      },
+      is_admin: true,
+    });
+
+    // Auto-approve small amounts (optional - for now, all manual)
+    // const AUTO_APPROVE_THRESHOLD = 50.00;
+    // if (amountUsd <= AUTO_APPROVE_THRESHOLD) {
+    //   // TODO: Initiate Stripe payout automatically
+    // }
 
     return new Response(
       JSON.stringify({

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import DiscoveryFeed from '../components/DiscoveryFeed';
 import DiscoveryFilters from '../components/DiscoveryFilters';
 import StreakWidget from '../components/StreakWidget';
@@ -6,7 +6,7 @@ import StoriesBar from '../components/StoriesBar';
 import StoryViewer from '../components/StoryViewer';
 import AuthPromptModal from '../components/AuthPromptModal';
 import { USER_STORIES } from '../constants';
-import { DiscoveryFilters as IDiscoveryFilters, UserStories } from '../types';
+import { DiscoveryFilters as IDiscoveryFilters, UserStories, UserProfile } from '../types';
 import { useDiscoveryProfiles } from '../hooks/useDiscoveryProfiles';
 import { useSwipeTracker } from '../hooks/useSwipeTracker';
 import { useLocale } from '../contexts/LocaleContext';
@@ -28,7 +28,7 @@ const DiscoveryPage: React.FC = () => {
 
   const handleApplyFilters = (newFilters: IDiscoveryFilters) => {
     setFilters(newFilters);
-    // TODO: Apply filters to profiles
+    // Filters are now applied via filteredProfiles useMemo below
   };
 
   const handleSwipe = () => {
@@ -63,6 +63,36 @@ const DiscoveryPage: React.FC = () => {
       setSelectedStory(USER_STORIES[prevIndex]);
     }
   };
+
+  // Apply filters to profiles
+  const filteredProfiles = useMemo(() => {
+    return profiles.filter((profile: UserProfile) => {
+      // Age range filter
+      if (filters.ageRange) {
+        const [minAge, maxAge] = filters.ageRange;
+        if (profile.age < minAge || profile.age > maxAge) {
+          return false;
+        }
+      }
+
+      // Verified filter
+      if (filters.verified && !profile.verified) {
+        return false;
+      }
+
+      // Interests filter (at least one matching interest)
+      if (filters.interests && filters.interests.length > 0) {
+        const hasMatchingInterest = filters.interests.some(
+          interest => profile.interests?.includes(interest)
+        );
+        if (!hasMatchingInterest) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }, [profiles, filters]);
 
   return (
     <div className="h-full w-full flex flex-col">
@@ -107,7 +137,7 @@ const DiscoveryPage: React.FC = () => {
           </div>
         ) : (
           <DiscoveryFeed
-            profiles={profiles}
+            profiles={filteredProfiles}
             onSwipe={handleSwipe}
             canSwipe={swipeTracker.canSwipe}
           />

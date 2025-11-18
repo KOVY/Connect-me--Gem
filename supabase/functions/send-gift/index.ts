@@ -149,8 +149,21 @@ serve(async (req) => {
 
     if (txError) throw txError;
 
-    // 6. TODO: Send notification to recipient
-    // await supabaseAdmin.from('notifications').insert({...})
+    // 6. Send notification to recipient
+    await supabaseAdmin.from('notifications').insert({
+      user_id: recipientId,
+      type: 'gift_received',
+      title: `You received a gift!`,
+      message: `You earned ${recipientEarningsUsd.toFixed(2)} USD from a gift`,
+      data: {
+        sender_id: user.id,
+        gift_id: giftId,
+        credit_cost: creditCost,
+        earned_usd: recipientEarningsUsd,
+        transaction_id: transaction.id,
+      },
+      is_admin: false,
+    });
 
     return new Response(
       JSON.stringify({

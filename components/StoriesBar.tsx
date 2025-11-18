@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { UserStories } from '../types';
+import { StoryCreateModal } from './StoryCreateModal';
 
 interface StoriesBarProps {
     stories: UserStories[];
@@ -13,6 +14,8 @@ const PlusIcon: React.FC = () => (
 );
 
 const StoriesBar: React.FC<StoriesBarProps> = ({ stories, onStoryClick }) => {
+    const [showCreateModal, setShowCreateModal] = useState(false);
+
     // Filter out expired stories
     const activeStories = stories.map(userStory => ({
         ...userStory,
@@ -25,10 +28,7 @@ const StoriesBar: React.FC<StoriesBarProps> = ({ stories, onStoryClick }) => {
                 {/* Add Story Button */}
                 <button
                     className="flex flex-col items-center gap-2 min-w-[70px] group"
-                    onClick={() => {
-                        // TODO: Implement story creation
-                        alert('Story creation coming soon!');
-                    }}
+                    onClick={() => setShowCreateModal(true)}
                 >
                     <div className="relative">
                         <div className="w-16 h-16 rounded-full bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center border-2 border-gray-600 group-hover:border-pink-500 transition-colors">
@@ -79,6 +79,16 @@ const StoriesBar: React.FC<StoriesBarProps> = ({ stories, onStoryClick }) => {
                     );
                 })}
             </div>
+
+            {/* Story Creation Modal */}
+            <StoryCreateModal
+                isOpen={showCreateModal}
+                onClose={() => setShowCreateModal(false)}
+                onSuccess={() => {
+                    // Could refresh stories here if needed
+                    console.log('Story created successfully!');
+                }}
+            />
         </div>
     );
 };

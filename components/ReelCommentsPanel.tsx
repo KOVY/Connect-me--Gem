@@ -4,6 +4,8 @@ import { ReelComment, UserProfile } from '../types';
 import { AVAILABLE_GIFTS } from '../src/lib/gifts';
 import { useUser } from '../contexts/UserContext';
 import { useTranslations } from '../hooks/useTranslations';
+import { useNotifications } from '../contexts/NotificationContext';
+import { supabase } from '../src/lib/supabase';
 
 interface ReelCommentsPanelProps {
   isOpen: boolean;
@@ -22,6 +24,7 @@ export function ReelCommentsPanel({
 }: ReelCommentsPanelProps) {
   const { user } = useUser();
   const { t } = useTranslations();
+  const { showGiftNotification } = useNotifications();
   const [comments, setComments] = useState<ReelComment[]>([]);
   const [newComment, setNewComment] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -29,114 +32,188 @@ export function ReelCommentsPanel({
   const [selectedGift, setSelectedGift] = useState<typeof AVAILABLE_GIFTS[0] | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Mock comments for demo
+  // Load comments from Supabase
   useEffect(() => {
-    if (isOpen) {
-      // TODO: Load real comments from Supabase
-      const mockComments: ReelComment[] = [
-        {
-          id: '1',
-          reelId,
-          userId: '123',
-          user: {
-            id: '123',
-            name: 'Sarah Johnson',
-            age: 25,
-            imageUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330',
-            occupation: 'Photographer',
-            bio: '',
-            interests: [],
-            hobbies: [],
-            country: 'US',
-            lastSeen: new Date().toISOString(),
-            verified: true,
-            icebreakers: []
-          },
-          commentText: 'Amazing video! 🔥',
-          includesGift: false,
-          likeCount: 12,
-          replyCount: 2,
-          isFlagged: false,
-          isDeleted: false,
-          createdAt: new Date(Date.now() - 3600000).toISOString(),
-          updatedAt: new Date(Date.now() - 3600000).toISOString(),
-        },
-        {
-          id: '2',
-          reelId,
-          userId: '456',
-          user: {
-            id: '456',
-            name: 'Mike Chen',
-            age: 28,
-            imageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d',
-            occupation: 'Developer',
-            bio: '',
-            interests: [],
-            hobbies: [],
-            country: 'US',
-            lastSeen: new Date().toISOString(),
-            verified: false,
-            icebreakers: []
-          },
-          commentText: '',
-          includesGift: true,
-          giftId: 'rose',
-          giftIcon: '🌹',
-          giftName: 'Rose',
-          giftValueCredits: 10,
-          likeCount: 5,
-          replyCount: 0,
-          isFlagged: false,
-          isDeleted: false,
-          createdAt: new Date(Date.now() - 7200000).toISOString(),
-          updatedAt: new Date(Date.now() - 7200000).toISOString(),
+    if (!isOpen) return;
+
+    const loadComments = async () => {
+      setIsLoading(true);
+      try {
+        // Fetch comments with user profile information
+        const { data: commentsData, error } = await supabase
+          .from('reel_comments')
+          .select(`
+            id,
+            reel_id,
+            user_id,
+            comment_text,
+            parent_comment_id,
+            includes_gift,
+            gift_id,
+            gift_value_credits,
+            like_count,
+            reply_count,
+            is_flagged,
+            is_deleted,
+            created_at,
+            updated_at
+          `)
+          .eq('reel_id', reelId)
+          .eq('is_deleted', false)
+          .is('parent_comment_id', null) // Only top-level comments for now
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        if (commentsData && commentsData.length > 0) {
+          // Fetch user profiles for all commenters
+          const userIds = [...new Set(commentsData.map(c => c.user_id))];
+          const { data: profilesData } = await supabase
+            .from('discovery_profiles')
+            .select('id, user_id, name, age, photo_url, occupation, verified, country')
+            .in('user_id', userIds);
+
+          // Create a map of user_id to profile
+          const profileMap = new Map(
+            profilesData?.map(p => [p.user_id, p]) || []
+          );
+
+          // Map comments to ReelComment type
+          const mappedComments: ReelComment[] = commentsData.map(comment => {
+            const profile = profileMap.get(comment.user_id);
+            const gift = comment.includes_gift && comment.gift_id
+              ? AVAILABLE_GIFTS.find(g => g.id === comment.gift_id)
+              : null;
+
+            return {
+              id: comment.id,
+              reelId: comment.reel_id,
+              userId: comment.user_id,
+              user: {
+                id: profile?.id || comment.user_id,
+                name: profile?.name || 'Anonymous',
+                age: profile?.age || 0,
+                imageUrl: profile?.photo_url || 'https://via.placeholder.com/100',
+                occupation: profile?.occupation || 'User',
+                bio: '',
+                interests: [],
+                hobbies: [],
+                country: profile?.country || 'Unknown',
+                lastSeen: new Date().toISOString(),
+                verified: profile?.verified || false,
+                icebreakers: []
+              },
+              commentText: comment.comment_text,
+              parentCommentId: comment.parent_comment_id,
+              includesGift: comment.includes_gift,
+              giftId: comment.gift_id,
+              giftIcon: gift?.icon,
+              giftName: gift?.name,
+              giftValueCredits: comment.gift_value_credits,
+              likeCount: comment.like_count,
+              replyCount: comment.reply_count,
+              isFlagged: comment.is_flagged,
+              isDeleted: comment.is_deleted,
+              createdAt: comment.created_at,
+              updatedAt: comment.updated_at,
+            };
+          });
+
+          setComments(mappedComments);
+        } else {
+          setComments([]);
         }
-      ];
-      setComments(mockComments);
-    }
-  }, [isOpen, reelId]);
-
-  const handleSendComment = () => {
-    if (!newComment.trim() && !selectedGift) return;
-
-    // TODO: Send comment to Supabase
-    const newCommentObj: ReelComment = {
-      id: Math.random().toString(),
-      reelId,
-      userId: user?.id || 'current-user',
-      user: {
-        id: user?.id || 'current-user',
-        name: 'You',
-        age: 25,
-        imageUrl: user?.profilePictureUrl || 'https://via.placeholder.com/100',
-        occupation: 'User',
-        bio: '',
-        interests: [],
-        hobbies: [],
-        country: 'US',
-        lastSeen: new Date().toISOString(),
-        verified: false,
-        icebreakers: []
-      },
-      commentText: newComment,
-      includesGift: !!selectedGift,
-      giftId: selectedGift?.id,
-      giftIcon: selectedGift?.icon,
-      giftName: selectedGift?.name,
-      giftValueCredits: selectedGift?.creditCost,
-      likeCount: 0,
-      replyCount: 0,
-      isFlagged: false,
-      isDeleted: false,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      } catch (error) {
+        console.error('Error loading comments:', error);
+        setComments([]);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
-    setComments([newCommentObj, ...comments]);
-    setNewComment('');
-    setSelectedGift(null);
-    setShowGiftPicker(false);
+    loadComments();
+
+    // Subscribe to new comments in real-time
+    const subscription = supabase
+      .channel(`reel-comments-${reelId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'reel_comments',
+          filter: `reel_id=eq.${reelId}`
+        },
+        () => {
+          // Reload comments when new one is added
+          loadComments();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [isOpen, reelId]);
+
+  const handleSendComment = async () => {
+    if (!newComment.trim() && !selectedGift) return;
+    if (!user) {
+      console.error('User must be logged in to comment');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      // Insert comment into Supabase
+      const { data, error } = await supabase
+        .from('reel_comments')
+        .insert({
+          reel_id: reelId,
+          user_id: user.id,
+          comment_text: newComment.trim() || '',
+          includes_gift: !!selectedGift,
+          gift_id: selectedGift?.id || null,
+          gift_value_credits: selectedGift?.creditCost || 0,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // If gift was included, also record it in reel_gifts table
+      if (selectedGift && data) {
+        await supabase.from('reel_gifts').insert({
+          reel_id: reelId,
+          sender_id: user.id,
+          recipient_id: reelOwner.id,
+          gift_id: selectedGift.id,
+          gift_name: selectedGift.name,
+          gift_icon: selectedGift.icon,
+          credit_cost: selectedGift.creditCost,
+          comment_id: data.id,
+        });
+
+        // Show gift notification
+        showGiftNotification(selectedGift.name, user.name, selectedGift.icon);
+
+        // Deduct credits from user (you may want to do this in a Supabase function)
+        // For now, we'll handle it client-side
+        // TODO: Move credit deduction to secure backend function
+      }
+
+      // Clear input
+      setNewComment('');
+      setSelectedGift(null);
+      setShowGiftPicker(false);
+
+      // Comments will auto-refresh via real-time subscription
+    } catch (error) {
+      console.error('Error sending comment:', error);
+      alert('Failed to send comment. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const formatTimeAgo = (dateString: string) => {
