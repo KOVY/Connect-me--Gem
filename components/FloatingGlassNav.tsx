@@ -5,6 +5,7 @@ import { useUser } from '../contexts/UserContext';
 import { getUserBalance } from '../src/lib/payoutService';
 import { useLocale } from '../contexts/LocaleContext';
 import { useTranslations } from '../hooks/useTranslations';
+import { NotificationBell } from './NotificationBell';
 
 export function FloatingGlassNav() {
   const { user, isLoggedIn, signOut } = useUser();
@@ -92,21 +93,27 @@ export function FloatingGlassNav() {
               </div>
             )}
 
-            {/* Right - Menu Button */}
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="relative group"
-              aria-label="Menu"
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full blur-lg group-hover:blur-xl transition-all"></div>
-              <div className="relative bg-white/10 backdrop-blur-xl border border-white/20 rounded-full p-3 hover:bg-white/20 transition-all duration-300 group-hover:scale-110">
-                {isMenuOpen ? (
-                  <X className="w-6 h-6 text-white" />
-                ) : (
-                  <Menu className="w-6 h-6 text-white" />
-                )}
-              </div>
-            </button>
+            {/* Right - Notifications & Menu */}
+            <div className="flex items-center space-x-3">
+              {/* Notification Bell */}
+              <NotificationBell />
+
+              {/* Menu Button */}
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="relative group"
+                aria-label="Menu"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full blur-lg group-hover:blur-xl transition-all"></div>
+                <div className="relative bg-white/10 backdrop-blur-xl border border-white/20 rounded-full p-3 hover:bg-white/20 transition-all duration-300 group-hover:scale-110">
+                  {isMenuOpen ? (
+                    <X className="w-6 h-6 text-white" />
+                  ) : (
+                    <Menu className="w-6 h-6 text-white" />
+                  )}
+                </div>
+              </button>
+            </div>
           </div>
         </div>
       </nav>
