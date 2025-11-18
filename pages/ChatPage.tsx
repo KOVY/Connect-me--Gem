@@ -313,12 +313,68 @@ const ChatPage: React.FC = () => {
     );
   }
 
-  const handleGiftUnlock = (giftType: 'coffee' | 'rose' | 'diamond') => {
-    // TODO: Implement gift payment flow
-    console.log(`User wants to purchase ${giftType} gift`);
-    setIsGiftUnlockModalOpen(false);
-    // For now, just show a message
-    alert(`Gift purchase coming soon! You selected: ${giftType}`);
+  const handleGiftUnlock = async (giftType: 'coffee' | 'rose' | 'diamond') => {
+    if (!user || !recipient) return;
+
+    // Map gift type to actual gift from GIFTS
+    const giftMap = {
+      coffee: GIFTS[0], // Assuming first gift is coffee
+      rose: GIFTS[1],   // Assuming second gift is rose
+      diamond: GIFTS[2] // Assuming third gift is diamond
+    };
+
+    const selectedGift = giftMap[giftType];
+    if (!selectedGift) {
+      alert('Gift not found');
+      return;
+    }
+
+    try {
+      setIsGiftUnlockModalOpen(false);
+
+      // Call send-gift edge function
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-gift`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({
+            recipientId: recipient.id,
+            giftId: selectedGift.id,
+            creditCost: selectedGift.cost,
+          }),
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok || result.error) {
+        throw new Error(result.error || 'Failed to send gift');
+      }
+
+      // Success! Show success message and unlock chat
+      alert(`${selectedGift.icon} ${selectedGift.name} sent successfully!`);
+
+      // Add gift message to chat
+      const giftMessage: ChatMessage = {
+        id: Date.now().toString(),
+        sender: 'user',
+        type: 'gift',
+        gift: selectedGift,
+        timestamp: new Date().toISOString(),
+      };
+      setMessages((prev) => [...prev, giftMessage]);
+
+      // Unlock chat/cooldown based on context
+      // This would depend on your specific unlock logic
+
+    } catch (error) {
+      console.error('Error sending gift:', error);
+      alert(`Failed to send gift: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
   };
 
   return (
