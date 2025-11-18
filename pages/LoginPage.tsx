@@ -9,7 +9,9 @@ import { AuthError } from '@supabase/supabase-js';
 const getAuthErrorMessage = (error: AuthError | Error | any, t: (key: string) => string): string => {
     // Log full error in development only
     if (import.meta.env.DEV) {
-        console.error('[Auth] Error:', error);
+        console.error('[Auth] Full error details:', error);
+        console.error('[Auth] Error message:', error?.message);
+        console.error('[Auth] Error status:', error?.status);
     }
 
     // Map Supabase error codes to user-friendly messages
@@ -31,8 +33,14 @@ const getAuthErrorMessage = (error: AuthError | Error | any, t: (key: string) =>
     if (error?.message?.includes('Password should be')) {
         return t('password_too_short');
     }
-    if (error?.message?.includes('rate limit')) {
+    // ONLY show rate limit for actual 429 status or very specific message
+    if (error?.status === 429 || error?.message?.toLowerCase() === 'rate limit exceeded') {
         return t('too_many_attempts');
+    }
+
+    // In dev mode, show the actual error message for debugging
+    if (import.meta.env.DEV && error?.message) {
+        return `${t('auth_error')} (DEV: ${error.message})`;
     }
 
     // Generic error message
@@ -48,7 +56,7 @@ const LoginPage: React.FC = () => {
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [isSignUp, setIsSignUp] = useState(false);
+    const [isSignUp, setIsSignUp] = useState(true); // Default to Sign Up for new apps
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
     // Email/Password Login
