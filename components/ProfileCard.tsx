@@ -68,7 +68,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ profile, onLike }) => {
   return (
     <div className="relative h-full w-full bg-cover bg-center" style={{ backgroundImage: `url(${profile.imageUrl})` }}>
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
-      <div className="absolute bottom-0 left-0 p-6 text-white w-full flex flex-col items-center">
+      <div className="absolute bottom-0 left-0 p-6 pb-28 md:pb-6 text-white w-full flex flex-col items-center">
         <div className="w-full mb-4">
             <div className="flex items-center gap-2">
                 <h1 className="text-4xl font-bold">{profile.name}, {profile.age}</h1>
