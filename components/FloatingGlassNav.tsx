@@ -7,7 +7,7 @@ import { useLocale } from '../contexts/LocaleContext';
 import { useTranslations } from '../hooks/useTranslations';
 
 export function FloatingGlassNav() {
-  const { user, isLoggedIn } = useUser();
+  const { user, isLoggedIn, signOut } = useUser();
   const { locale } = useLocale();
   const { t } = useTranslations();
   const location = useLocation();
@@ -239,27 +239,42 @@ export function FloatingGlassNav() {
 
             {/* Login / Logout Button */}
             <div className="mt-6 pt-6 border-t border-white/10">
-              <Link
-                to={isLoggedIn ? `/${locale}/` : `/${locale}/login`}
-                onClick={() => {
-                  setIsMenuOpen(false);
-                  // If logged in (mock user), just refresh to "logout"
-                  if (isLoggedIn) {
-                    window.location.href = `/${locale}/login`;
-                  }
-                }}
-                className="group relative block"
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all"></div>
-                <div className="relative bg-white/5 backdrop-blur-2xl border border-white/10 rounded-2xl p-4 hover:bg-white/10 transition-all">
-                  <div className="flex items-center justify-center space-x-3">
-                    <User className="w-5 h-5 text-blue-400" />
-                    <span className="text-white font-semibold">
-                      {isLoggedIn ? t('logout') : t('login_or_sign_up')}
-                    </span>
+              {isLoggedIn ? (
+                <button
+                  onClick={async () => {
+                    setIsMenuOpen(false);
+                    try {
+                      await signOut();
+                      window.location.href = `/${locale}/login`;
+                    } catch (error) {
+                      console.error('Failed to sign out:', error);
+                    }
+                  }}
+                  className="group relative block w-full"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all"></div>
+                  <div className="relative bg-white/5 backdrop-blur-2xl border border-white/10 rounded-2xl p-4 hover:bg-white/10 transition-all">
+                    <div className="flex items-center justify-center space-x-3">
+                      <User className="w-5 h-5 text-blue-400" />
+                      <span className="text-white font-semibold">{t('logout')}</span>
+                    </div>
                   </div>
-                </div>
-              </Link>
+                </button>
+              ) : (
+                <Link
+                  to={`/${locale}/login`}
+                  onClick={() => setIsMenuOpen(false)}
+                  className="group relative block"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all"></div>
+                  <div className="relative bg-white/5 backdrop-blur-2xl border border-white/10 rounded-2xl p-4 hover:bg-white/10 transition-all">
+                    <div className="flex items-center justify-center space-x-3">
+                      <User className="w-5 h-5 text-blue-400" />
+                      <span className="text-white font-semibold">{t('login_or_sign_up')}</span>
+                    </div>
+                  </div>
+                </Link>
+              )}
             </div>
           </div>
         </div>
