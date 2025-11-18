@@ -99,7 +99,14 @@ export function NotificationBell() {
         .select('*', { count: 'exact', head: true })
         .eq('is_read', false);
 
-      if (error) throw error;
+      if (error) {
+        // If table doesn't exist yet (migration not run), silently fail
+        if (error.message?.includes('relation "notifications" does not exist')) {
+          console.warn('[Notifications] Table not found - run migration 015');
+          return;
+        }
+        throw error;
+      }
       setUnreadCount(count || 0);
     } catch (error) {
       console.error('[Notifications] Failed to load unread count:', error);
@@ -115,10 +122,19 @@ export function NotificationBell() {
         .order('created_at', { ascending: false })
         .limit(20);
 
-      if (error) throw error;
+      if (error) {
+        // If table doesn't exist yet, return empty array
+        if (error.message?.includes('relation "notifications" does not exist')) {
+          console.warn('[Notifications] Table not found - run migration 015');
+          setNotifications([]);
+          return;
+        }
+        throw error;
+      }
       setNotifications(data || []);
     } catch (error) {
       console.error('[Notifications] Failed to load notifications:', error);
+      setNotifications([]);
     } finally {
       setIsLoading(false);
     }

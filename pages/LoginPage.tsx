@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslations } from '../hooks/useTranslations';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLocale } from '../contexts/LocaleContext';
@@ -62,6 +62,13 @@ const LoginPage: React.FC<LoginPageProps> = ({ mode = 'register' }) => {
     const [error, setError] = useState<string | null>(null);
     const [isSignUp, setIsSignUp] = useState(mode === 'register'); // Use mode prop
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+    // Update isSignUp when mode prop changes
+    useEffect(() => {
+        setIsSignUp(mode === 'register');
+        setError(null);
+        setSuccessMessage(null);
+    }, [mode]);
 
     // Email/Password Login
     const handleEmailLogin = async (e: React.FormEvent) => {
