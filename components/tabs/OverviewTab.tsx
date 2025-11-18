@@ -23,7 +23,7 @@ const OverviewTab: React.FC = () => {
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-2xl font-bold">{t('welcome_back', { name: user.name })}</h2>
+        <h2 className="text-2xl font-bold">{t('welcome_back_user', { name: user.name })}</h2>
         <p className="mt-1 text-gray-400">{t('hub_quick_look')}</p>
       </div>
 
