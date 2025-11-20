@@ -31,6 +31,7 @@ export function useDiscoveryProfiles(language?: string) {
   useEffect(() => {
     async function fetchProfiles() {
       try {
+        console.log('🔍 [Discovery] Starting profile fetch...', { language });
         setLoading(true);
 
         // Build query
@@ -42,14 +43,22 @@ export function useDiscoveryProfiles(language?: string) {
 
         // Filter by language if provided
         if (language && language !== 'en') {
+          console.log('🌐 [Discovery] Filtering by language:', language);
           query = query.eq('language', language);
         }
 
+        console.log('⏳ [Discovery] Executing Supabase query...');
         const { data, error: fetchError } = await query;
 
         if (fetchError) {
+          console.error('❌ [Discovery] Supabase error:', fetchError);
           throw fetchError;
         }
+
+        console.log('✅ [Discovery] Received data from Supabase:', {
+          count: data?.length || 0,
+          sample: data?.[0] ? { id: data[0].id, name: data[0].name } : null
+        });
 
         // Map database schema to UserProfile interface
         const mappedProfiles: UserProfile[] = (data as DiscoveryProfile[]).map((profile) => ({
@@ -67,14 +76,20 @@ export function useDiscoveryProfiles(language?: string) {
           icebreakers: profile.icebreakers || [],
         }));
 
+        console.log('📦 [Discovery] Mapped profiles:', mappedProfiles.length);
         setProfiles(mappedProfiles);
         setError(null);
       } catch (err) {
-        console.error('Error fetching discovery profiles:', err);
+        console.error('❌ [Discovery] Error fetching discovery profiles:', err);
+        console.error('❌ [Discovery] Error details:', {
+          message: err instanceof Error ? err.message : 'Unknown error',
+          stack: err instanceof Error ? err.stack : undefined
+        });
         setError(err instanceof Error ? err : new Error('Unknown error'));
         setProfiles([]); // Clear profiles on error
       } finally {
         setLoading(false);
+        console.log('🏁 [Discovery] Fetch complete');
       }
     }
 
