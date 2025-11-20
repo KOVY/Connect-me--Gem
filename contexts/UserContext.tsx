@@ -63,6 +63,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
           transactions: [],
           profilePictureUrl: '',
           imageUrl: '',
+          avatarUrl: '', // Normalized avatar URL
         };
         setUser(basicUser);
         return basicUser;
@@ -105,6 +106,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .single();
 
       // Build User object
+      const imageUrl = profile?.image_url || '';
       const userData: User = {
         id: authUser.id,
         name: profile?.name || authUser.email?.split('@')[0] || 'User',
@@ -118,8 +120,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
           description: t.description || t.type,
           amount: t.amount || 0,
         })) || [],
-        profilePictureUrl: profile?.image_url || '',
-        imageUrl: profile?.image_url || '',
+        profilePictureUrl: imageUrl,
+        imageUrl: imageUrl,
+        avatarUrl: imageUrl, // Normalized avatar URL
         verified: profile?.verified || false,
         subscription: subscription ? {
           tier: subscription.tier,
