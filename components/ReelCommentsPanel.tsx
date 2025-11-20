@@ -5,7 +5,9 @@ import { AVAILABLE_GIFTS } from '../src/lib/gifts';
 import { useUser } from '../contexts/UserContext';
 import { useTranslations } from '../hooks/useTranslations';
 import { useNotifications } from '../contexts/NotificationContext';
+import { useCommentTracker } from '../hooks/useCommentTracker';
 import { supabase } from '../src/lib/supabase';
+import TierUpgradeModal from './TierUpgradeModal';
 
 interface ReelCommentsPanelProps {
   isOpen: boolean;
@@ -22,15 +24,19 @@ export function ReelCommentsPanel({
   reelOwner,
   commentCount
 }: ReelCommentsPanelProps) {
-  const { user } = useUser();
+  const { user, getUserTier } = useUser();
   const { t } = useTranslations();
   const { showGiftNotification } = useNotifications();
+  const userTier = getUserTier();
+  const commentTracker = useCommentTracker(userTier, !!user);
+
   const [comments, setComments] = useState<ReelComment[]>([]);
   const [newComment, setNewComment] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showGiftPicker, setShowGiftPicker] = useState(false);
   const [selectedGift, setSelectedGift] = useState<typeof AVAILABLE_GIFTS[0] | null>(null);
   const [replyingTo, setReplyingTo] = useState<ReelComment | null>(null);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Load comments from Supabase
@@ -164,6 +170,12 @@ export function ReelCommentsPanel({
       return;
     }
 
+    // Check if FREE user has reached comment limit
+    if (userTier === 'free' && !commentTracker.canComment) {
+      setShowUpgradeModal(true);
+      return;
+    }
+
     setIsLoading(true);
     try {
       // Insert comment into Supabase
@@ -202,6 +214,11 @@ export function ReelCommentsPanel({
         // Deduct credits from user (you may want to do this in a Supabase function)
         // For now, we'll handle it client-side
         // TODO: Move credit deduction to secure backend function
+      }
+
+      // Track comment for FREE users
+      if (userTier === 'free') {
+        commentTracker.incrementComment();
       }
 
       // Clear input
@@ -261,6 +278,42 @@ export function ReelCommentsPanel({
             <X className="w-6 h-6 text-white" />
           </button>
         </div>
+
+        {/* FREE User Comment Limit Banner */}
+        {userTier === 'free' && (
+          <div className="px-4 py-3 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-b border-purple-500/30">
+            <div className="flex items-center justify-between">
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-white">
+                  {commentTracker.freeCommentsRemaining > 0 ? (
+                    <>
+                      💬 {commentTracker.freeCommentsRemaining} free {commentTracker.freeCommentsRemaining === 1 ? 'comment' : 'comments'} remaining
+                    </>
+                  ) : (
+                    <>
+                      🔒 No free comments left
+                    </>
+                  )}
+                </p>
+                <p className="text-xs text-purple-200 mt-0.5">
+                  {commentTracker.freeCommentsRemaining > 0 ? (
+                    'Upgrade for unlimited comments'
+                  ) : (
+                    'Upgrade to Premium to keep commenting'
+                  )}
+                </p>
+              </div>
+              {commentTracker.freeCommentsRemaining === 0 && (
+                <button
+                  onClick={() => setShowUpgradeModal(true)}
+                  className="ml-3 px-4 py-1.5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full text-sm font-semibold text-white hover:scale-105 transition-transform"
+                >
+                  Upgrade
+                </button>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Comments List */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -449,6 +502,17 @@ export function ReelCommentsPanel({
           </p>
         </div>
       </div>
+
+      {/* Upgrade Modal */}
+      <TierUpgradeModal
+        isOpen={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        onUpgrade={async (tier) => {
+          console.log('Upgrading to:', tier);
+          // TODO: Implement actual upgrade flow with Stripe
+          setShowUpgradeModal(false);
+        }}
+      />
     </>
   );
 }
