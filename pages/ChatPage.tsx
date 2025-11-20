@@ -79,17 +79,22 @@ const ChatPage: React.FC = () => {
 
       // Fetch from Supabase discovery_profiles
       try {
+        console.log('🔍 [ChatPage] Loading profile with ID:', userId);
         const { data, error } = await supabase
           .from('discovery_profiles')
           .select('*')
-          .eq('user_id', userId)
+          .eq('id', userId) // FIX: Changed from user_id to id
           .single();
 
-        if (error) throw error;
+        if (error) {
+          console.error('❌ [ChatPage] Error loading profile:', error);
+          throw error;
+        }
 
         if (data) {
+          console.log('✅ [ChatPage] Profile loaded:', data.name);
           setRecipient({
-            id: data.user_id,
+            id: data.id, // FIX: Use profile id, not user_id
             name: data.name,
             age: data.age,
             imageUrl: data.photo_url || 'https://via.placeholder.com/100',
@@ -98,12 +103,13 @@ const ChatPage: React.FC = () => {
             interests: data.interests || [],
             hobbies: data.hobbies || [],
             country: data.country || 'Unknown',
-            lastSeen: new Date().toISOString(),
+            lastSeen: data.last_seen || new Date().toISOString(),
             verified: data.verified || false,
             icebreakers: data.icebreakers || []
           });
         } else {
           // Handle user not found
+          console.warn('⚠️ [ChatPage] Profile not found, redirecting...');
           setTimeout(() => navigate(`/${locale}/`), 3000);
         }
       } catch (error) {
