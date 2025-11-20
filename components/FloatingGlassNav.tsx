@@ -63,7 +63,30 @@ export function FloatingGlassNav() {
               </span>
             </Link>
 
-            {/* Center - Credits Display (Desktop) */}
+            {/* Center - Desktop Nav Links */}
+            <div className="hidden lg:flex items-center space-x-2">
+              {menuItems.slice(0, 3).map((item) => {
+                const Icon = item.icon;
+                const isActive = location.pathname === item.path;
+
+                return (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className={`group relative flex items-center space-x-2 px-4 py-2 rounded-full transition-all duration-300 ${
+                      isActive
+                        ? 'bg-white/20 text-white shadow-lg backdrop-blur-sm'
+                        : 'text-white/70 hover:text-white hover:bg-white/10'
+                    }`}
+                  >
+                    <Icon className={`w-5 h-5 transition-transform ${isActive ? 'scale-110' : 'group-hover:scale-110'}`} />
+                    <span className="font-medium text-sm">{item.label}</span>
+                  </Link>
+                );
+              })}
+            </div>
+
+            {/* Right - Credits Display (Desktop) */}
             {isLoggedIn && (
               <div className="hidden md:flex items-center space-x-6">
                 {/* Credits Balance */}
