@@ -27,6 +27,10 @@
         {
           "key": "X-XSS-Protection",
           "value": "1; mode=block"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://esm.sh https://aistudiocdn.com; connect-src 'self' https://haayvhkovottszzdnzbz.supabase.co wss://haayvhkovottszzdnzbz.supabase.co https://images.unsplash.com; img-src 'self' data: https: blob:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests;"
         }
       ]
     },
