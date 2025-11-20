@@ -101,7 +101,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ mode }) => {
                     email,
                     password,
                     options: {
-                        emailRedirectTo: `${window.location.origin}/${locale}/discovery`,
+                        emailRedirectTo: `${window.location.origin}/${locale}/`,
                     },
                 });
 
@@ -126,8 +126,8 @@ const LoginPage: React.FC<LoginPageProps> = ({ mode }) => {
 
                 if (data?.user) {
                     console.log('[LoginPage] Login successful, user:', data.user.id);
-                    // Redirect to discovery after successful login
-                    navigate(`/${locale}/discovery`);
+                    // Redirect to home page after successful login
+                    navigate(`/${locale}/`);
                 }
             }
         } catch (err: any) {
@@ -146,7 +146,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ mode }) => {
             const { data, error } = await supabase.auth.signInWithOAuth({
                 provider: 'google',
                 options: {
-                    redirectTo: `${window.location.origin}/${locale}/discovery`,
+                    redirectTo: `${window.location.origin}/${locale}/`,
                 },
             });
 
@@ -166,7 +166,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ mode }) => {
             const { data, error } = await supabase.auth.signInWithOAuth({
                 provider: 'apple',
                 options: {
-                    redirectTo: `${window.location.origin}/${locale}/discovery`,
+                    redirectTo: `${window.location.origin}/${locale}/`,
                 },
             });
 
@@ -371,7 +371,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ mode }) => {
 
             {/* Anonymous Mode */}
             <Link
-                to={`/${locale}/discovery`}
+                to={`/${locale}/`}
                 className="mt-6 text-white/60 hover:text-white text-sm transition-colors flex items-center gap-2"
             >
                 <span>{t('continue_as_guest')}</span>
