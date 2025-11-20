@@ -38,11 +38,22 @@ export function useCommentTracker(
       return;
     }
 
-    const savedCount = localStorage.getItem(COMMENT_LIMIT_KEY);
+    try {
+      const savedCount = localStorage.getItem(COMMENT_LIMIT_KEY);
 
-    if (savedCount) {
-      const parsed: CommentCount = JSON.parse(savedCount);
-      setCommentCount(parsed);
+      if (savedCount) {
+        const parsed: CommentCount = JSON.parse(savedCount);
+        // Validate parsed data
+        if (typeof parsed.count === 'number' && typeof parsed.lastReset === 'string') {
+          setCommentCount(parsed);
+        } else {
+          console.warn('[useCommentTracker] Invalid localStorage data, resetting');
+          localStorage.removeItem(COMMENT_LIMIT_KEY);
+        }
+      }
+    } catch (error) {
+      console.error('[useCommentTracker] Failed to parse localStorage:', error);
+      localStorage.removeItem(COMMENT_LIMIT_KEY);
     }
   }, [isAuthenticated, userTier]);
 
