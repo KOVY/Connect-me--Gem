@@ -19,6 +19,7 @@ export interface User extends Omit<UserProfile, 'age' | 'country' | 'lastSeen' |
     credits: number;
     transactions: Transaction[];
     profilePictureUrl: string; // Renamed from imageUrl for clarity
+    avatarUrl: string; // Normalized avatar URL (prioritizes profilePictureUrl, falls back to imageUrl)
     subscription?: UserSubscription; // Current subscription
     superLikesRemaining?: number; // Super likes available
     boostsRemaining?: number; // Profile boosts available
