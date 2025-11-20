@@ -67,7 +67,7 @@ export function FloatingGlassNav() {
             <div className="hidden lg:flex items-center space-x-2">
               {menuItems.slice(0, 3).map((item) => {
                 const Icon = item.icon;
-                const isActive = location.pathname === item.path;
+                const isActive = location?.pathname === item.path;
 
                 return (
                   <Link
@@ -192,7 +192,7 @@ export function FloatingGlassNav() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {menuItems.map((item, index) => {
                 const Icon = item.icon;
-                const isActive = location.pathname === item.path;
+                const isActive = location?.pathname === item.path;
 
                 return (
                   <Link

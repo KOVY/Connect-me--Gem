@@ -508,8 +508,8 @@ export function ReelCommentsPanel({
         isOpen={showUpgradeModal}
         onClose={() => setShowUpgradeModal(false)}
         onUpgrade={async (tier) => {
-          console.log('Upgrading to:', tier);
           // TODO: Implement actual upgrade flow with Stripe
+          // Do not log sensitive tier information to client console
           setShowUpgradeModal(false);
         }}
       />
