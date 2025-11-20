@@ -31,7 +31,7 @@ export function useDiscoveryProfiles(language?: string) {
   useEffect(() => {
     async function fetchProfiles() {
       try {
-        console.log('[useDiscoveryProfiles] Starting fetch, language:', language);
+        console.log('🔍 [Discovery] Starting profile fetch...', { language });
         setLoading(true);
 
         // Build query
@@ -43,23 +43,26 @@ export function useDiscoveryProfiles(language?: string) {
 
         // Filter by language if provided
         if (language && language !== 'en') {
-          console.log('[useDiscoveryProfiles] Filtering by language:', language);
+          console.log('🌐 [Discovery] Filtering by language:', language);
           query = query.eq('language', language);
         }
 
-        console.log('[useDiscoveryProfiles] Executing query...');
+        console.log('⏳ [Discovery] Executing Supabase query...');
         const { data, error: fetchError } = await query;
 
         if (fetchError) {
-          console.error('[useDiscoveryProfiles] Query error:', fetchError);
+          console.error('❌ [Discovery] Supabase error:', fetchError);
           throw fetchError;
         }
 
-        console.log('[useDiscoveryProfiles] Query successful, rows:', data?.length || 0);
+        console.log('✅ [Discovery] Received data from Supabase:', {
+          count: data?.length || 0,
+          sample: data?.[0] ? { id: data[0].id, name: data[0].name } : null
+        });
 
         // Check if table is empty
         if (!data || data.length === 0) {
-          console.warn('[useDiscoveryProfiles] No profiles found in database. Have you run the seed migrations?');
+          console.warn('⚠️ [Discovery] No profiles found in database. Have you run the seed migrations?');
         }
 
         // Map database schema to UserProfile interface
@@ -78,16 +81,20 @@ export function useDiscoveryProfiles(language?: string) {
           icebreakers: profile.icebreakers || [],
         }));
 
-        console.log('[useDiscoveryProfiles] Mapped profiles:', mappedProfiles.length);
+        console.log('📦 [Discovery] Mapped profiles:', mappedProfiles.length);
         setProfiles(mappedProfiles);
         setError(null);
       } catch (err) {
-        console.error('[useDiscoveryProfiles] Error fetching discovery profiles:', err);
+        console.error('❌ [Discovery] Error fetching discovery profiles:', err);
+        console.error('❌ [Discovery] Error details:', {
+          message: err instanceof Error ? err.message : 'Unknown error',
+          stack: err instanceof Error ? err.stack : undefined
+        });
         setError(err instanceof Error ? err : new Error('Unknown error'));
         setProfiles([]); // Clear profiles on error
       } finally {
         setLoading(false);
-        console.log('[useDiscoveryProfiles] Fetch complete, loading set to false');
+        console.log('🏁 [Discovery] Fetch complete');
       }
     }
 
