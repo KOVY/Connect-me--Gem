@@ -30,7 +30,7 @@
         },
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' https://esm.sh https://aistudiocdn.com 'unsafe-inline' 'unsafe-eval'; connect-src 'self' https://haayvhkovottszzdnzbz.supabase.co wss://haayvhkovottszzdnzbz.supabase.co https://esm.sh https://aistudiocdn.com https://generativelanguage.googleapis.com; img-src 'self' data: https: blob:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self';"
+          "value": "default-src 'self'; script-src 'self' https://esm.sh https://aistudiocdn.com 'unsafe-inline' 'unsafe-eval'; connect-src 'self' https://haayvhkovottszzdnzbz.supabase.co wss://haayvhkovottszzdnzbz.supabase.co https://esm.sh https://aistudiocdn.com https://generativelanguage.googleapis.com https://images.unsplash.com; img-src 'self' data: https: blob:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests;"
         }
       ]
     },
