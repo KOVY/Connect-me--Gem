@@ -31,6 +31,7 @@ export function useDiscoveryProfiles(language?: string) {
   useEffect(() => {
     async function fetchProfiles() {
       try {
+        console.log('[useDiscoveryProfiles] Starting fetch, language:', language);
         setLoading(true);
 
         // Build query
@@ -42,13 +43,23 @@ export function useDiscoveryProfiles(language?: string) {
 
         // Filter by language if provided
         if (language && language !== 'en') {
+          console.log('[useDiscoveryProfiles] Filtering by language:', language);
           query = query.eq('language', language);
         }
 
+        console.log('[useDiscoveryProfiles] Executing query...');
         const { data, error: fetchError } = await query;
 
         if (fetchError) {
+          console.error('[useDiscoveryProfiles] Query error:', fetchError);
           throw fetchError;
+        }
+
+        console.log('[useDiscoveryProfiles] Query successful, rows:', data?.length || 0);
+
+        // Check if table is empty
+        if (!data || data.length === 0) {
+          console.warn('[useDiscoveryProfiles] No profiles found in database. Have you run the seed migrations?');
         }
 
         // Map database schema to UserProfile interface
@@ -67,14 +78,16 @@ export function useDiscoveryProfiles(language?: string) {
           icebreakers: profile.icebreakers || [],
         }));
 
+        console.log('[useDiscoveryProfiles] Mapped profiles:', mappedProfiles.length);
         setProfiles(mappedProfiles);
         setError(null);
       } catch (err) {
-        console.error('Error fetching discovery profiles:', err);
+        console.error('[useDiscoveryProfiles] Error fetching discovery profiles:', err);
         setError(err instanceof Error ? err : new Error('Unknown error'));
         setProfiles([]); // Clear profiles on error
       } finally {
         setLoading(false);
+        console.log('[useDiscoveryProfiles] Fetch complete, loading set to false');
       }
     }
 
