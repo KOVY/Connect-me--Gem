@@ -14,6 +14,7 @@ import ProfileHubPage from './pages/ProfileHubPage';
 import LoginPage from './pages/LoginPage';
 import OnboardingPage from './pages/OnboardingPage';
 import NotFoundPage from './pages/NotFoundPage';
+import SupabaseDebugPage from './pages/SupabaseDebugPage';
 
 // Profile Hub Tabs
 import OverviewTab from './components/tabs/OverviewTab';
@@ -95,6 +96,10 @@ export const router = createBrowserRouter([
                     {
                         path: 'onboarding',
                         element: <OnboardingPage />
+                    },
+                    {
+                        path: 'debug',
+                        element: <SupabaseDebugPage />
                     },
                 ]
             },
