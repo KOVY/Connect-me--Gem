@@ -60,6 +60,11 @@ export function useDiscoveryProfiles(language?: string) {
           sample: data?.[0] ? { id: data[0].id, name: data[0].name } : null
         });
 
+        // Check if table is empty
+        if (!data || data.length === 0) {
+          console.warn('⚠️ [Discovery] No profiles found in database. Have you run the seed migrations?');
+        }
+
         // Map database schema to UserProfile interface
         const mappedProfiles: UserProfile[] = (data as DiscoveryProfile[]).map((profile) => ({
           id: profile.id,
