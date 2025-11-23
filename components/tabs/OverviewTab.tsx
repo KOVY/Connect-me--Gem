@@ -1,16 +1,28 @@
 // FIX: Creating the OverviewTab component for the user profile hub.
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Sparkles, Clock } from 'lucide-react';
 import { useUser } from '../../contexts/UserContext';
 import { useLocale } from '../../contexts/LocaleContext';
 import { useTranslations } from '../../hooks/useTranslations';
 import BalanceWidget from '../BalanceWidget';
 import ProfileCompletenessWidget from '../ProfileCompletenessWidget';
+import PersonalityQuiz from '../PersonalityQuiz';
+import { QuizAnswer } from '../../lib/quizTypes';
 
 const OverviewTab: React.FC = () => {
   const { user, isLoading, profileCompleteness, completionSuggestions } = useUser();
   const { locale } = useLocale();
   const { t } = useTranslations();
+  const [showQuiz, setShowQuiz] = useState(false);
+  const [quizCompleted, setQuizCompleted] = useState(false);
+
+  const handleQuizComplete = (answers: QuizAnswer[], lieScore: number) => {
+    // TODO: Save answers to user profile in Supabase
+    console.log('Quiz completed:', { answers, lieScore });
+    setQuizCompleted(true);
+    setShowQuiz(false);
+  };
 
   if (isLoading && !user) {
     return <div>{t('loading_overview')}</div>;
@@ -28,12 +40,57 @@ const OverviewTab: React.FC = () => {
       </div>
 
       {profileCompleteness < 100 && (
-        <ProfileCompletenessWidget 
-            completeness={profileCompleteness} 
+        <ProfileCompletenessWidget
+            completeness={profileCompleteness}
             suggestions={completionSuggestions}
             showAction={true}
         />
       )}
+
+      {/* Personality Quiz Entry - subtle card */}
+      {!quizCompleted && (
+        <button
+          onClick={() => setShowQuiz(true)}
+          className="w-full p-4 bg-gradient-to-r from-pink-900/30 to-purple-900/30 rounded-xl border border-pink-500/20 hover:border-pink-500/40 transition-all group text-left"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-pink-500/20 rounded-lg group-hover:bg-pink-500/30 transition-colors">
+                <Sparkles className="w-5 h-5 text-pink-400" />
+              </div>
+              <div>
+                <h4 className="font-semibold text-white">{t('quiz_entry_title')}</h4>
+                <p className="text-sm text-white/60">{t('quiz_entry_desc')}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 text-pink-400">
+              <Clock className="w-4 h-4" />
+              <span className="text-sm">{t('quiz_entry_time')}</span>
+            </div>
+          </div>
+        </button>
+      )}
+
+      {quizCompleted && (
+        <div className="p-4 bg-gradient-to-r from-green-900/30 to-emerald-900/30 rounded-xl border border-green-500/30">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-green-500/20 rounded-lg">
+              <Sparkles className="w-5 h-5 text-green-400" />
+            </div>
+            <div>
+              <h4 className="font-semibold text-white">{t('quiz_complete_title')}</h4>
+              <p className="text-sm text-white/60">{t('quiz_complete_desc')}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Quiz Modal */}
+      <PersonalityQuiz
+        isOpen={showQuiz}
+        onClose={() => setShowQuiz(false)}
+        onComplete={handleQuizComplete}
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <BalanceWidget />
