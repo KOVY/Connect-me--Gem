@@ -30,7 +30,7 @@
         },
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' https://esm.sh https://aistudiocdn.com 'unsafe-eval'; connect-src 'self' https://haayvhkovottszzdnzbz.supabase.co wss://haayvhkovottszzdnzbz.supabase.co https://esm.sh https://aistudiocdn.com https://generativelanguage.googleapis.com https://images.unsplash.com; img-src 'self' data: blob: https://images.unsplash.com https://haayvhkovottszzdnzbz.supabase.co https://lh3.googleusercontent.com; style-src 'self' 'unsafe-inline'; font-src 'self' data:; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests;"
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://esm.sh https://aistudiocdn.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://esm.sh https://aistudiocdn.com https://generativelanguage.googleapis.com https://images.unsplash.com; img-src 'self' data: blob: https://images.unsplash.com https://*.supabase.co https://lh3.googleusercontent.com; style-src 'self' 'unsafe-inline'; font-src 'self' data:; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests;"
         }
       ]
     },
@@ -47,7 +47,7 @@
         },
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' https://esm.sh https://aistudiocdn.com 'unsafe-eval'; connect-src 'self' https://haayvhkovottszzdnzbz.supabase.co wss://haayvhkovottszzdnzbz.supabase.co https://esm.sh https://aistudiocdn.com https://generativelanguage.googleapis.com https://images.unsplash.com; img-src 'self' data: blob: https://images.unsplash.com https://haayvhkovottszzdnzbz.supabase.co https://lh3.googleusercontent.com; style-src 'self' 'unsafe-inline'; font-src 'self' data:; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests;"
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://esm.sh https://aistudiocdn.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://esm.sh https://aistudiocdn.com https://generativelanguage.googleapis.com https://images.unsplash.com; img-src 'self' data: blob: https://images.unsplash.com https://*.supabase.co https://lh3.googleusercontent.com; style-src 'self' 'unsafe-inline'; font-src 'self' data:; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests;"
         }
       ]
     },
