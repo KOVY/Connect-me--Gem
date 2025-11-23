@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useTranslations } from '../hooks/useTranslations';
 import { useLocale } from '../contexts/LocaleContext';
@@ -9,6 +9,7 @@ const PublicProfilePage: React.FC = () => {
     const { t } = useTranslations();
     const { locale } = useLocale();
     const navigate = useNavigate();
+    const [isIcebreakersExpanded, setIsIcebreakersExpanded] = useState(false);
     const profile = PROFILES.find(p => p.id === userId);
 
     if (!profile) {
@@ -124,25 +125,44 @@ const PublicProfilePage: React.FC = () => {
                     </div>
                 )}
 
-                {/* Icebreakers */}
+                {/* Icebreakers - Collapsible */}
                 {profile.icebreakers && profile.icebreakers.length > 0 && (
-                    <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6">
-                        <div className="flex items-center gap-2 mb-4">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5 text-pink-400">
-                                <path fillRule="evenodd" d="M10 2c-2.236 0-4.43.18-6.57.524C1.993 2.755 1 4.014 1 5.426v5.148c0 1.413.993 2.67 2.43 2.902.848.137 1.705.248 2.57.331v3.443a.75.75 0 0 0 1.28.53l3.58-3.579a.78.78 0 0 1 .527-.224 41.202 41.202 0 0 0 5.183-.5c1.437-.232 2.43-1.49 2.43-2.903V5.426c0-1.413-.993-2.67-2.43-2.902A41.289 41.289 0 0 0 10 2Zm0 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2ZM8 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0Zm5 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z" clipRule="evenodd" />
+                    <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl overflow-hidden">
+                        <button
+                            onClick={() => setIsIcebreakersExpanded(!isIcebreakersExpanded)}
+                            className="w-full flex items-center justify-between p-6 hover:bg-white/5 transition-all duration-200"
+                        >
+                            <div className="flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5 text-pink-400">
+                                    <path fillRule="evenodd" d="M10 2c-2.236 0-4.43.18-6.57.524C1.993 2.755 1 4.014 1 5.426v5.148c0 1.413.993 2.67 2.43 2.902.848.137 1.705.248 2.57.331v3.443a.75.75 0 0 0 1.28.53l3.58-3.579a.78.78 0 0 1 .527-.224 41.202 41.202 0 0 0 5.183-.5c1.437-.232 2.43-1.49 2.43-2.903V5.426c0-1.413-.993-2.67-2.43-2.902A41.289 41.289 0 0 0 10 2Zm0 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2ZM8 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0Zm5 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z" clipRule="evenodd" />
+                                </svg>
+                                <h2 className="text-xl font-bold">{t('start_conversation')}</h2>
+                            </div>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                                className={`w-5 h-5 text-pink-400 transition-transform duration-300 ${isIcebreakersExpanded ? 'rotate-180' : ''}`}
+                            >
+                                <path fillRule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clipRule="evenodd" />
                             </svg>
-                            <h2 className="text-xl font-bold">{t('start_conversation')}</h2>
-                        </div>
-                        <div className="space-y-2">
-                            {profile.icebreakers.map((icebreaker, index) => (
-                                <button
-                                    key={index}
-                                    onClick={() => navigate(`/${locale}/chat/${profile.id}?message=${encodeURIComponent(icebreaker)}`)}
-                                    className="w-full text-left px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/20 rounded-lg text-sm hover:bg-white/10 hover:border-pink-400/50 transition-all duration-200 group"
-                                >
-                                    <span className="group-hover:text-pink-300 transition-colors">"{icebreaker}"</span>
-                                </button>
-                            ))}
+                        </button>
+
+                        {/* Expandable content */}
+                        <div
+                            className={`overflow-hidden transition-all duration-300 ease-in-out ${isIcebreakersExpanded ? 'max-h-64 opacity-100' : 'max-h-0 opacity-0'}`}
+                        >
+                            <div className="px-6 pb-6 space-y-2">
+                                {profile.icebreakers.map((icebreaker, index) => (
+                                    <button
+                                        key={index}
+                                        onClick={() => navigate(`/${locale}/chat/${profile.id}?message=${encodeURIComponent(icebreaker)}`)}
+                                        className="w-full text-left px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/20 rounded-lg text-sm hover:bg-white/10 hover:border-pink-400/50 transition-all duration-200 group"
+                                    >
+                                        <span className="group-hover:text-pink-300 transition-colors">"{icebreaker}"</span>
+                                    </button>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 )}

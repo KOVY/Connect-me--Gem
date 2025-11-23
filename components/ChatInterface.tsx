@@ -410,7 +410,16 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ messages, onSendMessage, 
                         <div className="text-center flex-1">
                             <h2 className="text-lg font-bold aurora-text">{t('chat_with', { name: recipient.name })}</h2>
                             {recipientLastSeenStatus && (
-                                <p className="text-xs text-white/60">{recipientLastSeenStatus}</p>
+                                <div className="flex items-center justify-center gap-1.5">
+                                    {recipientLastSeenStatus.toLowerCase().includes('online') ? (
+                                        <>
+                                            <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.6)]"></span>
+                                            <p className="text-xs text-green-400 font-medium">{recipientLastSeenStatus}</p>
+                                        </>
+                                    ) : (
+                                        <p className="text-xs text-white/60">{recipientLastSeenStatus}</p>
+                                    )}
+                                </div>
                             )}
                         </div>
                         <div className="flex items-center">

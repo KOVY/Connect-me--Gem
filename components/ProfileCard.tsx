@@ -45,10 +45,17 @@ const ChatBubbleIcon: React.FC<{className?: string}> = ({className}) => (
     </svg>
 );
 
+const ChevronDownIcon: React.FC<{className?: string}> = ({className}) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={className || "w-5 h-5"}>
+        <path fillRule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clipRule="evenodd" />
+    </svg>
+);
+
 
 const ProfileCard: React.FC<ProfileCardProps> = ({ profile, onLike }) => {
   const allTags = [...profile.interests, ...profile.hobbies];
   const [isBioExpanded, setIsBioExpanded] = useState(false);
+  const [isIcebreakersExpanded, setIsIcebreakersExpanded] = useState(false);
   const navigate = useNavigate();
   const { locale } = useLocale();
   const { t } = useTranslations();
@@ -112,23 +119,35 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ profile, onLike }) => {
                 ))}
             </div>
 
-            {/* Icebreakers Section */}
+            {/* Icebreakers Section - Collapsible */}
             {profile.icebreakers && profile.icebreakers.length > 0 && (
-                <div className="mt-6 space-y-2">
-                    <div className="flex items-center gap-2 mb-3">
-                        <ChatBubbleIcon className="w-5 h-5 text-pink-400" />
-                        <h3 className="text-sm font-semibold text-white/90">Start a conversation</h3>
-                    </div>
-                    <div className="space-y-2">
-                        {profile.icebreakers.map((icebreaker, index) => (
-                            <button
-                                key={index}
-                                onClick={() => handleIcebreakerClick(icebreaker)}
-                                className="w-full text-left px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-sm hover:bg-white/20 hover:border-pink-400/50 transition-all duration-200 group"
-                            >
-                                <span className="group-hover:text-pink-300 transition-colors">"{icebreaker}"</span>
-                            </button>
-                        ))}
+                <div className="mt-4">
+                    <button
+                        onClick={() => setIsIcebreakersExpanded(!isIcebreakersExpanded)}
+                        className="w-full flex items-center justify-between px-4 py-3 bg-gradient-to-r from-pink-500/20 to-purple-500/20 backdrop-blur-sm border border-pink-400/30 rounded-xl hover:from-pink-500/30 hover:to-purple-500/30 transition-all duration-200"
+                    >
+                        <div className="flex items-center gap-2">
+                            <ChatBubbleIcon className="w-5 h-5 text-pink-400" />
+                            <span className="font-medium text-white">{t('start_conversation')}</span>
+                        </div>
+                        <ChevronDownIcon className={`w-5 h-5 text-pink-400 transition-transform duration-300 ${isIcebreakersExpanded ? 'rotate-180' : ''}`} />
+                    </button>
+
+                    {/* Expandable content with smooth animation */}
+                    <div
+                        className={`overflow-hidden transition-all duration-300 ease-in-out ${isIcebreakersExpanded ? 'max-h-64 opacity-100 mt-2' : 'max-h-0 opacity-0'}`}
+                    >
+                        <div className="space-y-2">
+                            {profile.icebreakers.map((icebreaker, index) => (
+                                <button
+                                    key={index}
+                                    onClick={() => handleIcebreakerClick(icebreaker)}
+                                    className="w-full text-left px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-sm hover:bg-white/20 hover:border-pink-400/50 transition-all duration-200 group"
+                                >
+                                    <span className="group-hover:text-pink-300 transition-colors">"{icebreaker}"</span>
+                                </button>
+                            ))}
+                        </div>
                     </div>
                 </div>
             )}
